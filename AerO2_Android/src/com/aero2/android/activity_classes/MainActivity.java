@@ -1,7 +1,8 @@
-package com.aero2.android;
+package com.aero2.android.activity_classes;
 
 import android.app.Activity;
 import android.os.Bundle;
+import com.aero2.android.R;
 
 public class MainActivity extends Activity {
     /**
