@@ -12,11 +12,11 @@ import android.provider.Settings;
 import android.util.Log;
 
 
-/** Determines the gps location after every 2 seconds and returns a 1-D array
+/**
+ * Determines the gps location after every 2 seconds and returns a 1-D array
  * that contains longitude, latitude, and altitude.
  *
- * @author Usman Mahmood
- * @version 0.2
+ * Created by Usman on 11/14/2015
  */
 
 public class GPSTracker {
