@@ -15,6 +15,11 @@ local.properties
 
 # Java class files
 *.class
+
+# Generated files
+bin/
+gen/
+out/
  
 # User-specific configurations
 .idea/libraries/
