@@ -5,7 +5,7 @@ import java.util.Date;
 
 /**
  *
- * Instantiates BTService's and GPSTracker's objects and
+ * Instantiates STMCommunicator's and GPSTracker's objects and
  * integrates them.
  *
  * Created by Usman on 11/17/2015.
