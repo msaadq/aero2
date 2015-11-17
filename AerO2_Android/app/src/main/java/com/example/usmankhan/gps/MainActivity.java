@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     Runnable mStatusChecker = new Runnable() {
         @Override
         public void run() {
+
             Log.v("Info", "Capturing GPS Reading");
             if (value_count <= max_value_count) {
 

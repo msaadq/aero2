@@ -78,7 +78,10 @@ public class STMCommunicator {
      */
 
     public STMCommunicator(Activity activity) throws IOException {
+
         this(activity, DEF_USERNAME, DEF_PASSWORD);
+
+
     }
 
     /**

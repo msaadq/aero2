@@ -21,17 +21,16 @@ import android.util.Log;
 
 public class GPSTracker {
 
-    private int value_count;
+    private static int value_count;
     // Maximum number of expected values
-    private final int max_value_count;
+    private final int max_value_count = 1000;
     private Context context;
-    double locations [];
+    private static double locations [];
 
     GPSTracker(Context context){
 
         this.context=context;
         value_count = 0;
-        max_value_count = 1000;
         locations = new double [3];
     }
 
