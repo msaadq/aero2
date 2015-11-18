@@ -33,11 +33,17 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
+#define ADCCONVERTEDVALUES_BUFFER_SIZE ((uint32_t) 256)     /* Size of array containing ADC converted values */
+
+
 #include "adc.h"
 
 #include "gpio.h"
 
 /* USER CODE BEGIN 0 */
+
+/* Variable containing ADC conversions results */
+__IO uint16_t   aADCxConvertedValues[ADCCONVERTEDVALUES_BUFFER_SIZE];
 
 /* USER CODE END 0 */
 

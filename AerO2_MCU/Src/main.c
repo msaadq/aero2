@@ -63,6 +63,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+	
 
   /* USER CODE END 1 */
 
@@ -78,28 +79,74 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC1_Init();
   MX_USART1_UART_Init();
+	
+	ADC_InitTypeDef ADC_InitStructure;
+    Usart1Init();
+
+    RCC_ADCCLKConfig(RCC_PCLK2_Div6); //ADCCLK = PCLK22/6 = 72/6=12MHz
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE); //Enable ADC1 Clock
+
+    /* ADC1 configuration */
+    ADC_DeInit(ADC1); //Power-on default
+    ADC_InitStructure.ADC_Mode = ADC_Mode_Independent; //Independent conversion mode (single)
+    ADC_InitStructure.ADC_ScanConvMode = DISABLE; //Convert single channel only
+    ADC_InitStructure.ADC_ContinuousConvMode = DISABLE; //Convert 1 time
+    ADC_InitStructure.ADC_ExternalTrigConv = DISABLE; //No external triggering
+    ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right; //Right 12-bit data alignment
+    ADC_InitStructure.ADC_NbrOfChannel = 1; //single channel conversion
+    ADC_Init(ADC1, &ADC_InitStructure);
+    ADC_TempSensorVrefintCmd(ENABLE); //wake up temperature sensor
+    ADC_Cmd(ADC1, ENABLE); //Enable ADC1
+    ADC_ResetCalibration(ADC1); //Enable ADC1 reset calibration register
+    while(ADC_GetResetCalibrationStatus(ADC1)); //check the end of ADC1 reset calibration register  
+    ADC_StartCalibration(ADC1); //Start ADC1 calibration
+    while(ADC_GetCalibrationStatus(ADC1)); //Check the end of ADC1 calibration
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_16, 1, ADC_SampleTime_1Cycles5); //Select 1.5 cycles conversion for channel 16
+    ADC_SoftwareStartConvCmd(ADC1, ENABLE); //Start ADC1 software conversion
+    while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET); //Wail for conversion complete
+    AD_value = ADC_GetConversionValue(ADC1); //Read ADC value
+    ADC_ClearFlag(ADC1, ADC_FLAG_EOC); //Clear EOC flag
+
+    printf("\r\n ADC value: %d \r\n", AD_value);
+    TemperatureC = (uint16_t)((V25-AD_value)/Avg_Slope+25);
+    printf("Temperature: %d%cC\r\n", TemperatureC, 176);
+    while (1)
+    {}  
+
 
   /* USER CODE BEGIN 2 */
 	unsigned char message[2] = "AT";
+	unsigned char endLine[1] = "\n";
 	
-	HAL_UART_Transmit(&huart1, message, 2, 2000);
 
   /* USER CODE END 2 */
+	HAL_UART_Transmit(&huart1, message, 2, 2000);
 
-	
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
   /* USER CODE END WHILE */
+			
+	
+/*			
+			 unsigned char adc_char[1] = {(unsigned char) adc};
+						HAL_UART_Transmit(&huart1, adc_char, 2, 2000);
+			 
+			 HAL_Delay(2000);
+			
+*/
+		}
+
+		
 
   /* USER CODE BEGIN 3 */
 
   }
   /* USER CODE END 3 */
 
-}
+
 
 /** System Clock Configuration
 */

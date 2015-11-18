@@ -1,10 +1,9 @@
 #MicroXplorer Configuration settings - do not modify
-ADC1.Channel-40\#ChannelRegularConversion=ADC_CHANNEL_0
-ADC1.IPParameters=Rank-40\#ChannelRegularConversion,Channel-40\#ChannelRegularConversion,SamplingTime-40\#ChannelRegularConversion,NbrOfConversionFlag,master
+ADC1.Channel-44\#ChannelRegularConversion=ADC_CHANNEL_0
+ADC1.IPParameters=Rank-44\#ChannelRegularConversion,Channel-44\#ChannelRegularConversion,SamplingTime-44\#ChannelRegularConversion,NbrOfConversionFlag
 ADC1.NbrOfConversionFlag=1
-ADC1.Rank-40\#ChannelRegularConversion=1
-ADC1.SamplingTime-40\#ChannelRegularConversion=ADC_SAMPLETIME_1CYCLE_5
-ADC1.master=1
+ADC1.Rank-44\#ChannelRegularConversion=1
+ADC1.SamplingTime-44\#ChannelRegularConversion=ADC_SAMPLETIME_1CYCLE_5
 File.Version=5
 KeepUserPlacement=true
 Mcu.Family=STM32F1
