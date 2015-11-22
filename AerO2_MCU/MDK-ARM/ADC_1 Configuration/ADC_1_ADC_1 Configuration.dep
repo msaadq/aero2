@@ -377,7 +377,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x5647E97E)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x5647E97E)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x5647E97F)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x5647E97F)
-F (../Src/adc.c)(0x564ED8AD)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I../Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Include -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include --C99-I C:\Users\usmankhan\Desktop\Folders\Aero2\aero2\AerO2_MCU\MDK-ARM\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o "adc_1 configuration/\adc.o" --omf_browse "adc_1 configuration/\adc.crf" --depend "adc_1 configuration/\adc.d")
+F (../Src/adc.c)(0x564EDEE5)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I../Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Include -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include --C99-I C:\Users\usmankhan\Desktop\Folders\Aero2\aero2\AerO2_MCU\MDK-ARM\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o "adc_1 configuration/\adc.o" --omf_browse "adc_1 configuration/\adc.crf" --depend "adc_1 configuration/\adc.d")
 I (../Inc/adc.h)(0x564EAF24)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x5647E97E)
 I (../Inc/stm32f1xx_hal_conf.h)(0x564EAF25)
@@ -406,7 +406,119 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x5647E97E)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x5647E97F)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x5647E97F)
 I (../Inc/gpio.h)(0x564EAF24)
-F (../Src/main.c)(0x564EDA00)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I../Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Include -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include --C99-I C:\Users\usmankhan\Desktop\Folders\Aero2\aero2\AerO2_MCU\MDK-ARM\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o "adc_1 configuration/\main.o" --omf_browse "adc_1 configuration/\main.crf" --depend "adc_1 configuration/\main.d")
+F (.\sensor.c)(0x565175DF)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I../Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Include -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include --C99-I C:\Users\usmankhan\Desktop\Folders\Aero2\aero2\AerO2_MCU\MDK-ARM\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o "adc_1 configuration/\sensor_1.o" --omf_browse "adc_1 configuration/\sensor_1.crf" --depend "adc_1 configuration/\sensor_1.d")
+I (sensor.h)(0x56517871)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x5647E97E)
+I (../Inc/stm32f1xx_hal_conf.h)(0x564EAF25)
+I (../Inc/mxconstants.h)(0x564EAF25)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h)(0x5647E97E)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h)(0x5647E970)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h)(0x5647E970)
+I (../Drivers/CMSIS/Include/core_cm3.h)(0x5647E97D)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x55DB55B0)
+I (../Drivers/CMSIS/Include/core_cmInstr.h)(0x5647E97D)
+I (../Drivers/CMSIS/Include/core_cmFunc.h)(0x5647E97D)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h)(0x5647E970)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x5647E97E)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x55DB55A6)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x5647E97F)
+F (.\usart_functionality.c)(0x56517531)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I../Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Include -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include --C99-I C:\Users\usmankhan\Desktop\Folders\Aero2\aero2\AerO2_MCU\MDK-ARM\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o "adc_1 configuration/\usart_functionality_1.o" --omf_browse "adc_1 configuration/\usart_functionality_1.crf" --depend "adc_1 configuration/\usart_functionality_1.d")
+I (usart_functionality.h)(0x56517874)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x5647E97E)
+I (../Inc/stm32f1xx_hal_conf.h)(0x564EAF25)
+I (../Inc/mxconstants.h)(0x564EAF25)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h)(0x5647E97E)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h)(0x5647E970)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h)(0x5647E970)
+I (../Drivers/CMSIS/Include/core_cm3.h)(0x5647E97D)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x55DB55B0)
+I (../Drivers/CMSIS/Include/core_cmInstr.h)(0x5647E97D)
+I (../Drivers/CMSIS/Include/core_cmFunc.h)(0x5647E97D)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h)(0x5647E970)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x5647E97E)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x55DB55A6)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x5647E97F)
+F (.\sensor.h)(0x56517871)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I../Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Include -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include --C99-I C:\Users\usmankhan\Desktop\Folders\Aero2\aero2\AerO2_MCU\MDK-ARM\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o "adc_1 configuration/\sensor_1.o" --omf_browse "adc_1 configuration/\sensor_1.crf" --depend "adc_1 configuration/\sensor_1.d")
+I (sensor.h)(0x56517871)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x5647E97E)
+I (../Inc/stm32f1xx_hal_conf.h)(0x564EAF25)
+I (../Inc/mxconstants.h)(0x564EAF25)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h)(0x5647E97E)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h)(0x5647E970)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h)(0x5647E970)
+I (../Drivers/CMSIS/Include/core_cm3.h)(0x5647E97D)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x55DB55B0)
+I (../Drivers/CMSIS/Include/core_cmInstr.h)(0x5647E97D)
+I (../Drivers/CMSIS/Include/core_cmFunc.h)(0x5647E97D)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h)(0x5647E970)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x5647E97E)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x55DB55A6)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x5647E97F)
+F (.\usart_functionality.h)(0x56517874)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I../Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Include -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include --C99-I C:\Users\usmankhan\Desktop\Folders\Aero2\aero2\AerO2_MCU\MDK-ARM\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o "adc_1 configuration/\usart_functionality_1.o" --omf_browse "adc_1 configuration/\usart_functionality_1.crf" --depend "adc_1 configuration/\usart_functionality_1.d")
+I (usart_functionality.h)(0x56517874)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x5647E97E)
+I (../Inc/stm32f1xx_hal_conf.h)(0x564EAF25)
+I (../Inc/mxconstants.h)(0x564EAF25)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h)(0x5647E97E)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h)(0x5647E970)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h)(0x5647E970)
+I (../Drivers/CMSIS/Include/core_cm3.h)(0x5647E97D)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x55DB55B0)
+I (../Drivers/CMSIS/Include/core_cmInstr.h)(0x5647E97D)
+I (../Drivers/CMSIS/Include/core_cmFunc.h)(0x5647E97D)
+I (../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h)(0x5647E970)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x5647E97E)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x55DB55A6)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h)(0x5647E97E)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x5647E97F)
+I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x5647E97F)
+F (../Src/main.c)(0x565179AF)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I../Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Include -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include --C99-I C:\Users\usmankhan\Desktop\Folders\Aero2\aero2\AerO2_MCU\MDK-ARM\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o "adc_1 configuration/\main.o" --omf_browse "adc_1 configuration/\main.crf" --depend "adc_1 configuration/\main.d")
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x5647E97E)
 I (../Inc/stm32f1xx_hal_conf.h)(0x564EAF25)
 I (../Inc/mxconstants.h)(0x564EAF25)
@@ -435,6 +547,8 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x5647E97F)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x5647E97F)
 I (../Inc/adc.h)(0x564EAF24)
 I (../Inc/usart.h)(0x564EAF25)
+I (../Inc/sensor.h)(0x56517871)
+I (../Inc/usart_functionality.h)(0x56517874)
 I (../Inc/gpio.h)(0x564EAF24)
 F (../Src/usart.c)(0x564ED14C)(-c --cpu Cortex-M3 -D__EVAL -D__MICROLIB -g -O1 -Otime --apcs=interwork --split_sections -I../Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Include -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include --C99-I C:\Users\usmankhan\Desktop\Folders\Aero2\aero2\AerO2_MCU\MDK-ARM\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o "adc_1 configuration/\usart.o" --omf_browse "adc_1 configuration/\usart.crf" --depend "adc_1 configuration/\usart.d")
 I (../Inc/usart.h)(0x564EAF25)

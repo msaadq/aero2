@@ -23,6 +23,8 @@ Contributors:
 #include "stm32f1xx_hal.h"
 #include "adc.h"
 #include "usart.h"
+#include "sensor.h"
+#include "usart_functionality.h"
 #include "gpio.h"
 
 
@@ -44,18 +46,14 @@ int main(void)
   MX_USART1_UART_Init();
 
 	/* Define variables */
-	uint32_t adc_value;		
 	uint32_t sampling_delay = 1000;
 	
 	
   while (1)
   {
 			
-		HAL_ADC_Start(&hadc1);
-		adc_value = HAL_ADC_GetValue(&hadc1);
-		//adc_value is converted to uint8_t integer and size is divided by 4
-		HAL_UART_Transmit(&huart1,(uint8_t*)(&adc_value), sizeof(adc_value)/4,1);
-		HAL_ADC_Stop(&hadc1);
+		uint32_t sensor_data = Get_Sensor_Value(hadc1);
+		UART_Transmit_int32(huart1,sensor_data);
 		HAL_Delay(sampling_delay);
 		
   }

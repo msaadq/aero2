@@ -28,4 +28,6 @@ adc_1 configuration/\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_p
 adc_1 configuration/\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 adc_1 configuration/\main.o: ../Inc/adc.h
 adc_1 configuration/\main.o: ../Inc/usart.h
+adc_1 configuration/\main.o: ../Inc/sensor.h
+adc_1 configuration/\main.o: ../Inc/usart_functionality.h
 adc_1 configuration/\main.o: ../Inc/gpio.h
