@@ -22,25 +22,40 @@ Dialog DLL:      TCM.DLL V1.14.6.0
  
 <h2>Project:</h2>
 C:\Users\usmankhan\Desktop\Folders\Aero2\aero2\AerO2_MCU\MDK-ARM\ADC_1.uvprojx
-Project File Date:  11/20/2015
+Project File Date:  11/23/2015
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 1 (build 61)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'ADC_1 Configuration'
-compiling sensor.h...
-Error: C4065E: type of input file 'sensor.h' unknown
-compiling usart_functionality.c...
-Error: C4065E: type of input file 'usart_functionality.h' unknown
 compiling sensor.c...
-Error: C4065E: type of input file 'sensor.h' unknown
-compiling usart_functionality.h...
-Error: C4065E: type of input file 'usart_functionality.h' unknown
+sensor.h(11): warning:  #1295-D: Deprecated declaration Get_Sensor_Value - give arg types
+  uint32_t Get_Sensor_Value();
+sensor.h(17): warning:  #1-D: last line of file ends without a newline
+  #endif /*__ sensor_H */
+sensor.c(13): warning:  #1-D: last line of file ends without a newline
+  }
+sensor.c: 3 warnings, 0 errors
+compiling usart_functionality.c...
+usart_functionality.h(13): warning:  #1295-D: Deprecated declaration UART_Receive - give arg types
+  uint8_t UART_Receive();
+usart_functionality.h(20): warning:  #1-D: last line of file ends without a newline
+  #endif /*__ usart_functionality_H */
+usart_functionality.c(22): warning:  #1-D: last line of file ends without a newline
+  }
+usart_functionality.c: 3 warnings, 0 errors
+compiling main.c...
+../Inc/sensor.h(11): warning:  #1295-D: Deprecated declaration Get_Sensor_Value - give arg types
+  uint32_t Get_Sensor_Value();
+../Inc/sensor.h(17): warning:  #1-D: last line of file ends without a newline
+  #endif /*__ sensor_H */
+../Inc/usart_functionality.h(13): warning:  #1295-D: Deprecated declaration UART_Receive - give arg types
+  uint8_t UART_Receive();
+../Inc/usart_functionality.h(20): warning:  #1-D: last line of file ends without a newline
+  #endif /*__ usart_functionality_H */
+../Src/main.c: 4 warnings, 0 errors
 linking...
-ADC_1 Configuration/\.axf: Warning: L6304W: Duplicate input file adc_1 configuration/\sensor_1.o ignored.
-ADC_1 Configuration/\.axf: Warning: L6304W: Duplicate input file adc_1 configuration/\usart_functionality_1.o ignored.
-Program Size: Code=7896 RO-data=284 RW-data=8 ZI-data=1136  
-Finished: 0 information, 2 warning and 0 error messages.
-"ADC_1 Configuration/\.axf" - 0 Error(s), 2 Warning(s).
+Program Size: Code=7708 RO-data=284 RW-data=8 ZI-data=1136  
+"ADC_1 Configuration/\.axf" - 0 Error(s), 10 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -58,7 +73,7 @@ Package Vendor: ARM
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:4.3.0
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

@@ -8,7 +8,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 
-uint32_t Get_Sensor_Value(ADC_HandleTypeDef);
+uint32_t Get_Sensor_Value();
 	 
 #ifdef __cplusplus
 }

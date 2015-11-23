@@ -8,10 +8,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 		
-void UART_Transmit_int8(UART_HandleTypeDef, uint8_t data);
-void UART_Transmit_int32(UART_HandleTypeDef, uint32_t data);
-uint8_t UART_Receive(UART_HandleTypeDef);
+void UART_Transmit_int8(uint8_t data);
+void UART_Transmit_int32(uint32_t data);
+uint8_t UART_Receive();
 
+		
 #ifdef __cplusplus
 }
 

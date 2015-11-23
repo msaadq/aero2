@@ -27,3 +27,4 @@ adc_1 configuration/\sensor_1.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_h
 adc_1 configuration/\sensor_1.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 adc_1 configuration/\sensor_1.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 adc_1 configuration/\sensor_1.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
+adc_1 configuration/\sensor_1.o: ../Inc/adc.h

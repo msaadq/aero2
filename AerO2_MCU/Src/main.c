@@ -52,8 +52,8 @@ int main(void)
   while (1)
   {
 			
-		uint32_t sensor_data = Get_Sensor_Value(hadc1);
-		UART_Transmit_int32(huart1,sensor_data);
+		uint32_t sensor_data = Get_Sensor_Value();
+		UART_Transmit_int32(sensor_data);
 		HAL_Delay(sampling_delay);
 		
   }
