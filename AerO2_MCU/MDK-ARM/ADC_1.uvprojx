@@ -625,6 +625,16 @@
               <FilePath>../Src/adc.c</FilePath>
             </File>
             <File>
+              <FileName>usart_functionality.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\usart_functionality.c</FilePath>
+            </File>
+            <File>
+              <FileName>sensor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\sensor.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/main.c</FilePath>
