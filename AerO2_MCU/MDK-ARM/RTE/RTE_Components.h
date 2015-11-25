@@ -3,8 +3,8 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'ADC_1' 
- * Target:  'ADC_1 Configuration' 
+ * Project: 'AerO2_MCU' 
+ * Target:  'AerO2_MCU Configuration' 
  */
 
 #ifndef RTE_COMPONENTS_H
