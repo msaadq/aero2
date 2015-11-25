@@ -15,6 +15,8 @@ void uartTransmit(char toSend){
 	uint8_t data = (uint8_t) toSend;
 	
 	HAL_UART_Transmit(&huart1, &data, sizeof(data),1);
+	
+	while (HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY);
 }
 
 /**
@@ -27,8 +29,13 @@ void uartTransmit(char toSend){
 
 char uartReceive(void){
 	
-	uint8_t byteData;
-	HAL_UART_Receive(&huart1, &byteData, sizeof(byteData), 1); 
+	uint8_t byteData = 0;
+	
+	while(byteData == 0) {
+		HAL_UART_Receive(&huart1, &byteData, sizeof(byteData), 1);
+	}
+	
+	while (HAL_UART_GetState(&huart1) != HAL_UART_STATE_READY);
 	
 	char toReceive = (char) byteData;
 	
@@ -48,6 +55,8 @@ void sendString(char *s) {
 	for(int i = 0; s[i] != '\0'; i++ ) {
 		uartTransmit(s[i]);
 	}
+	
+	uartTransmit('\n');
 }
 
 /**
@@ -61,8 +70,9 @@ void sendString(char *s) {
 char * readString(void) {
 	static char stringData[25];
 
-	for(int i = 0; stringData[i] != '\0'; i++) {
+	for(int i = 0; ; i++) {
 		stringData[i] = uartReceive();
+		if(stringData[i] == '\n') { break; }
 	}
 	
 	return stringData;

@@ -13,7 +13,7 @@ int main(void)
 {
   /* STM MCU initialization and configuation */
 	initSTM();
-
+	
 	/* Bluetooth Communication Routine */
 	btRoutine();
 	

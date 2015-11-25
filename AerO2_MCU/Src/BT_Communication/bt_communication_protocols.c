@@ -45,46 +45,54 @@ char receivedParameters[20];
 
 void btRoutine(void) {
 	
-	char receivedCommand[4];
+	sendString("Started");
+	
+	char receivedCommand[5];
+	int i;
 	
 	while(!communicationEnded) {
 		receivedString = readString();
 		
-		int i = 0;
+		i = 0;
 		
-		for(; receivedCommand[i] != '\0' && i < 4; i++) {
+		HAL_Delay(1);
+		
+		for(; receivedString[i] != '\0' && i < 4; i++) {
 			receivedCommand[i] = receivedString[i];
 		}
 		
-		if(i != 3) { break; }
-		else { i++; }
+		if(i < 4) { break; }
+		else { i = 5; }
 		
-		for(; i < 25; i++) {
-			receivedParameters[i - 4] = receivedString[i];
+		for(; i < 25 && receivedString != '\0'; i++) {
+			receivedParameters[i - 5] = receivedString[i];
 		}
 		
-		if(receivedCommand == O_COM_AUT) {
+		if(strcmp(receivedCommand, O_COM_AUT) == 0) {
 			autRoutine();
 			
-		} else if (receivedCommand == O_COM_USR) {
+		} else if (strcmp(receivedCommand, O_COM_USR) == 0) {
 			userRoutine();
 			
-		} else if (receivedCommand == O_COM_PAS) {
+		} else if (strcmp(receivedCommand, O_COM_PAS) == 0) {
 			passRoutine();
 			
-		} else if (receivedCommand == O_COM_NSG) {
+		} else if (strcmp(receivedCommand, O_COM_NSG) == 0) {
 			smogEnable();
 			
-		} else if (receivedCommand == O_COM_NAQ) {
+		} else if (strcmp(receivedCommand, O_COM_NAQ) == 0) {
 			airQualityEnable();
 
-		} else if (receivedCommand == O_COM_SSG) {
+		} else if (strcmp(receivedCommand, O_COM_SSG) == 0) {
 			reqSmogData();
 			
-		} else if (receivedCommand == O_COM_SAQ) {
+		} else if (strcmp(receivedCommand, O_COM_SAQ) == 0) {
 			reqAirQualityData();
 			
-		} 
+		} else {
+			sendCommand("IINV","COMMAND_REJECTED");
+			
+		}
 	}
 }
 
@@ -97,11 +105,11 @@ void btRoutine(void) {
  */
 
 void autRoutine(void) {
-	if(receivedString[6] == '1') {
+	if(receivedString[5] == '1') {
 		btAvailable = true;
 		sendCommand(I_COM_AUT, "1");
 		
-	} else if (receivedString[6] == '0') {
+	} else if (receivedString[5] == '0') {
 		btAvailable = false;
 		sendCommand(I_COM_AUT, "0");
 		
@@ -116,8 +124,16 @@ void autRoutine(void) {
  * return: No return value
  */
 
-void userRoutine(void) {
-	if(btAvailable && receivedParameters == DEFAULT_USERNAME) {
+void userRoutine(void) {	
+	bool userVerified = true;
+	
+	for(int i = 0; DEFAULT_USERNAME[i] != '\0'; i++) {
+		if(receivedParameters[i] != DEFAULT_USERNAME[i]) {
+			userVerified = false;
+		}
+	}
+	
+	if(btAvailable && userVerified) {
 		userCorrect = true;
 		sendCommand(I_COM_USR, "1");
 		
@@ -137,7 +153,15 @@ void userRoutine(void) {
  */
 
 void passRoutine(void) {
-	if(userCorrect && receivedParameters == DEFAULT_PASSWORD) {
+	bool passVerified = true;
+	
+	for(int i = 0; DEFAULT_PASSWORD[i] != '\0'; i++) {
+		if(receivedParameters[i] != DEFAULT_PASSWORD[i]) {
+			passVerified = false;
+		}
+	}
+	
+	if(userCorrect && passVerified) {
 		passwordCorrect = true;
 		authenticationStatus = true;
 		sendCommand(I_COM_PAS, "1");
@@ -159,7 +183,7 @@ void passRoutine(void) {
  */
 
 void smogEnable(void) {
-	if(authenticationStatus) {
+	if(authenticationStatus && receivedString[5] == '1') {
 		smogAvailable = true;
 		sendCommand(I_COM_NSG, "1");
 		
@@ -179,7 +203,7 @@ void smogEnable(void) {
  */
 
 void airQualityEnable(void) {
-	if(authenticationStatus) {
+	if(authenticationStatus && receivedString[5] == '1') {
 		airQualityAvailable = true;
 		sendCommand(I_COM_NAQ, "1");
 		
@@ -201,9 +225,14 @@ void airQualityEnable(void) {
 void reqSmogData(void) {
 	if(smogAvailable) {
 		char smogData[3];
-		int iSmogData = getSmogSensorValue();	
-		sprintf(smogData, "%d", iSmogData);
+		int iSmogData = 0;
 		
+		for(int i = 0; i < 1000; i++) {
+			iSmogData += getSmogSensorValue();
+		}	
+		iSmogData /= 1000;
+		
+		sprintf(smogData, "%d", iSmogData);
 		sendCommand(I_COM_SSG, smogData);
 		
 	} else {
@@ -222,10 +251,17 @@ void reqSmogData(void) {
 
 void reqAirQualityData(void) {
 	if(airQualityAvailable) {
-		char airQualityData[3];	
-		//int iAirQualityData = getAirQualitySensorValue();
-		//sprintf(airQualityData, "%d", iAirQualityData);
+		char airQualityData[3];
+		/*
+		int iAirQualityData = 0;
 		
+		for(int i = 0; i < 100; i++) {
+			iAirQualityData += getAirQualitySensorValue();
+		}	
+		iAirQualityData /= 100;
+		
+		sprintf(airQualityData, "%d", iAirQualityData);
+		*/
 		sendCommand(I_COM_SAQ, airQualityData);
 		
 	} else {
