@@ -496,14 +496,13 @@ ARM Macro Assembler    Page 8
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
 ork --depend="aero2_mcu configuration/\startup_stm32f103xb.d" -o"aero2_mcu conf
-iguration/\startup_stm32f103xb.o" -IC:\Users\Saad\Documents\ProjectFiles\Test\A
-erO2_MCU\AerO2_MCU\MDK-ARM\RTE -IC:\dev\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\
-Include -IC:\dev\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include --pre
-define="__EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_V
-ERSION SETA 517" --predefine="_RTE_ SETA 1" --predefine="STM32F10X_MD SETA 1" -
--list=startup_stm32f103xb.lst C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F
-1_V1.2.0/Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/arm/startup_stm32f1
-03xb.s
+iguration/\startup_stm32f103xb.o" -IC:\Users\Saad\Documents\ProjectFiles\AerO2\
+AerO2_MCU\MDK-ARM\RTE -IC:\dev\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include -
+IC:\dev\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.0.0\Device\Include --predefine="_
+_EVAL SETA 1" --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SE
+TA 517" --predefine="_RTE_ SETA 1" --predefine="STM32F10X_MD SETA 1" --list=sta
+rtup_stm32f103xb.lst C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/
+Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/arm/startup_stm32f103xb.s
 
 
 
