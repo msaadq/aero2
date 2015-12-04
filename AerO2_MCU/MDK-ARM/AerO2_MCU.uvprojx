@@ -373,7 +373,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;   ../Drivers/STM32F1xx_HAL_Driver/Inc;   ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;   ../Drivers/CMSIS/Include;   ../Drivers/CMSIS/Device/ST/STM32F1xx/Include</IncludePath>
+              <IncludePath>../Inc;C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Inc;C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/CMSIS/Include;C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/CMSIS/Device/ST/STM32F1xx/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -483,7 +483,12 @@
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Src/gpio.c</FilePath>
+              <FilePath>../Src/GPIO/gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Src/ADC_Functionality/adc.c</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
@@ -493,22 +498,42 @@
             <File>
               <FileName>usart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Src/usart.c</FilePath>
+              <FilePath>../Src/UART_Communication/usart.c</FilePath>
             </File>
             <File>
               <FileName>stm32f1xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Src/stm32f1xx_hal_msp.c</FilePath>
+              <FilePath>../Src/STM_Config/stm32f1xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>stm32f1xx_it.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Src/stm32f1xx_it.c</FilePath>
+              <FilePath>../Src/STM_Config/stm32f1xx_it.c</FilePath>
             </File>
             <File>
-              <FileName>adc.c</FileName>
+              <FileName>system_clock.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Src/adc.c</FilePath>
+              <FilePath>..\Src\STM_Config\system_clock.c</FilePath>
+            </File>
+            <File>
+              <FileName>init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\STM_Config\init.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart_functionality.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\UART_Communication\uart_functionality.c</FilePath>
+            </File>
+            <File>
+              <FileName>smog_sensor_interface.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\Sensor_Interfaces\smog_sensor_interface.c</FilePath>
+            </File>
+            <File>
+              <FileName>bt_communication_protocols.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\BT_Communication\bt_communication_protocols.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -582,7 +607,7 @@
             <File>
               <FileName>startup_stm32f103xb.s</FileName>
               <FileType>2</FileType>
-              <FilePath>../Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/arm/startup_stm32f103xb.s</FilePath>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/arm/startup_stm32f103xb.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -656,7 +681,7 @@
             <File>
               <FileName>system_stm32f1xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/system_stm32f1xx.c</FilePath>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/system_stm32f1xx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -728,69 +753,69 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>stm32f1xx_hal_cortex.c</FileName>
+              <FileName>stm32f1xx_hal_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c</FilePath>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f1xx_hal_flash_ex.c</FileName>
+              <FileName>stm32f1xx_hal_cortex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c</FilePath>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f1xx_hal_rcc_ex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f1xx_hal_pwr.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f1xx_hal_uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f1xx_hal_gpio_ex.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f1xx_hal_rcc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c</FilePath>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f1xx_hal_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c</FilePath>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f1xx_hal_gpio.c</FileName>
+              <FileName>stm32f1xx_hal_rcc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c</FilePath>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f1xx_hal_dma.c</FileName>
+              <FileName>stm32f1xx_hal_flash_ex.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c</FilePath>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f1xx_hal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c</FilePath>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f1xx_hal_adc_ex.c</FileName>
+              <FileName>stm32f1xx_hal_uart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c</FilePath>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f1xx_hal_gpio_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c</FilePath>
             </File>
             <File>
               <FileName>stm32f1xx_hal_adc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c</FilePath>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f1xx_hal_adc_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f1xx_hal_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f1xx_hal_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>C:/Users/Saad/STM32Cube/Repository/STM32Cube_FW_F1_V1.2.0/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c</FilePath>
             </File>
           </Files>
         </Group>

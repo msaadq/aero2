@@ -20,7 +20,7 @@ import java.io.IOException;
 
 public class STMCommunicator {
     public static final String BT_DEVICE_NAME = "BT_DEVICE"; // Default device name
-    public static final int DEFAULT_I_COMMAND_SIZE = 6; // eg. "IPAS:1"
+    public static final int DEFAULT_I_COMMAND_SIZE = 20; // eg. "IPAS:1"
 
     public int nSensors = 0; // No. of available sensors
 
