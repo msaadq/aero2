@@ -126,6 +126,4 @@ public class MainActivity extends AppCompatActivity {
         thank_you_text.setText("Thank you for using. Have a nice exercise!");
     }
 
-
-
 }
