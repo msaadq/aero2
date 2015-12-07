@@ -1,24 +1,37 @@
-import numpy as np
 from bs4 import BeautifulSoup as bs
+
+import numpy as np
+import pandas as pd
 import urllib2
 
 
-def findPlace(key, origin, radius, ptype):
+def findPlace(key, origin, ptype, radius="1000"):
 
 	'''Calls Google Place API and returns the nearest place within 
-	the radius provided by user'''
+	the radius provided by user.
+
+	Supported ptypes: https://developers.google.com/places/supported_types
+	'''
 
 	web_link = 'https://maps.googleapis.com/maps/api/place/nearbysearch/xml?key='+key
 	web_link += '&location='+origin[0]+','+origin[1]+'&radius='+radius+'&type='+ptype
 	source = urllib2.urlopen(web_link)
 	tree = bs(source)
 
-	return tree.findAll('name')
-	
+	results = tree.findAll('name')
+	results_text = [i.getText() for i in results]
+
+	print results_text
+
+	return results_text
 
 def calDuration (key, origin, destination, departure_time='now',traffic_model='best_guess'):
 
-	'''Calls Google Distance API and returns the duration/km'''
+	'''Calls Google Distance API and returns the duration/km.
+
+	departure_time is number of seconds in int from December, 1970.
+	traffic model can be 'best_guess', 'optimistic', or 'pessimistic'
+	'''
 
 	web_link = 'https://maps.googleapis.com/maps/api/distancematrix/xml?key'+key
 	web_link += '&origins='+origin[0]+','+origin[1]+'&destinations='+destination[0]+','
@@ -27,19 +40,26 @@ def calDuration (key, origin, destination, departure_time='now',traffic_model='b
 
 	source = urllib2.urlopen(web_link)
 	tree = bs(source)
-
 	result = tree.findAll('distance')
 	distance = [i.findChild('text').getText() for i in result]
-	distance = float((distance[0].split())[0])
+	
+	if (len(distance) != 0):
+		distance = float((distance[0].split())[0])
+	else:
+		distance = 1
 
 	result = tree.findAll('duration')
 	duration = [i.findChild('text').getText() for i in result]
-	duration = float((duration[0].split())[0])
+	
+	if (len(duration) != 0):
+		duration = float((duration[0].split())[0])
+	else:
+		duration = 0
 
 	return duration/distance
 
 
-def calTraffic (key, origin, increment=0.015):
+def calTraffic (key, origin, increment=0.01):
 
 	'''Estimates traffic by averaging duration over 4 different 
 	directions from origin'''
@@ -54,7 +74,36 @@ def calTraffic (key, origin, increment=0.015):
 	d3 = calDuration(key, origin, destination3)
 	d4 = calDuration(key, origin, destination4)
 	
+	print (d1 + d2 + d3 + d4)/4
 	return (d1+d2+d3+d4)/4
+
+
+def storeData (key, origin, delta=0.5, increment=0.02):
+
+	'''Calculates traffic and industry information starting from 
+	origin and up to delta'''
+
+	origins1 = [(str(float(origin[0]) + i), origin[1]) for i in np.linspace(0,delta,delta/increment)]
+	origins2 = [(str(float(origin[0]) - i), origin[1]) for i in np.linspace(0,delta,delta/increment)]
+	origins3 = [(origin[0], str(float(origin[1]) + i)) for i in np.linspace(0,delta,delta/increment)]
+	origins4 = [(origin[0], str(float(origin[1]) + i)) for i in np.linspace(0,delta,delta/increment)]
+
+	origins = origins1 + origins2 + origins3 + origins4
+
+	general_contractors = [len(findPlace(key, i,'general_contractor')) for i in origins]
+	traffics = [calTraffic(key, i) for i in origins]
+
+	print general_contractors, traffics
+
+	df = pd.DataFrame({
+		'coordinates' : origins,
+		'industries' : general_contractors,
+		'traffic' : traffics 
+		})
+
+	df.to_csv('data.csv')
+	df.to_csv('Data\data.csv')
+	df.to_csv('Data/data.csv')
 
 
 def main():
@@ -66,27 +115,7 @@ def main():
 	radius = '2000'
 	ptype = 'hospital'
 
-	'''
-	#Test Code for findPlace function
-	results_pl = findPlace(key, origin, radius, ptype)
-	results_pl_text = [i.getText() for i in results]
-	print results_text
-
-	'''
-
-	'''
-	#Test code for calDuration function
-	print calDuration(key2, origin, destination)
-	'''
-
-	print calTraffic(key2,origin)
-# 
+	storeData(key1,origin)
 
 if __name__ == '__main__':
 	main()
-
-
-#convert latitude, longitude to distance
-#implement place api
-#function that saves data in pandas
-#output pandas into csv
