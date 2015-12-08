@@ -2,10 +2,11 @@ from bs4 import BeautifulSoup as bs
 
 import numpy as np
 import pandas as pd
+import pyssql
 import urllib2
 
 
-def findPlace(key, origin, ptype, radius="1000"):
+def findPlace(key, origin, ptype, radius='1000'):
 
 	'''Calls Google Place API and returns the nearest place within 
 	the radius provided by user.
@@ -105,6 +106,8 @@ def storeData (key, origin, delta=0.5, increment=0.02):
 	df.to_csv('Data\data.csv')
 	df.to_csv('Data/data.csv')
 
+def connectDb ():
+
 
 def main():
 
@@ -115,7 +118,7 @@ def main():
 	radius = '2000'
 	ptype = 'hospital'
 
-	storeData(key1,origin)
+	#storeData(key1,origin)
 
 if __name__ == '__main__':
 	main()
