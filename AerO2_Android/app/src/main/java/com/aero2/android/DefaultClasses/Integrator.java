@@ -33,7 +33,7 @@ public class Integrator {
      * arg: None
      * exception: None
      * return: Double array containing smog,
-     * longitude, latitude,altitude and time (in order)
+     * longitude, latitude, altitude and time (in order)
      */
 
     public double[] integrateSmog(){
