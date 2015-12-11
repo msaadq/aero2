@@ -13,7 +13,10 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 import com.aero2.android.DefaultClasses.GPSTracker;
+import com.aero2.android.DefaultClasses.STMCommunicator;
 import com.aero2.android.R;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     Button stop_button;
     Handler m_handler;
 
+    STMCommunicator stmCommunicator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
         m_handler = new Handler();
         locations = new double [3][max_value_count];
 
+        try {
+            stmCommunicator = new STMCommunicator(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         setSupportActionBar(toolbar);
         gps.showSettingsAlert();
         stop_button.setOnClickListener(new View.OnClickListener() {
@@ -57,7 +68,11 @@ public class MainActivity extends AppCompatActivity {
 
                 //Stop GPS Handler
                 m_handler.removeCallbacks(mStatusChecker);
-                showValueCount();
+                try {
+                    showValueCount();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 Log.v("Info", "Stopped.");
             }
         });
@@ -121,8 +136,8 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void showValueCount(){
-        value_count_text.setText("Value Count: " + String.valueOf(value_count));
+    public void showValueCount() throws IOException {
+        value_count_text.setText("Value Count: " + stmCommunicator.getSmogValue());
         thank_you_text.setText("Thank you for using. Have a nice exercise!");
     }
 

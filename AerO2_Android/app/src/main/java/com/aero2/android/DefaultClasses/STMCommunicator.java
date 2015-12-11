@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 
 public class STMCommunicator {
-    public static final String BT_DEVICE_NAME = "BT_DEVICE"; // Default device name
+    public static final String BT_DEVICE_NAME = "HC-05"; // Default device name
     public static final int DEFAULT_I_COMMAND_SIZE = 20; // eg. "IPAS:1"
 
     public int nSensors = 0; // No. of available sensors
@@ -113,7 +113,7 @@ public class STMCommunicator {
 
     private void authenticate(String username, String password) throws IOException {
         // Step 1 : Send the AUT: Instruction for initial identification and wait for approval
-        sendCommand(O_COM_AUT, "");
+        sendCommand(O_COM_AUT, "1");
         if(receiveCommand().equals(I_COM_AUT + ":1")) {
             btAvailable = true;
         }

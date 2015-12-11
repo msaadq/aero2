@@ -98,13 +98,16 @@ public class BTService {
         Log.e("Appstatus", "Entered the bondDevice() function");
 
         bondedDevices = bluetoothAdapter.getBondedDevices();
-        Log.e("Appstatus", bondedDevices.size() + " This the no. of Devices connected");
+        Log.e("Appstatus", bondedDevices.size() + " is the no. of Devices connected");
 
         if(bondedDevices.size() > 0){
             Log.e("Appstatus", "Bonded Devices present");
 
             for (BluetoothDevice single_device : bondedDevices) {
-                if(single_device.getName() == deviceName) {
+                Log.e("checking for:  ", single_device.getName());
+
+                if(single_device.getName().contains(deviceName)) {
+                    Log.e("Connected to : ", single_device.getName());
                     device = single_device;
                 }
             }
