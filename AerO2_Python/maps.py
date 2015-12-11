@@ -1,16 +1,17 @@
 from bs4 import BeautifulSoup as bs
 
+import azure_service as az
 import numpy as np
 import pandas as pd
-import pyssql
 import urllib2
 
 
+# Helper Function
 def findPlace(key, origin, ptype, radius='1000'):
 
-	'''Calls Google Place API and returns the nearest place within 
+	'''
+	Calls Google Place API and returns the nearest place within 
 	the radius provided by user.
-
 	Supported ptypes: https://developers.google.com/places/supported_types
 	'''
 
@@ -26,10 +27,12 @@ def findPlace(key, origin, ptype, radius='1000'):
 
 	return results_text
 
+
+#Helper Function
 def calDuration (key, origin, destination, departure_time='now',traffic_model='best_guess'):
 
-	'''Calls Google Distance API and returns the duration/km.
-
+	'''
+	Calls Google Distance API and returns the duration/km.
 	departure_time is number of seconds in int from December, 1970.
 	traffic model can be 'best_guess', 'optimistic', or 'pessimistic'
 	'''
@@ -60,10 +63,13 @@ def calDuration (key, origin, destination, departure_time='now',traffic_model='b
 	return duration/distance
 
 
+#Helper Function
 def calTraffic (key, origin, increment=0.01):
 
-	'''Estimates traffic by averaging duration over 4 different 
-	directions from origin'''
+	'''
+	Estimates traffic by averaging duration over 4 different 
+	directions from origin.
+	'''
 
 	destination1 = [str(float(origin[0]) + increment), origin[1]]
 	destination2 = [str(float(origin[0]) - increment), origin[1]]
@@ -79,10 +85,13 @@ def calTraffic (key, origin, increment=0.01):
 	return (d1+d2+d3+d4)/4
 
 
-def storeData (key, origin, delta=0.5, increment=0.02):
+#Callable Function
+def calData (key, origin, delta=0.5, increment=0.02):
 
-	'''Calculates traffic and industry information starting from 
-	origin and up to delta'''
+	'''
+	Calculates traffic and industry information starting from 
+	origin and up to delta.
+	'''
 
 	origins1 = [(str(float(origin[0]) + i), origin[1]) for i in np.linspace(0,delta,delta/increment)]
 	origins2 = [(str(float(origin[0]) - i), origin[1]) for i in np.linspace(0,delta,delta/increment)]
@@ -96,29 +105,35 @@ def storeData (key, origin, delta=0.5, increment=0.02):
 
 	print general_contractors, traffics
 
+	#TO DO: Add timestamp here
+
 	df = pd.DataFrame({
 		'coordinates' : origins,
 		'industries' : general_contractors,
 		'traffic' : traffics 
 		})
 
-	df.to_csv('data.csv')
 	df.to_csv('Data\data.csv')
-	df.to_csv('Data/data.csv')
 
-def connectDb ():
+	return df
 
 
 def main():
 
-	key1 = 'AIzaSyDRhcSUYbhG25wWSKRmvau1GuoXCnnjN8c'
-	key2 = 'AIzaSyDKQ-7d3pejj3BxgdGusj3djD4ppwWtn2s'
+	azure_user = 'pythontestcloudservice1'
+	azure_key = 'rBnrx1uqYGXY8tvAyXATjn2NLYiPC+p+jgmxty+ZbI39tDauPI3sDFnYXEy8y53Ei4We8WGDg52HILUoAx1OCA=='
+	google_key1 = 'AIzaSyDRhcSUYbhG25wWSKRmvau1GuoXCnnjN8c'
+	google_key2 = 'AIzaSyDKQ-7d3pejj3BxgdGusj3djD4ppwWtn2s'
 	origin = ['33.6499632','72.9637728']
 	destination = ['33.6499632','72.9737728']
 	radius = '2000'
 	ptype = 'hospital'
+	table_name = 'smogTable'
+	partition_key = 'smogValues'
 
-	#storeData(key1,origin)
+	#df = calData(google_key1,origin)
+	df = pd.read_csv('Data\data.csv')
+
 
 if __name__ == '__main__':
 	main()
