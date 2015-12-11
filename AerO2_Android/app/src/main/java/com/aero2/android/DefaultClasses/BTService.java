@@ -148,7 +148,9 @@ public class BTService {
         Log.e("Appstatus", "Entered the readMessage() function");
 
         byte[] dataBuffer = new byte[messageSize];
-        inStream.read(dataBuffer, 0, messageSize);
+
+        while(inStream.read(dataBuffer) >= 0);
+
         return new String(dataBuffer, "UTF-8");
     }
 }
