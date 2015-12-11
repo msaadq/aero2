@@ -16,6 +16,8 @@ def saveDb (user, key, table_name, partition_key, df):
 
 	c_name = list(df.columns.values)
 
+	#TO DO: Add timestamp here
+	
 	entities = [{'PartitionKey':partition_key,'RowKey':df[c_name[1]][i],c_name[2]:str(df[c_name[2]][i]),c_name[3]:str(df[c_name[3]][i])}
 	for i in range(0,len(df[c_name[0]]))]
 
@@ -25,6 +27,11 @@ def saveDb (user, key, table_name, partition_key, df):
 	#TO DO: Implement an exception here for if the data already exists.
 	az.insertEntities(user, key, table_name, entities[5:10])
 
+def getDb (user, key, table_name, partition_key):
+
+	entities = az.getEntities(user,key,table_name,partition_key)
+	for e in entities:
+		print e.traffic
 
 def main():
 
@@ -40,7 +47,7 @@ def main():
 	partition_key = 'smogValues'
 
 	df = pd.read_csv('Data\data.csv')
-	saveDb(azure_user,azure_key,'smogTable','smogValues',df)
+	getDb(azure_user,azure_key,'smogTable','smogValues')
 
 
 if __name__ == '__main__':

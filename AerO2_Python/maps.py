@@ -105,6 +105,8 @@ def calData (key, origin, delta=0.5, increment=0.02):
 
 	print general_contractors, traffics
 
+	#TO DO: Add timestamp here
+
 	df = pd.DataFrame({
 		'coordinates' : origins,
 		'industries' : general_contractors,

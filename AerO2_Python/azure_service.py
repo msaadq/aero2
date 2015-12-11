@@ -8,6 +8,8 @@ import pandas as pd
 
 #TO DO: Function to count values of all entities in a table
 
+#TO DO: Delete function
+
 
 def checkTable (user, key, table_name):
 
