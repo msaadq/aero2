@@ -21,11 +21,11 @@ import java.util.concurrent.ExecutionException;
 
 public class DBWriter {
 
-    public final static String DEFAULT_URL = "https://aero2db.azure-mobile.net/";
-    public final static String DEFAULT_KEY = "AdLBwcAtBzmqTcAlKEoHdVZEPSzrkn69";
+    public final static String DEFAULT_URL = "https://aero2.azure-mobile.net/";
+    public final static String DEFAULT_KEY = "WWnbNVGsdqRoniOxupcfwjOQaosAAl67";
 
     private MobileServiceClient mClient;  // Mobile Service Client reference
-    private MobileServiceTable<Item> mTable;  // Mobile Service Table used to access data
+    private MobileServiceTable<SampleDataTable> mTable;  // Mobile Service Table used to access data
 
 
     /**
@@ -59,7 +59,7 @@ public class DBWriter {
             Log.d("App Status", "URL Successful");
 
             // Get the Mobile Service Table instance to use
-            mTable = mClient.getTable(Item.class);
+            mTable = mClient.getTable(SampleDataTable.class);
 
             Log.d("App Status", "Table get successful");
 
@@ -82,14 +82,14 @@ public class DBWriter {
             return;
         }
         // Create a new item
-        final Item mItem = new Item(id, data);
+        final SampleDataTable mSampleDataTable = new SampleDataTable(id, data);
 
         // Insert the new item
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>(){
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    addItemInTable(mItem);
+                    addItemInTable(mSampleDataTable);
                 } catch (final Exception e) {
                     Log.d("Exception", "Data Cannot be saved");
                 }
@@ -101,14 +101,14 @@ public class DBWriter {
     }
 
     /**
-     * Adds a compatible List Item to the Database table
+     * Adds a compatible List SampleDataTable to the Database table
      * arg: DBListItem
      * exception: ExecutionException, InterruptedException
      * return: No return value.
      */
 
-    private Item addItemInTable(Item item) throws ExecutionException, InterruptedException {
-        Item entity = mTable.insert(item).get();
+    private SampleDataTable addItemInTable(SampleDataTable sampleDataTable) throws ExecutionException, InterruptedException {
+        SampleDataTable entity = mTable.insert(sampleDataTable).get();
         return entity;
     }
 

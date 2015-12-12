@@ -6,42 +6,42 @@ package com.aero2.android.DefaultClasses;
  * Created by Saad on 12/8/2015.
  */
 
-public class Item {
+public class SampleDataTable {
 
     /**
-     * Item ID
+     * SampleDataTable ID
      */
     @com.google.gson.annotations.SerializedName("id")
     private String mId;
 
     /**
-     * Item Smog Value
+     * SampleDataTable Smog Value
      */
     @com.google.gson.annotations.SerializedName("smog")
     private String mSmog;
 
     /**
-     * Item Longitude
+     * SampleDataTable Longitude
      */
     @com.google.gson.annotations.SerializedName("long")
     private String mLong;
 
 
     /**
-     * Item Latitude
+     * SampleDataTable Latitude
      */
     @com.google.gson.annotations.SerializedName("lat")
     private String mLat;
 
 
     /**
-     * Item Altitude
+     * SampleDataTable Altitude
      */
     @com.google.gson.annotations.SerializedName("alt")
     private String mAlt;
 
     /**
-     * Item Time
+     * SampleDataTable Time
      */
     @com.google.gson.annotations.SerializedName("time")
     private String mTime;
@@ -49,12 +49,12 @@ public class Item {
     /**
      * DBListItem constructor
      */
-    public Item() { }
+    public SampleDataTable() { }
 
     /**
      * Initializes a new DBListItem
      */
-    public Item(String id, double[] integratedValues) {
+    public SampleDataTable(String id, double[] integratedValues) {
         this.setmId(id);
         this.setSmog(integratedValues[0]);
         this.setLong(integratedValues[1]);

@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.aero2.android.DefaultClasses.DBWriter;
 import com.aero2.android.DefaultClasses.GPSTracker;
 import com.aero2.android.DefaultClasses.STMCommunicator;
 import com.aero2.android.R;
@@ -36,7 +38,13 @@ public class MainActivity extends AppCompatActivity {
     Button stop_button;
     Handler m_handler;
 
-    STMCommunicator stmCommunicator;
+
+    /// Debug Code
+
+    // STMCommunicator stmCommunicator;
+    DBWriter dbWriter;
+
+    ///
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +63,23 @@ public class MainActivity extends AppCompatActivity {
         m_handler = new Handler();
         locations = new double [3][max_value_count];
 
+        ///
+        /*
         try {
             stmCommunicator = new STMCommunicator(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        */
+
+        /// Debug Code
+
+        double[] fakeData = {1, 2, 3, 4, 5, 6, 7};
+
+        dbWriter = new DBWriter(this);
+        dbWriter.addItem("Fake Data", fakeData);
+
+        ///
 
         setSupportActionBar(toolbar);
         gps.showSettingsAlert();
@@ -137,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showValueCount() throws IOException {
-        value_count_text.setText("Value Count: " + stmCommunicator.getSmogValue());
+        value_count_text.setText("Value Count: " + value_count);
         thank_you_text.setText("Thank you for using. Have a nice exercise!");
     }
 
