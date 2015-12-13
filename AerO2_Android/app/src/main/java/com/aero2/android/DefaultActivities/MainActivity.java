@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         /// Debug Code
 
-        double[] fakeData = {1, 2, 3, 4, 5, 6, 7};
+        double[] fakeData = {1, 2, 3, 4, 5, 6};
 
         dbWriter = new DBWriter(this);
         dbWriter.addItem("Fake Data", fakeData);

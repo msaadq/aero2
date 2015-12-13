@@ -21,18 +21,22 @@ public class SampleDataTable {
     private String mSmog;
 
     /**
+     * SampleDataTable Air Quality Value
+     */
+    @com.google.gson.annotations.SerializedName("airq")
+    private String mAirQ;
+
+    /**
      * SampleDataTable Longitude
      */
     @com.google.gson.annotations.SerializedName("long")
     private String mLong;
-
 
     /**
      * SampleDataTable Latitude
      */
     @com.google.gson.annotations.SerializedName("lat")
     private String mLat;
-
 
     /**
      * SampleDataTable Altitude
@@ -52,97 +56,101 @@ public class SampleDataTable {
     public SampleDataTable() { }
 
     /**
-     * Initializes a new DBListItem
+     * Initializes a new SampleDataTable Row
      */
     public SampleDataTable(String id, double[] integratedValues) {
         this.setmId(id);
-        this.setSmog(integratedValues[0]);
-        this.setLong(integratedValues[1]);
-        this.setLat(integratedValues[2]);
+        this.setTime(integratedValues[0]);
+        this.setLat(integratedValues[1]);
+        this.setLong(integratedValues[2]);
         this.setAlt(integratedValues[3]);
-        this.setTime(integratedValues[4]);
+        this.setSmog(integratedValues[4]);
+        this.setmAirQ(integratedValues[5]);
     }
 
-
     /**
-     * Sets the ID
+     * Sets the SampleDataTable ID
      */
-    public void setmId(String mId) {
-        this.mId = mId;
-    }
+    public void setmId(String mId) { this.mId = mId; }
 
     /**
-     * Sets the item Smog Value
+     * Sets the SampleDataTable Smog Value
      */
-    public final void setSmog(double smog) {
-        mSmog = String.valueOf(smog);
-    }
+    public final void setSmog(double smog) { mSmog = String.valueOf(smog); }
 
     /**
-     * Sets the item Longitude
+     * Sets the SampleDataTable Air Quality Value
      */
-    public final void setLong(double lon) {
-        mLong = String.valueOf(lon);
-    }
+    public void setmAirQ(double mAirQ) { this.mAirQ = String.valueOf(mAirQ); }
 
     /**
-     * Sets the item Latitude
+     * Sets the SampleDataTable Longitude
+     */
+    public final void setLong(double lon) { mLong = String.valueOf(lon); }
+
+    /**
+     * Sets the SampleDataTable Latitude
      */
     public final void setLat(double lat) {
         mLat = String.valueOf(lat);
     }
 
     /**
-     * Sets the item Altitude
+     * Sets the SampleDataTable Altitude
      */
     public final void setAlt(double alt) {
         mAlt = String.valueOf(alt);
     }
 
     /**
-     * Sets the item Time
+     * Sets the SampleDataTable Time
      */
     public final void setTime(double time) {
         mTime = String.valueOf(time);
     }
 
     /**
-     * Returns the ID
+     * Returns the SampleDataTable ID
      */
     public String getmId() {
         return mId;
     }
 
     /**
-     * Returns the item Smog Value
+     * Returns the SampleDataTable Smog Value
      */
     public String getSmog() {
         return mSmog;
     }
 
     /**
-     * Returns the item Longitude
+     * Returns the SampleDataTable Air Quality Value
+     */
+    public String getmAirQ() { return mAirQ; }
+
+    /**
+     * Returns the SampleDataTable Longitude
      */
     public String getLong() {
         return mLong;
     }
 
     /**
-     * Returns the item Latitude
+     * Returns the SampleDataTable Latitude
      */
     public String getLat() {
         return mLat;
     }
 
     /**
-     * Returns the item Altitude
+     * Returns the SampleDataTable Altitude
      */
     public String getAlt() {
         return mAlt;
     }
 
     /**
-     * Returns the item Time
+     * Returns the SampleDataTable Time
      */
     public String getTime() {
         return mTime;
