@@ -35,3 +35,16 @@ class AzureSQLHandler:
 
 		connection = pyodbc.connect("DRIVER={SQL Server};SERVER=" + server_url, user=self._username + "@" + self._sql_server, password=self._password, database=self._database_name)
 		self._cursor = connection.cursor()
+
+
+	def _sql_query(self, select_params, from_params, where_params = None):
+		select_string = "SELECT " + select_params
+		from_string = " FROM " + from_params
+
+		if not where_params:
+			self._cursor.execute(select_string + from_string)
+		else:
+			where_string = " WHERE " + where_params
+			self._cursor.execute(select_string + from_string + where_string)
+
+
