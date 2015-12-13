@@ -1,6 +1,7 @@
 package com.aero2.android.DefaultClasses;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
@@ -18,20 +19,25 @@ public class Integrator {
     STMCommunicator sensor;
     GPSTracker gps;
 
+    private int value_count;
+    // Maximum number of expected values
+    private final int max_value_count = 10000;
+
     // Authentication Strings
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
 
     public Integrator(Activity activity){
         try{
+
             sensor = new STMCommunicator(USERNAME, PASSWORD);
             gps = new GPSTracker(activity);
             for (int i=0;i<25000000;i++){
 
             }
             sensor.bypassAuthentication();
-            int smog = sensor.getSmogValue();
-            Log.v("Value",String.valueOf(smog));
+            //int smog = sensor.getSmogValue();
+            //Log.v("Value",String.valueOf(smog));
 
 
         }
@@ -49,24 +55,31 @@ public class Integrator {
      * longitude, latitude, altitude and time (in order)
      */
 
-    public double[] integrateSmog(){
+    public String[] integrateSmog(){
 
-        double [] integrated = {};
+        String [] integrated = new String [6];
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyMMdd;HHmmss");//dd/MM/yyyy
         Date date = new Date();
-
-        try {
-            int smog = sensor.getSmogValue();
+        String dateTime = sdfDate.format(date);
+        //try {
+            //int smog = sensor.getSmogValue();
+            int smog = 10;
+            int airQuality = 98;
             double[] newLocation = gps.getGps();
-            int temp = integrated.length;
-            integrated = new double[temp + 2];
 
-            System.arraycopy(smog, 0, integrated, 0, 1);
-            System.arraycopy(newLocation,0,integrated,1,temp);
-            System.arraycopy(date, 0, integrated, 1 + temp, 1);
-        }
-        catch (IOException ie){
-            ie.printStackTrace();
-        }
+            integrated[0] = String.valueOf(dateTime);
+            integrated[1] = String.valueOf(newLocation[0]);
+            integrated[2] = String.valueOf(newLocation[1]);
+            integrated[3] = String.valueOf(newLocation[2]);
+            integrated[4] = String.valueOf(smog);
+            integrated[5] = String.valueOf(airQuality);
+
+            Log.v("Hello",integrated[0]+" "+integrated[2]+" "+integrated[1]+" "+integrated[3]+" "
+                    +integrated[4]+" "+integrated[5]);
+        //}
+        //catch (IOException ie){
+          //  ie.printStackTrace();
+        //}
 
         return integrated;
     }
