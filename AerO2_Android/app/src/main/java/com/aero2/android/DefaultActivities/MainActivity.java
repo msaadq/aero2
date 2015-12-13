@@ -1,6 +1,7 @@
 package com.aero2.android.DefaultActivities;
 
 
+import android.Manifest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -63,6 +64,11 @@ public class MainActivity extends AppCompatActivity {
         m_handler = new Handler();
         locations = new double [3][max_value_count];
 
+        setSupportActionBar(toolbar);
+        gps.showSettingsAlert();            //Ask user to turn on location
+        this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                1);                         //Ask user for Manifest permission
+
         ///
         /*
         try {
@@ -74,15 +80,13 @@ public class MainActivity extends AppCompatActivity {
 
         /// Debug Code
 
-        double[] fakeData = {1, 2, 3, 4, 5, 6};
+        //double[] fakeData = {1, 2, 3, 4, 5, 6};
 
-        dbWriter = new DBWriter(this);
-        dbWriter.addItem("Fake Data", fakeData);
+        //dbWriter = new DBWriter(this);
+        //dbWriter.addItem("Fake Data", fakeData);
 
         ///
 
-        setSupportActionBar(toolbar);
-        gps.showSettingsAlert();
         stop_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
@@ -120,11 +124,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
 
-            Log.v("Info", "Capturing GPS Reading");
+            Log.v("Status", "Capturing GPS Reading");
             if (value_count <= max_value_count) {
 
                 new_location = gps.getGps();
-
+                Log.v("Status","Inside if condition");
                 locations[0][value_count] = new_location[0];
                 locations[1][value_count] = new_location[1];
                 locations[2][value_count] = new_location[2];
