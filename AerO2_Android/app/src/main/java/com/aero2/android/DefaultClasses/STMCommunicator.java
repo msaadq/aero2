@@ -56,30 +56,34 @@ public class STMCommunicator {
     public boolean smogAvailable = false;
     public boolean airQualityAvailable = false;
 
+
     /**
      * Default Constructor
-     * Starts the BT communication and and Authenticates using Provided Username and Password
-     * arg: Current Activity, Username, Password
-     * exception: IOException
-     * return: No return value
-     */
-
-    public STMCommunicator(Activity activity, String username, String password) throws IOException {
-        this.btService = new BTService(activity, BT_DEVICE_NAME);
-        //this.authenticate(username, password);
-    }
-
-    /**
-     * Overloaded Constructor
-     * Calls the default Constructor and Authenticates using Default Username and Password
+     * Instantiates the BTService object
      * arg: Current Activity
      * exception: IOException
      * return: No return value
      */
 
     public STMCommunicator(Activity activity) throws IOException {
-        this(activity, DEF_USERNAME, DEF_PASSWORD);
+        this.btService = new BTService(activity, BT_DEVICE_NAME);
     }
+
+
+    /**
+     * Overloaded Constructor
+     * Authenticates using Default Username and Password
+     * arg: Current Activity, Username & Password
+     * exception: IOException
+     * return: No return value
+     */
+
+    public STMCommunicator(String username, String password) throws IOException {
+
+        //this.authenticate(username, password);
+    }
+
+
 
     /**
      * Sends the O commands to the BT device according to the format defined above
@@ -203,11 +207,28 @@ public class STMCommunicator {
     }
 
     /**
+     *
+     * Bypasses authentication by setting
+     * authenticationStatus and smogAvailable
+     * to true.
+     *
+     */
+
+
+    public void bypassAuthentication(){
+
+        this.authenticationStatus = true;
+        this.smogAvailable = true;
+    }
+
+
+    /**
      * Returns the current Smog sensor value
      * arg: None
      * exception: IOException
      * return: Integer
      */
+
 
     public int getSmogValue() throws IOException {
         if(authenticationStatus && smogAvailable) {

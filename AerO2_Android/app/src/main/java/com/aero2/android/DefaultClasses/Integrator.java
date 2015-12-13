@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import android.app.Activity;
+import android.util.Log;
 
 /**
  *
@@ -14,13 +15,25 @@ import android.app.Activity;
  */
 public class Integrator {
 
-    private STMCommunicator sensor;
-    private GPSTracker gps;
+    STMCommunicator sensor;
+    GPSTracker gps;
 
-    Integrator(Activity activity){
+    // Authentication Strings
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
+
+    public Integrator(Activity activity){
         try{
-            sensor = new STMCommunicator(activity);
+            sensor = new STMCommunicator(USERNAME, PASSWORD);
             gps = new GPSTracker(activity);
+            for (int i=0;i<25000000;i++){
+
+            }
+            sensor.bypassAuthentication();
+            int smog = sensor.getSmogValue();
+            Log.v("Value",String.valueOf(smog));
+
+
         }
         catch (IOException ie){
             ie.printStackTrace();
@@ -47,9 +60,9 @@ public class Integrator {
             int temp = integrated.length;
             integrated = new double[temp + 2];
 
-            System.arraycopy(smog,0,integrated,0,1);
+            System.arraycopy(smog, 0, integrated, 0, 1);
             System.arraycopy(newLocation,0,integrated,1,temp);
-            System.arraycopy(date,0,integrated,1+temp,1);
+            System.arraycopy(date, 0, integrated, 1 + temp, 1);
         }
         catch (IOException ie){
             ie.printStackTrace();

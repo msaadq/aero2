@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.aero2.android.DefaultClasses.DBWriter;
 import com.aero2.android.DefaultClasses.GPSTracker;
+import com.aero2.android.DefaultClasses.Integrator;
 import com.aero2.android.DefaultClasses.STMAsyncTask;
 import com.aero2.android.DefaultClasses.STMCommunicator;
 import com.aero2.android.R;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     TextView thank_you_text;
     TextView value_count_text;
     GPSTracker gps;
+    Integrator integrator;
     STMAsyncTask stmTask;
     Button gps_button;
     Button stop_button;
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         stmTask = new STMAsyncTask(this);
         stmTask.execute();
 
+        integrator = new Integrator(this);
         ///
 
 
