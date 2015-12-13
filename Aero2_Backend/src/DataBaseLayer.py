@@ -9,6 +9,8 @@ Database Layer allows functions for accessing the SQL Database at a higher abstr
 
 class DataBaseLayer:
     DEFAULT_COLUMNS = "time, lat, long, alt, smog, airq"
+    SAMPLE_TABLE_NAME = "aero2.SampleDataTable"
+    RESULTS_TABLE_NAME = "aero2.ResultDataTable"
     SMOG_MAX = 100
     SMOG_MIN = 0
     AIRQ_MAX = 100
