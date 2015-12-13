@@ -66,7 +66,7 @@ public class STMCommunicator {
 
     public STMCommunicator(Activity activity, String username, String password) throws IOException {
         this.btService = new BTService(activity, BT_DEVICE_NAME);
-        this.authenticate(username, password);
+        //this.authenticate(username, password);
     }
 
     /**

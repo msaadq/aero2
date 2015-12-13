@@ -90,7 +90,6 @@ public class DBWriter {
             protected Void doInBackground(Void... params) {
                 try {
                     addItemInTable(mSampleDataTable);
-                    Log.d("Success","Data Inserted");
                 } catch (final Exception e) {
                     Log.d("Exception", "Data Cannot be saved");
                 }

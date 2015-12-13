@@ -2,6 +2,7 @@ package com.aero2.android.DefaultActivities;
 
 
 import android.Manifest;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.aero2.android.DefaultClasses.DBWriter;
 import com.aero2.android.DefaultClasses.GPSTracker;
+import com.aero2.android.DefaultClasses.STMAsyncTask;
 import com.aero2.android.DefaultClasses.STMCommunicator;
 import com.aero2.android.R;
 
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     TextView thank_you_text;
     TextView value_count_text;
     GPSTracker gps;
+    STMAsyncTask stmTask;
     Button gps_button;
     Button stop_button;
     Handler m_handler;
@@ -43,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     /// Debug Code
 
     // STMCommunicator stmCommunicator;
-    DBWriter dbWriter;
+    //DBWriter dbWriter;
 
     ///
 
@@ -69,7 +72,12 @@ public class MainActivity extends AppCompatActivity {
         this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 1);                         //Ask user for Manifest permission
 
+        stmTask = new STMAsyncTask(this);
+        stmTask.execute();
+
         ///
+
+
         /*
         try {
             stmCommunicator = new STMCommunicator(this);
