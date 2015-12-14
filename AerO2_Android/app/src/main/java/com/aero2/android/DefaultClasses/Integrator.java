@@ -1,9 +1,9 @@
 package com.aero2.android.DefaultClasses;
 
+import android.app.Activity;
+
 import java.io.IOException;
 import java.util.Date;
-
-import android.app.Activity;
 
 /**
  *
@@ -56,6 +56,30 @@ public class Integrator {
         }
 
         return integrated;
+    }
+
+    public SampleDataTable integratedAir(){
+        SampleDataTable data=new SampleDataTable();
+        Date date=new Date();
+        try {
+            double smog=sensor.getSmogValue();
+            double airQuality=sensor.getAirQualityValue();
+            double time=date.getTime();
+            double longi=gps.getGps()[0];
+            double lat=gps.getGps()[1];
+            double alt=gps.getGps()[2];
+            data.setmId(String.valueOf(time));
+            data.setSmog(smog);
+            data.setmAirQ(airQuality);
+            data.setTime(time);
+            data.setLong(longi);
+            data.setLat(lat);
+            data.setAlt(alt);
+            return data;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

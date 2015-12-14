@@ -23,16 +23,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-<<<<<<< Updated upstream
-import com.aero2.android.DefaultClasses.DBWriter;
-import com.aero2.android.DefaultClasses.GPSTracker;
-import com.aero2.android.DefaultClasses.STMCommunicator;
-import com.aero2.android.R;
-
-import java.io.IOException;
-
-public class MainActivity extends AppCompatActivity {
-=======
 import com.aero2.android.DefaultActivities.Data.AirContract;
 import com.aero2.android.DefaultClasses.AirAdapter;
 import com.aero2.android.DefaultClasses.DBWriter;
@@ -40,8 +30,11 @@ import com.aero2.android.DefaultClasses.GPSTracker;
 import com.aero2.android.DefaultClasses.SQLiteDatabaseFunctions;
 import com.aero2.android.R;
 
+import java.io.IOException;
+
+
 public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor>{
->>>>>>> Stashed changes
+
 
     // Time between each GPS recording
     private int m_interval = 1000;
@@ -62,12 +55,6 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
     Handler m_handler;
 
 
-    /// Debug Code
-
-    // STMCommunicator stmCommunicator;
-    DBWriter dbWriter;
-
-    ///
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,28 +74,11 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         m_handler = new Handler();
         locations = new double [3][max_value_count];
 
-<<<<<<< Updated upstream
-        ///
-        /*
-        try {
-            stmCommunicator = new STMCommunicator(this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-
-        /// Debug Code
 
         double[] fakeData = {1, 2, 3, 4, 5, 6};
 
         dbWriter = new DBWriter(this);
         dbWriter.addItem("Fake Data", fakeData);
-
-        ///
-
-        setSupportActionBar(toolbar);
-=======
->>>>>>> Stashed changes
         gps.showSettingsAlert();
         stop_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

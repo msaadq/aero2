@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import com.aero2.android.DefaultActivities.Data.AirContract;
 
+import java.util.concurrent.ExecutionException;
+
 /**
  * Created by Muddassir on 12/13/2015.
  */
@@ -51,8 +53,8 @@ public class SQLiteDatabaseFunctions extends Service {
                     }
                 }
 
-                double[] airTuple=integrator.integrateSmog();
-                addAirValue(airTuple[0], airTuple[1], airTuple[2], airTuple[3], airTuple[4]);
+                SampleDataTable airTuple=integrator.integratedAir();
+                addAirValue(airTuple);
                 if(isOnline()){
                     uploadAir(dbWriterLocal);
                 }
@@ -135,8 +137,8 @@ public class SQLiteDatabaseFunctions extends Service {
     /* -----------------FUNCTIONS FOR INTERACTION WITH LOCAL DATA BASE-----------------------*/
     /*****************************************************************************************/
 
-    //get all the values in the local database
-    public double[][] getAllAir(){
+    //get all the values in the local database in the form of doubles
+    public double[][] getAllAirDouble(){
 
         String[] COLUMNS={
                 AirContract.AirEntry.TABLE_NAME+"."+ AirContract.AirEntry._ID,
@@ -159,6 +161,53 @@ public class SQLiteDatabaseFunctions extends Service {
             }
         }
         return allAir;
+    }
+
+    //get all the values in the local database in the form of Strings
+    public String[][] getAllAirStrings(){
+        String[] COLUMNS={
+                AirContract.AirEntry.TABLE_NAME+"."+ AirContract.AirEntry._ID,
+                AirContract.AirEntry.COLUMN_SMOG_VALUE,
+                AirContract.AirEntry.COLUMN_AIR_QUALITY,
+                AirContract.AirEntry.COLUMN_TIME,
+                AirContract.AirEntry.COLUMN_LONG,
+                AirContract.AirEntry.COLUMN_LAT,
+                AirContract.AirEntry.COLUMN_ALT
+        } ;
+
+        Cursor airCursor=getContentResolver().query(AirContract.AirEntry.CONTENT_URI,COLUMNS,null,null,null);
+        int noOfRows=airCursor.getCount();
+        String[][] allAir=new String[noOfRows][6];
+        for(int i=0;i<noOfRows;i++)
+        {
+            airCursor.moveToPosition(i);
+            for(int j=0;j<6;j++)
+            {
+                allAir[i][j]=airCursor.getString(j);
+            }
+        }
+        return allAir;
+    }
+
+    //get number of rows in the local database
+    public int getRowCountInLocal(){
+        String[] COLUMNS={
+                AirContract.AirEntry.TABLE_NAME+"."+ AirContract.AirEntry._ID
+        } ;
+
+        Cursor airCursor=getContentResolver().query(AirContract.AirEntry.CONTENT_URI, COLUMNS, null, null, null);
+        int noOfRows=airCursor.getCount();
+        return noOfRows;
+    }
+
+    //find out if the local data base is empty
+    public boolean isLocalEmpty(){
+        String[] COLUMNS={
+                AirContract.AirEntry.TABLE_NAME+"."+ AirContract.AirEntry._ID
+        } ;
+
+        Cursor airCursor=getContentResolver().query(AirContract.AirEntry.CONTENT_URI,COLUMNS,null,null,null);
+        return airCursor.moveToFirst();
     }
 
     //get all air values at a certain Coordinate
@@ -224,22 +273,38 @@ public class SQLiteDatabaseFunctions extends Service {
     }
 
     //add a new entry into the table
-    public void addAirValue(double smogValue,double time,double longi,double lat,double alt){
+    public void addAirValue(SampleDataTable sampleDataTable){
         ContentValues values=new ContentValues();
-        values.put(AirContract.AirEntry.COLUMN_SMOG_VALUE,String.valueOf(smogValue));
-        values.put(AirContract.AirEntry.COLUMN_TIME,String.valueOf(time));
-        values.put(AirContract.AirEntry.COLUMN_LONG,String.valueOf(longi));
-        values.put(AirContract.AirEntry.COLUMN_LAT,String.valueOf(lat));
-        values.put(AirContract.AirEntry.COLUMN_ALT,String.valueOf(alt));
+        values.put(AirContract.AirEntry.COLUMN_SMOG_VALUE,sampleDataTable.getSmog());
+        values.put(AirContract.AirEntry.COLUMN_AIR_QUALITY,sampleDataTable.getmAirQ());
+        values.put(AirContract.AirEntry.COLUMN_TIME,sampleDataTable.getTime());
+        values.put(AirContract.AirEntry.COLUMN_LONG,sampleDataTable.getLong());
+        values.put(AirContract.AirEntry.COLUMN_LAT,sampleDataTable.getLat());
+        values.put(AirContract.AirEntry.COLUMN_ALT,sampleDataTable.getAlt());
         getContentResolver().insert(AirContract.AirEntry.CONTENT_URI, values);
     }
 
     //upload all air values into the online database and empty the local database
     public void uploadAir(DBWriter dbWriter){
-        double[][] allAir=getAllAir();
+        double[][] allAir=getAllAirDouble();
         getContentResolver().delete(AirContract.AirEntry.CONTENT_URI, null, null);
-        for(int i=0;i<allAir.length;i++)
-            dbWriter.addItem(String.valueOf(allAir[i][1]),allAir[i]);
+        SampleDataTable data=new SampleDataTable();
+        for(int i=0;i<allAir.length;i++) {
+            data.setmId(String.valueOf(allAir[i][2]));
+            data.setSmog(allAir[i][0]);
+            data.setmAirQ(allAir[i][1]);
+            data.setTime(allAir[i][2]);
+            data.setLong(allAir[i][3]);
+            data.setLat(allAir[i][4]);
+            data.setAlt(allAir[i][5]);
+            try {
+                dbWriter.addItemInTable(data);
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /***************************************************************************/
