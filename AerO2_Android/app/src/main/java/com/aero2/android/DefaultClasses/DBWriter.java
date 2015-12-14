@@ -40,6 +40,7 @@ public class DBWriter {
         this(activity, DEFAULT_URL, DEFAULT_KEY);
     }
 
+
     /**
      * Parametrized Constructor
      * This calls the parametrized constructor with provided URL and Key

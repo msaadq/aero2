@@ -3,4 +3,5 @@
     <string name="title_activity_test">test</string>
     <string name="action_settings">Settings</string>
     <string name="introduction_text">Here are the values</string>
+    <string name="content_authority">com.aero2.android.DefaultActivities</string>
 </resources>
