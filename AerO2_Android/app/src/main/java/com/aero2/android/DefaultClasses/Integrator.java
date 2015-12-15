@@ -54,10 +54,9 @@ public class Integrator {
         String dateTime = sdfDate.format(date);
         try {
 
-            for(int i=0; i<1000000000;i++){};
 
             Log.v("Status","Entering integrator try");
-            sensor.authenticate("username","password");
+            //sensor.authenticate("username","password");
             int smog = sensor.getSmogValue();
             Log.v("Status","Done with BT Service");
             int airQuality = 98;
@@ -68,10 +67,9 @@ public class Integrator {
             integrated[2] = String.valueOf(newLocation[1]);
             integrated[3] = String.valueOf(newLocation[2]);
             integrated[4] = String.valueOf(smog);
-            integrated[5] = String.valueOf(airQuality);
 
-            Log.v("Hello",integrated[0]+" "+integrated[2]+" "+integrated[1]+" "+integrated[3]+" "
-                    +integrated[4]+" "+integrated[5]);
+            Log.v("Hello", integrated[0] + " " + integrated[2] + " " + integrated[1] + " "
+                    + integrated[3] + " " +integrated[4]);
         }
         catch (IOException ie){
             ie.printStackTrace();
