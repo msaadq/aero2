@@ -2,7 +2,6 @@ package com.aero2.android.DefaultActivities;
 
 
 import android.Manifest;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -15,11 +14,8 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.aero2.android.DefaultClasses.DBWriter;
 import com.aero2.android.DefaultClasses.GPSTracker;
 import com.aero2.android.DefaultClasses.Integrator;
-import com.aero2.android.DefaultClasses.STMAsyncTask;
-import com.aero2.android.DefaultClasses.STMCommunicator;
 import com.aero2.android.R;
 
 import java.io.IOException;
@@ -33,18 +29,17 @@ public class MainActivity extends AppCompatActivity {
     private final int max_value_count = 1000;
     private String integrators[][];
     private String new_integrator [];
-    TextView longitude_text;
-    TextView latitude_text;
-    TextView altitude_text;
-    TextView smog_text;
-    TextView air_quality_text;
+    public static TextView longitude_text;
+    public static TextView latitude_text;
+    public static TextView altitude_text;
+    public static TextView smog_text;
+    public static TextView air_quality_text;
     TextView time_text;
     TextView thank_you_text;
     TextView value_count_text;
     Date date;
     GPSTracker gps;
     Integrator integrator;
-    STMAsyncTask stmTask;
     Button gps_button;
     Button stop_button;
     Handler m_handler;
@@ -82,10 +77,8 @@ public class MainActivity extends AppCompatActivity {
         this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 1);                         //Ask user for Manifest permission
 
-        stmTask = new STMAsyncTask(this);
-        stmTask.execute();
 
-        integrator = new Integrator(this);
+        integrator = new Integrator(MainActivity.this);
         integrator.integrateSmog();
         ///
 
@@ -121,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
         gps_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
@@ -147,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             Log.v("Status", "Capturing GPS Reading");
             if (value_count <= max_value_count) {
 
-                new_integrator = integrator.integrateSmog();
+                //new_integrator = integrator.integrateSmog();
                 Log.v("Status", "Inside if condition");
 
                 for (int i=0; i<6;i++) {

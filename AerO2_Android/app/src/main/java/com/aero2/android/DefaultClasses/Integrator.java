@@ -28,21 +28,12 @@ public class Integrator {
     public static final String PASSWORD = "password";
 
     public Integrator(Activity activity){
-        try{
-
-            sensor = new STMCommunicator(USERNAME, PASSWORD);
+        try {
             gps = new GPSTracker(activity);
-            for (int i=0;i<25000000;i++){
-
-            }
-            sensor.bypassAuthentication();
-            //int smog = sensor.getSmogValue();
-            //Log.v("Value",String.valueOf(smog));
-
-
-        }
-        catch (IOException ie){
-            ie.printStackTrace();
+            sensor = new STMCommunicator(activity);
+            //sensor.bypassAuthentication();
+        } catch (IOException e){
+            e.printStackTrace();
         }
     }
 
@@ -61,9 +52,14 @@ public class Integrator {
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyMMdd;HHmmss");//dd/MM/yyyy
         Date date = new Date();
         String dateTime = sdfDate.format(date);
-        //try {
-            //int smog = sensor.getSmogValue();
-            int smog = 10;
+        try {
+
+            for(int i=0; i<1000000000;i++){};
+
+            Log.v("Status","Entering integrator try");
+            sensor.authenticate("username","password");
+            int smog = sensor.getSmogValue();
+            Log.v("Status","Done with BT Service");
             int airQuality = 98;
             double[] newLocation = gps.getGps();
 
@@ -76,10 +72,10 @@ public class Integrator {
 
             Log.v("Hello",integrated[0]+" "+integrated[2]+" "+integrated[1]+" "+integrated[3]+" "
                     +integrated[4]+" "+integrated[5]);
-        //}
-        //catch (IOException ie){
-          //  ie.printStackTrace();
-        //}
+        }
+        catch (IOException ie){
+            ie.printStackTrace();
+        }
 
         return integrated;
     }

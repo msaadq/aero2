@@ -1,6 +1,7 @@
 package com.aero2.android.DefaultClasses;
 
 import android.app.Activity;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -55,6 +56,7 @@ public class STMCommunicator {
     public boolean passwordCorrect = false;
     public boolean smogAvailable = false;
     public boolean airQualityAvailable = false;
+    public boolean isDeviceConnected = false;
 
 
     /**
@@ -115,11 +117,14 @@ public class STMCommunicator {
      * return: No return value.
      */
 
-    private void authenticate(String username, String password) throws IOException {
+    public void authenticate(String username, String password) throws IOException {
+
         // Step 1 : Send the AUT: Instruction for initial identification and wait for approval
         sendCommand(O_COM_AUT, "1");
         if(receiveCommand().equals(I_COM_AUT + ":1")) {
             btAvailable = true;
+            Log.v("STMCommunicator","btAvailable is set to true, authenticate()");
+
         }
 
         // Step 2 : Send the Username and wait for approval
@@ -139,6 +144,7 @@ public class STMCommunicator {
         // Step 4 : Enable Smog Sensor amd Air Quality Sensor
         enableSensors();
     }
+
 
     /**
      * Activates all the available sensors
@@ -219,6 +225,8 @@ public class STMCommunicator {
 
         this.authenticationStatus = true;
         this.smogAvailable = true;
+
+        Log.v("STMCommunicator", "Auehntication Bypassed");
     }
 
 
@@ -233,12 +241,16 @@ public class STMCommunicator {
     public int getSmogValue() throws IOException {
         if(authenticationStatus && smogAvailable) {
             String temp;
-            sendCommand(O_COM_SSG, "");
+            Log.v("STMCommunicator", "Inside getSmogValue()");
+            sendCommand(O_COM_SSG, "0");
+            Log.v("STMCommunicator", "Command sent! getSmogValue()");
             temp = receiveCommand();
-
+            Log.v("STMCommunicator","Message Received in getSmogValue(): "+temp);
+            /*
             if(temp.substring(0, 3).equals(I_COM_SSG)) {
                 return (int) temp.charAt(5);
             }
+            */
             return 0;
         }
         return 0;

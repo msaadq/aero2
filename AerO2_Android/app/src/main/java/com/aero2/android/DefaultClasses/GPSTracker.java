@@ -74,16 +74,16 @@ public class GPSTracker {
 
         if (GPS_enabled) {
             try {
-
                 if (ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED ){
                     Log.v("Status","Permission Resolved!");
                     locationManager.requestLocationUpdates(locationProvider, 0, 0, locationListener);
+                    Log.v("Status", "Location Requested!");
                     new_location = locationManager.getLastKnownLocation(locationProvider);
                     Log.v("Status","GPS Enabled!");
                 }
             } catch (Exception e) {
-                Log.e("Security Exception", "Permission Denied");
+                Log.e("WExcepotionm in true", "Permission Denied");
             }
 
             if (new_location != null) {
