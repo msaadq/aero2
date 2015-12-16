@@ -71,22 +71,6 @@ public class STMCommunicator {
         this.btService = new BTService(activity, BT_DEVICE_NAME);
     }
 
-
-    /**
-     * Overloaded Constructor
-     * Authenticates using Default Username and Password
-     * arg: Current Activity, Username & Password
-     * exception: IOException
-     * return: No return value
-     */
-
-    public STMCommunicator(String username, String password) throws IOException {
-
-        //this.authenticate(username, password);
-    }
-
-
-
     /**
      * Sends the O commands to the BT device according to the format defined above
      * arg: Command Prefix (4-digit), Command Arguments
@@ -121,10 +105,8 @@ public class STMCommunicator {
 
         // Step 1 : Send the AUT: Instruction for initial identification and wait for approval
         sendCommand(O_COM_AUT, "1\n");
-        String temp;
-        temp = receiveCommand();
 
-        if(temp.equals(I_COM_AUT + ":1")) {
+        if(receiveCommand().equals(I_COM_AUT + ":1")) {
             btAvailable = true;
             Log.v("STMCommunicator","btAvailable is set to true, authenticate()");
 
@@ -132,26 +114,21 @@ public class STMCommunicator {
 
         // Step 2 : Send the Username and wait for approval
         sendCommand(O_COM_USR, username+"\n");
-        temp = receiveCommand();
-        Log.v("Command: ",temp);
 
-        if(temp.equals(I_COM_USR + ":1")) {
+        if(receiveCommand().equals(I_COM_USR + ":1")) {
             userCorrect = true;
             Log.v("STMCommunicator","username is set to true, authenticate()");
         }
 
         // Step 3 : Send the Password and wait for approval
         sendCommand(O_COM_PAS, password+"\n");
-        temp = receiveCommand();
 
-        if(temp.equals(I_COM_PAS + ":1")) {
+        if(receiveCommand().equals(I_COM_PAS + ":1")) {
             passwordCorrect = true;
             Log.v("STMCommunicator","password is set to true, authenticate()");
         }
 
-
         authenticationStatus = btAvailable && userCorrect && passwordCorrect;
-
         Log.v("Authenticated? ", String.valueOf(authenticationStatus));
 
         // Step 4 : Enable Smog Sensor amd Air Quality Sensor
@@ -168,19 +145,16 @@ public class STMCommunicator {
 
     public void enableSensors() throws IOException {
         sendCommand(O_COM_NSG, "1\n");
-        String temp;
-        temp = receiveCommand();
 
-        if(temp.equals(I_COM_NSG + ":1")) {
+        if(receiveCommand().equals(I_COM_NSG + ":1")) {
             smogAvailable = true;
             nSensors++;
             Log.v("Smog sensor: ", "Authenticated");
         }
 
         sendCommand(O_COM_NAQ, "1\n");
-        temp = receiveCommand();
 
-        if(temp.equals(I_COM_NAQ + ":1")) {
+        if(receiveCommand().equals(I_COM_NAQ + ":1")) {
             airQualityAvailable = true;
             nSensors++;
             Log.v("Air quality sensor: ", "Authenticated");
@@ -195,13 +169,11 @@ public class STMCommunicator {
      */
 
     public void disableSensors() throws IOException {
-        String temp;
 
         if(smogAvailable) {
             sendCommand(O_COM_NSG, "0\n");
-            temp = receiveCommand();
 
-            if(temp.equals(I_COM_NSG + ":0")) {
+            if(receiveCommand().equals(I_COM_NSG + ":0")) {
                 smogAvailable = false;
                 nSensors--;
             }
@@ -209,9 +181,8 @@ public class STMCommunicator {
 
         if(airQualityAvailable) {
             sendCommand(O_COM_NAQ, "0\n");
-            temp = receiveCommand();
 
-            if(temp.equals(I_COM_NAQ + ":0")) {
+            if(receiveCommand().equals(I_COM_NAQ + ":0")) {
                 airQualityAvailable = false;
                 nSensors--;
             }
@@ -237,23 +208,6 @@ public class STMCommunicator {
         return sensorValues;
     }
 
-    /**
-     *
-     * Bypasses authentication by setting
-     * authenticationStatus and smogAvailable
-     * to true.
-     *
-     */
-
-
-    public void bypassAuthentication(){
-
-        this.authenticationStatus = true;
-        this.smogAvailable = true;
-
-        Log.v("STMCommunicator", "Auehntication Bypassed");
-    }
-
 
     /**
      * Returns the current Smog sensor value
@@ -265,18 +219,15 @@ public class STMCommunicator {
 
     public int getSmogValue() throws IOException {
         if(authenticationStatus && smogAvailable) {
+
             String temp;
-            Log.v("STMCommunicator", "Inside getSmogValue()");
             sendCommand(O_COM_SSG, "\n");
-            Log.v("STMCommunicator", "Command sent! getSmogValue()");
             temp = receiveCommand();
             Log.v("STMCommunicator", "Message Received in getSmogValue(): " + temp);
 
             if(temp.substring(0,4).equals(I_COM_SSG)) {
                 String smog = temp.substring(5,temp.length());
-                int value = Integer.parseInt(smog);
-                Log.v("Smog Value: ",String.valueOf(value));
-                return value;
+                return Integer.parseInt(smog);
             }
             return 0;
         }
