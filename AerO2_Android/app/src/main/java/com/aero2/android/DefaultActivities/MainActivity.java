@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.aero2.android.DefaultClasses.DBAsyncTask;
 import com.aero2.android.DefaultClasses.DBWriter;
 import com.aero2.android.DefaultClasses.GPSTracker;
 import com.aero2.android.DefaultClasses.Integrator;
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Time between each GPS recording
     private int m_interval = 1000;
-    private int value_count = 0;
+    public static int value_count = 0;
     private final int max_value_count = 1000;
     private String integrators[][];
     private String new_integrator [];
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     GPSTracker gps;
     Integrator integrator;
     DBWriter dbWriter;
+    DBAsyncTask dbAsyncTask;
     Button gps_button;
     Button stop_button;
     Handler m_handler;
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         m_handler = new Handler();
         dbWriter = new DBWriter(this);
         integrator = new Integrator(this);
-        integrators = new String [5][max_value_count];
+        integrators = new String [max_value_count][6];
 
         //Ask user to adjust settings
         setSupportActionBar(toolbar);
@@ -123,8 +125,8 @@ public class MainActivity extends AppCompatActivity {
 
                 new_integrator = integrator.integrateSmog();
 
-                for (int i=0; i<5;i++) {
-                    integrators[i][value_count] = new_integrator[i];
+                for (int i=0; i<6;i++) {
+                    integrators[value_count][i] = new_integrator[i];
                 }
 
                 SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
@@ -137,6 +139,8 @@ public class MainActivity extends AppCompatActivity {
                 smog_text.setText("Smog: " +new_integrator[4]);
 
                 //value_count = gps.getValueCount();
+                value_count ++;
+                Log.v("Value Count",String.valueOf(value_count));
                 m_handler.postDelayed(mStatusChecker, m_interval);
             }
         }
@@ -158,8 +162,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showValueCount() throws IOException {
-        //value_count_text.setText("Value Count: " + value_count);
-        thank_you_text.setText("Thank you for using. Have a nice exercise!");
+        value_count_text.setText("Value Count: " + value_count);
+        Log.v("MainActivity","Calling constructor");
+
+        dbAsyncTask = new DBAsyncTask(this,dbWriter);
+        Log.v("MainActivity","Calling execute");
+
+        dbAsyncTask.execute(integrators);
+        thank_you_text.setText("Thank you for contributing! Your values have been recorded." +
+                " Have a nice exercise!");
     }
 
 }

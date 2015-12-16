@@ -67,9 +67,10 @@ public class Integrator {
             integrated[2] = String.valueOf(newLocation[1]);
             integrated[3] = String.valueOf(newLocation[2]);
             integrated[4] = String.valueOf(smog);
+            integrated[5] = String.valueOf(false);
 
-            Log.v("Hello", integrated[0] + " " + integrated[2] + " " + integrated[1] + " "
-                    + integrated[3] + " " +integrated[4]);
+            Log.v("Hello", integrated[0] + " " + integrated[1] + " " + integrated[2] + " "
+                    + integrated[3] + " " +integrated[4]+ " "+integrated[5]);
         }
         catch (IOException ie){
             ie.printStackTrace();

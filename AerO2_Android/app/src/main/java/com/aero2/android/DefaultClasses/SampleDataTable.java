@@ -49,7 +49,8 @@ public class SampleDataTable {
      * SampleDataTable Normalized
      */
     @com.google.gson.annotations.SerializedName("normalized")
-    private Boolean mNormalized;
+    private String mNormalized;
+
 
     /**
      * DBListItem constructor
@@ -112,8 +113,8 @@ public class SampleDataTable {
         mTime = time;
     }
 
-    public void setmNormalized(String mNormalized) {
-        mNormalized = String.valueOf(mNormalized);
+    public void setmNormalized(String Normalized) {
+        mNormalized = Normalized;
     }
 
     /**
@@ -161,7 +162,7 @@ public class SampleDataTable {
     }
 
 
-    public Boolean getmNormalized() {
+    public String getmNormalized() {
         return mNormalized;
     }
 }
