@@ -1,6 +1,7 @@
 package com.aero2.android.DefaultActivities;
 
 
+import android.Manifest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -12,26 +13,41 @@ import android.view.View;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.aero2.android.DefaultClasses.DBAsyncTask;
+import com.aero2.android.DefaultClasses.DBWriter;
 import com.aero2.android.DefaultClasses.GPSTracker;
+import com.aero2.android.DefaultClasses.Integrator;
 import com.aero2.android.R;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
     // Time between each GPS recording
     private int m_interval = 1000;
-    private int value_count = 0;
+    public static int value_count = 0;
     private final int max_value_count = 1000;
-    private double locations[][];
-    private double new_location [];
-    TextView longitude_text;
-    TextView latitude_text;
-    TextView altitude_text;
+    private String integrators[][];
+    private String new_integrator [];
+    public static TextView longitude_text;
+    public static TextView latitude_text;
+    public static TextView altitude_text;
+    public static TextView smog_text;
+    TextView time_text;
     TextView thank_you_text;
     TextView value_count_text;
+    Date date;
     GPSTracker gps;
+    Integrator integrator;
+    DBWriter dbWriter;
+    DBAsyncTask dbAsyncTask;
     Button gps_button;
     Button stop_button;
     Handler m_handler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,29 +58,48 @@ public class MainActivity extends AppCompatActivity {
         longitude_text = (TextView) findViewById(R.id.longitude_text);
         latitude_text = (TextView) findViewById(R.id.latitude_text);
         altitude_text = (TextView) findViewById(R.id.altitude_text);
+        smog_text = (TextView) findViewById(R.id.smog_text);
+        time_text = (TextView) findViewById(R.id.time_text);
         thank_you_text = (TextView) findViewById(R.id.thank_you_text);
         value_count_text = (TextView) findViewById(R.id.value_count_text);
         gps_button = (Button) findViewById(R.id.gps_button);
         stop_button = (Button) findViewById(R.id.stop_button);
+
+        //Instantiate Objects
         gps = new GPSTracker(this);
         m_handler = new Handler();
-        locations = new double [3][max_value_count];
+        dbWriter = new DBWriter(this);
+        integrator = new Integrator(this);
+        integrators = new String [max_value_count][6];
 
+        //Ask user to adjust settings
         setSupportActionBar(toolbar);
-        gps.showSettingsAlert();
+        gps.showSettingsAlert();            //Ask user to turn on location
+        this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                1);                         //Ask user for Manifest permission
+
+        //dbWriter.addItem("Fake Data", fakeData);
+
         stop_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
                 //Stop GPS Handler
                 m_handler.removeCallbacks(mStatusChecker);
-                showValueCount();
+                try {
+                    showValueCount();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 Log.v("Info", "Stopped.");
             }
         });
 
-        gps_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
 
+
+        gps_button.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+                Log.v("gps_button","Inside setonClickListener()");
                 //Run GPS Handler
                 mStatusChecker.run();
             }
@@ -74,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Relevant Action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -85,24 +120,29 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
 
-            Log.v("Info", "Capturing GPS Reading");
+            Log.v("Status", "Capturing GPS Reading");
             if (value_count <= max_value_count) {
 
-                new_location = gps.getGps();
+                new_integrator = integrator.integrateSmog();
 
-                locations[0][value_count] = new_location[0];
-                locations[1][value_count] = new_location[1];
-                locations[2][value_count] = new_location[2];
+                for (int i=0; i<6;i++) {
+                    integrators[value_count][i] = new_integrator[i];
+                }
 
-                longitude_text.setText("Longitude: " + String.valueOf(new_location[0]));
-                latitude_text.setText("Latitude: " + String.valueOf(new_location[1]));
-                altitude_text.setText("Altitude: " + String.valueOf(new_location[2]));
+                SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
+                date=new Date();
 
-                value_count = gps.getValueCount();
+                time_text.setText("Time & Date: " + sdfDate.format(date));
+                longitude_text.setText("Longitude: " + new_integrator[1]);
+                latitude_text.setText("Latitude: " + new_integrator[2]);
+                altitude_text.setText("Altitude: " + new_integrator[3]);
+                smog_text.setText("Smog: " +new_integrator[4]);
 
+                //value_count = gps.getValueCount();
+                value_count ++;
+                Log.v("Value Count",String.valueOf(value_count));
                 m_handler.postDelayed(mStatusChecker, m_interval);
             }
-
         }
     };
 
@@ -121,9 +161,16 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void showValueCount(){
-        value_count_text.setText("Value Count: " + String.valueOf(value_count));
-        thank_you_text.setText("Thank you for using. Have a nice exercise!");
+    public void showValueCount() throws IOException {
+        value_count_text.setText("Value Count: " + value_count);
+        Log.v("MainActivity","Calling constructor");
+
+        dbAsyncTask = new DBAsyncTask(this,dbWriter);
+        Log.v("MainActivity","Calling execute");
+
+        dbAsyncTask.execute(integrators);
+        thank_you_text.setText("Thank you for contributing! Your values have been recorded." +
+                " Have a nice exercise!");
     }
 
 }

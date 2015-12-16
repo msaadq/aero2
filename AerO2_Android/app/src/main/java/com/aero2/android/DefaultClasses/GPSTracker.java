@@ -1,15 +1,20 @@
 package com.aero2.android.DefaultClasses;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+
+import com.aero2.android.DefaultActivities.MainActivity;
 
 
 /**
@@ -62,19 +67,23 @@ public class GPSTracker {
         GPS_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
         if (!GPS_enabled) {
-
+            Log.v("Status","GPS not enabled.");
             //If GPS is not enabled, finish taking values
             value_count = max_value_count;
-
         }
 
         if (GPS_enabled) {
             try {
-                locationManager.requestLocationUpdates(locationProvider, 0, 0, locationListener);
-                new_location = locationManager.getLastKnownLocation(locationProvider);
-
+                if (ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED ){
+                    Log.v("Status","Permission Resolved!");
+                    locationManager.requestLocationUpdates(locationProvider, 0, 0, locationListener);
+                    Log.v("Status", "Location Requested!");
+                    new_location = locationManager.getLastKnownLocation(locationProvider);
+                    Log.v("Status","GPS Enabled!");
+                }
             } catch (Exception e) {
-                Log.e("Security Exception", "Permission Denied");
+                Log.e("WExcepotionm in true", "Permission Denied");
             }
 
             if (new_location != null) {
@@ -83,6 +92,7 @@ public class GPSTracker {
                 locations[0] = new_location.getLongitude();
                 locations[1] = new_location.getLatitude();
                 locations[2] = new_location.getAltitude();
+                Log.v("Value",String.valueOf(locations[0]));
             }
 
         }

@@ -1,6 +1,7 @@
 package com.aero2.android.DefaultClasses;
 
 import android.app.Activity;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -19,7 +20,7 @@ import java.io.IOException;
  */
 
 public class STMCommunicator {
-    public static final String BT_DEVICE_NAME = "BT_DEVICE"; // Default device name
+    public static final String BT_DEVICE_NAME = "HC-05"; // Default device name
     public static final int DEFAULT_I_COMMAND_SIZE = 20; // eg. "IPAS:1"
 
     public int nSensors = 0; // No. of available sensors
@@ -55,30 +56,19 @@ public class STMCommunicator {
     public boolean passwordCorrect = false;
     public boolean smogAvailable = false;
     public boolean airQualityAvailable = false;
+    public boolean isDeviceConnected = false;
+
 
     /**
      * Default Constructor
-     * Starts the BT communication and and Authenticates using Provided Username and Password
-     * arg: Current Activity, Username, Password
-     * exception: IOException
-     * return: No return value
-     */
-
-    public STMCommunicator(Activity activity, String username, String password) throws IOException {
-        this.btService = new BTService(activity, BT_DEVICE_NAME);
-        this.authenticate(username, password);
-    }
-
-    /**
-     * Overloaded Constructor
-     * Calls the default Constructor and Authenticates using Default Username and Password
+     * Instantiates the BTService object
      * arg: Current Activity
      * exception: IOException
      * return: No return value
      */
 
     public STMCommunicator(Activity activity) throws IOException {
-        this(activity, DEF_USERNAME, DEF_PASSWORD);
+        this.btService = new BTService(activity, BT_DEVICE_NAME);
     }
 
     /**
@@ -111,30 +101,40 @@ public class STMCommunicator {
      * return: No return value.
      */
 
-    private void authenticate(String username, String password) throws IOException {
+    public void authenticate(String username, String password) throws IOException {
+
         // Step 1 : Send the AUT: Instruction for initial identification and wait for approval
-        sendCommand(O_COM_AUT, "");
+        sendCommand(O_COM_AUT, "1\n");
+
         if(receiveCommand().equals(I_COM_AUT + ":1")) {
             btAvailable = true;
+            Log.v("STMCommunicator","btAvailable is set to true, authenticate()");
+
         }
 
         // Step 2 : Send the Username and wait for approval
-        sendCommand(O_COM_USR, username);
+        sendCommand(O_COM_USR, username+"\n");
+
         if(receiveCommand().equals(I_COM_USR + ":1")) {
             userCorrect = true;
+            Log.v("STMCommunicator","username is set to true, authenticate()");
         }
 
         // Step 3 : Send the Password and wait for approval
-        sendCommand(O_COM_PAS, password);
+        sendCommand(O_COM_PAS, password+"\n");
+
         if(receiveCommand().equals(I_COM_PAS + ":1")) {
             passwordCorrect = true;
+            Log.v("STMCommunicator","password is set to true, authenticate()");
         }
 
         authenticationStatus = btAvailable && userCorrect && passwordCorrect;
+        Log.v("Authenticated? ", String.valueOf(authenticationStatus));
 
         // Step 4 : Enable Smog Sensor amd Air Quality Sensor
         enableSensors();
     }
+
 
     /**
      * Activates all the available sensors
@@ -144,16 +144,20 @@ public class STMCommunicator {
      */
 
     public void enableSensors() throws IOException {
-        sendCommand(O_COM_NSG, "1");
+        sendCommand(O_COM_NSG, "1\n");
+
         if(receiveCommand().equals(I_COM_NSG + ":1")) {
             smogAvailable = true;
             nSensors++;
+            Log.v("Smog sensor: ", "Authenticated");
         }
 
-        sendCommand(O_COM_NAQ, "1");
+        sendCommand(O_COM_NAQ, "1\n");
+
         if(receiveCommand().equals(I_COM_NAQ + ":1")) {
             airQualityAvailable = true;
             nSensors++;
+            Log.v("Air quality sensor: ", "Authenticated");
         }
     }
 
@@ -167,7 +171,8 @@ public class STMCommunicator {
     public void disableSensors() throws IOException {
 
         if(smogAvailable) {
-            sendCommand(O_COM_NSG, "0");
+            sendCommand(O_COM_NSG, "0\n");
+
             if(receiveCommand().equals(I_COM_NSG + ":0")) {
                 smogAvailable = false;
                 nSensors--;
@@ -175,7 +180,8 @@ public class STMCommunicator {
         }
 
         if(airQualityAvailable) {
-            sendCommand(O_COM_NAQ, "0");
+            sendCommand(O_COM_NAQ, "0\n");
+
             if(receiveCommand().equals(I_COM_NAQ + ":0")) {
                 airQualityAvailable = false;
                 nSensors--;
@@ -202,6 +208,7 @@ public class STMCommunicator {
         return sensorValues;
     }
 
+
     /**
      * Returns the current Smog sensor value
      * arg: None
@@ -209,14 +216,18 @@ public class STMCommunicator {
      * return: Integer
      */
 
+
     public int getSmogValue() throws IOException {
         if(authenticationStatus && smogAvailable) {
-            String temp;
-            sendCommand(O_COM_SSG, "");
-            temp = receiveCommand();
 
-            if(temp.substring(0, 3).equals(I_COM_SSG)) {
-                return (int) temp.charAt(5);
+            String temp;
+            sendCommand(O_COM_SSG, "\n");
+            temp = receiveCommand();
+            Log.v("STMCommunicator", "Message Received in getSmogValue(): " + temp);
+
+            if(temp.substring(0,4).equals(I_COM_SSG)) {
+                String smog = temp.substring(5,temp.length());
+                return Integer.parseInt(smog);
             }
             return 0;
         }
@@ -233,7 +244,7 @@ public class STMCommunicator {
     public int getAirQualityValue() throws IOException {
         if(authenticationStatus && airQualityAvailable) {
             String temp;
-            sendCommand(O_COM_SAQ, "");
+            sendCommand(O_COM_SAQ, "\n");
             temp = receiveCommand();
 
             if(temp.substring(0, 3).equals(I_COM_SAQ)) {
