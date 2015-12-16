@@ -179,21 +179,21 @@ public class BTService {
     public String readMessage(int messageSize) throws IOException {
         Log.v("BTService", "Entered the readMessage() function");
 
-        byte[] dataBuffer = new byte[messageSize];
+        byte[] dataBuffer = new byte[1];
         Log.v("BTService", "Byte buffer created");
 
-        while(true) {
-            if (inStream.available()>0) {
-                inStream.read(dataBuffer);
-                break;
-            }
-            else{
-                SystemClock.sleep(100);
-            }
+        String message = "";
+
+        while (!message.endsWith("\n")) {
+            inStream.read(dataBuffer);
+            message += new String(dataBuffer, "UTF-8");
+
+            dataBuffer = new byte[1];
+            Log.v("BTService imndie", message);
         }
-        //while(inStream.read(dataBuffer) >= 0);
-        Log.v("BTService", "Byte received");
-        return new String(dataBuffer, "UTF-8");
+
+        Log.v("BTService outside", message);
+        return message;
     }
 
     /**

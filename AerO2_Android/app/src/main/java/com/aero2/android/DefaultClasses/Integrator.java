@@ -56,7 +56,7 @@ public class Integrator {
 
 
             Log.v("Status","Entering integrator try");
-            //sensor.authenticate("username","password");
+            sensor.authenticate("username","password");
             int smog = sensor.getSmogValue();
             Log.v("Status","Done with BT Service");
             int airQuality = 98;

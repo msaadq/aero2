@@ -139,7 +139,11 @@ public class STMCommunicator {
             passwordCorrect = true;
         }
 
+        Log.v("Value of Autehn", String.valueOf(btAvailable) + String.valueOf(userCorrect) + String.valueOf(passwordCorrect));
+
         authenticationStatus = btAvailable && userCorrect && passwordCorrect;
+
+        Log.v("Value of Aute244n", String.valueOf(authenticationStatus));
 
         // Step 4 : Enable Smog Sensor amd Air Quality Sensor
         enableSensors();
@@ -158,6 +162,7 @@ public class STMCommunicator {
         if(receiveCommand().equals(I_COM_NSG + ":1")) {
             smogAvailable = true;
             nSensors++;
+            Log.v("Value of Sensor", "We're here!");
         }
 
         sendCommand(O_COM_NAQ, "1");
@@ -239,18 +244,17 @@ public class STMCommunicator {
 
 
     public int getSmogValue() throws IOException {
-        if(authenticationStatus && smogAvailable) {
+        if(true/*authenticationStatus && smogAvailable*/) {
             String temp;
             Log.v("STMCommunicator", "Inside getSmogValue()");
-            sendCommand(O_COM_SSG, "0");
+            sendCommand(O_COM_SSG, "1");
             Log.v("STMCommunicator", "Command sent! getSmogValue()");
             temp = receiveCommand();
             Log.v("STMCommunicator","Message Received in getSmogValue(): "+temp);
-            /*
-            if(temp.substring(0, 3).equals(I_COM_SSG)) {
+
+            if(true/*temp.substring(0, 3).equals(I_COM_SSG*/) {
                 return (int) temp.charAt(5);
             }
-            */
             return 0;
         }
         return 0;
