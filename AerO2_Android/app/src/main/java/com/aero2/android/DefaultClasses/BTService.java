@@ -166,7 +166,7 @@ public class BTService {
 
         outputStream = socket.getOutputStream();
         outputStream.write(message.getBytes());
-        Log.v("Appstatus","Mesage Written");
+        Log.v("Appstatus","Mesage Written " + message);
     }
 
     /**
@@ -183,15 +183,26 @@ public class BTService {
         Log.v("BTService", "Byte buffer created");
 
         String message = "";
+        String temp = "";
+        try {
+            while (true) {
+                inStream.read(dataBuffer);
+                temp = new String(dataBuffer, "UTF-8");
+                Log.v("Value",temp);
+                if (temp.equals("\n")) {
+                    Log.v("Breaking.", "Breaking");
+                    break;
+                }
 
-        while (!message.endsWith("\n")) {
-            inStream.read(dataBuffer);
-            message += new String(dataBuffer, "UTF-8");
+                message += temp;
+                dataBuffer = new byte[1];
+                Log.v("BTService inside", message);
 
-            dataBuffer = new byte[1];
-            Log.v("BTService imndie", message);
+            }
         }
-
+        catch (IOException e){
+            Log.e("BTService","read exception");
+        }
         Log.v("BTService outside", message);
         return message;
     }
