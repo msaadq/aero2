@@ -133,15 +133,15 @@ These functions need to be defined here
 '''
 
 
-def _get_corner_coordinates(self, city_name):
+def get_corner_coordinates(self, city_name):
     pass
 
 
-def _get_road_index(self, node_coordinates):
+def get_road_index(self, node_coordinates):
     pass
 
 
-def _get_industry_index(self, node_coordinates):
+def get_industry_index(self, node_coordinates):
     pass
 
 
