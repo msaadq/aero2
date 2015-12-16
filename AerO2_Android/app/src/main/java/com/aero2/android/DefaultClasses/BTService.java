@@ -5,7 +5,9 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.ParcelUuid;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.io.IOException;
@@ -23,6 +25,12 @@ import java.util.Set;
 
 public class BTService {
     static private OutputStream outputStream;
+
+    static public Boolean getDeviceConnected() {
+        return deviceConnected;
+    }
+
+    static private Boolean deviceConnected;
     static private InputStream inStream;
     static private Activity activity;
 
@@ -44,24 +52,46 @@ public class BTService {
      * return: No return value.
      */
 
-    public BTService(Activity activity, String deviceName) {
-        Log.e("Appstatus", "Entered the BTService Constructor");
+    public BTService(Activity activity, final String deviceName) {
+        Log.v("Appstatus", "Entered the BTService Constructor");
 
         this.activity = activity;
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         this.btDeviceName = deviceName;
+        deviceConnected = false;
 
-        try {
-            setBluetoothDevice();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>(){
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    setBluetoothDevice();
+                    Log.v("Appstatus", "BTService Constructor, bluetoothDevice");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("Exception", "BTService Constructor, bluetoothDevice");
+                    return false;
+                }
 
-        try {
-            bondDevice(deviceName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                try {
+                    bondDevice(deviceName);
+                    Log.v("Appstatus", "BTService Constructor, bondDevice");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("Exception", "BTService Constructor, bondDevice");
+                    return false;
+                }
+                return true;
+            }
+
+            protected void onPostExecute(Boolean result) {
+                Log.v("Set","Setting deviceConntect true");
+                deviceConnected = true;
+            }
+        };
+
+        runAsyncTask(task);
+
+
     }
 
     /**
@@ -117,6 +147,7 @@ public class BTService {
             socket.connect();
             outputStream = socket.getOutputStream();
             inStream = socket.getInputStream();
+            Log.v("BTService","Input and Output Streams set");
         }
         else {
             Log.e("On Screen Message", "No appropriate paired devices.");
@@ -131,10 +162,11 @@ public class BTService {
      */
 
     public void sendMessage(String message) throws IOException {
-        Log.e("Appstatus", "Entered the sendMessage() function");
+        Log.v("Appstatus", "Entered the sendMessage() function");
 
         outputStream = socket.getOutputStream();
         outputStream.write(message.getBytes());
+        Log.v("Appstatus","Mesage Written " + message);
     }
 
     /**
@@ -145,12 +177,44 @@ public class BTService {
      */
 
     public String readMessage(int messageSize) throws IOException {
-        Log.e("Appstatus", "Entered the readMessage() function");
+        Log.v("BTService", "Entered the readMessage() function");
 
-        byte[] dataBuffer = new byte[messageSize];
+        byte[] dataBuffer = new byte[1];
+        Log.v("BTService", "Byte buffer created");
 
-        while(inStream.read(dataBuffer) >= 0);
+        String message = "";
+        String temp = "";
+        try {
+            while (true) {
+                inStream.read(dataBuffer);
+                temp = new String(dataBuffer, "UTF-8");
+                Log.v("Value",temp);
+                if (temp.equals("\n")) {
+                    Log.v("Breaking.", "Breaking");
+                    break;
+                }
 
-        return new String(dataBuffer, "UTF-8");
+                message += temp;
+                dataBuffer = new byte[1];
+                Log.v("BTService inside", message);
+
+            }
+        }
+        catch (IOException e){
+            Log.e("BTService","read exception");
+        }
+        Log.v("BTService outside", message);
+        return message;
+    }
+
+    /**
+     * Executes the AsyncTask
+     * arg: AsyncTask
+     * exception: None
+     * return: No return value.
+     */
+
+    private AsyncTask<Void, Void, Boolean> runAsyncTask(AsyncTask<Void, Void, Boolean> task) {
+        return task.execute();
     }
 }

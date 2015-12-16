@@ -1,9 +1,11 @@
 package com.aero2.android.DefaultClasses;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
+import android.util.Log;
 
 /**
  *
@@ -14,16 +16,24 @@ import android.app.Activity;
  */
 public class Integrator {
 
-    private STMCommunicator sensor;
-    private GPSTracker gps;
+    STMCommunicator sensor;
+    GPSTracker gps;
 
-    Integrator(Activity activity){
-        try{
-            sensor = new STMCommunicator(activity);
+    private int value_count;
+    // Maximum number of expected values
+    private final int max_value_count = 10000;
+
+    // Authentication Strings
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
+
+    public Integrator(Activity activity){
+        try {
             gps = new GPSTracker(activity);
-        }
-        catch (IOException ie){
-            ie.printStackTrace();
+            sensor = new STMCommunicator(activity);
+            //sensor.bypassAuthentication();
+        } catch (IOException e){
+            e.printStackTrace();
         }
     }
 
@@ -36,20 +46,31 @@ public class Integrator {
      * longitude, latitude, altitude and time (in order)
      */
 
-    public double[] integrateSmog(){
+    public String[] integrateSmog(){
 
-        double [] integrated = {};
+        String [] integrated = new String [6];
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyMMdd;HHmmss");//dd/MM/yyyy
         Date date = new Date();
-
+        String dateTime = sdfDate.format(date);
         try {
-            int smog = sensor.getSmogValue();
-            double[] newLocation = gps.getGps();
-            int temp = integrated.length;
-            integrated = new double[temp + 2];
 
-            System.arraycopy(smog,0,integrated,0,1);
-            System.arraycopy(newLocation,0,integrated,1,temp);
-            System.arraycopy(date,0,integrated,1+temp,1);
+
+            Log.v("Status","Entering integrator try");
+            sensor.authenticate("username","password");
+            int smog = sensor.getSmogValue();
+            Log.v("Status","Done with BT Service");
+            int airQuality = 98;
+            double[] newLocation = gps.getGps();
+
+            integrated[0] = String.valueOf(dateTime);
+            integrated[1] = String.valueOf(newLocation[0]);
+            integrated[2] = String.valueOf(newLocation[1]);
+            integrated[3] = String.valueOf(newLocation[2]);
+            integrated[4] = String.valueOf(smog);
+            integrated[5] = String.valueOf(false);
+
+            Log.v("Hello", integrated[0] + " " + integrated[1] + " " + integrated[2] + " "
+                    + integrated[3] + " " +integrated[4]+ " "+integrated[5]);
         }
         catch (IOException ie){
             ie.printStackTrace();
