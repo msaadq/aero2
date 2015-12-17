@@ -70,6 +70,8 @@ void sendString(char *s) {
 char * readString(void) {
 	static char stringData[25];
 
+	HAL_Delay(1);
+
 	for(int i = 0; ; i++) {
 		stringData[i] = uartReceive();
 		if(stringData[i] == '\n') { break; }
