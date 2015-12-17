@@ -293,12 +293,11 @@ void sendCommand(char * command, char * parameters) {
  * return: Concatenated Strings with ":" between them
  */
 
-char * commandBuilder(char *s1, char *s2)
-{
+char * commandBuilder(char *s1, char *s2) {
     char *result = malloc(strlen(s1)+strlen(s2)+2);
     
     strcpy(result, s1);
-		strcat(result, ":");
+	strcat(result, ":");
     strcat(result, s2);
 	
     return result;
