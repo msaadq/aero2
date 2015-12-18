@@ -77,7 +77,7 @@ public class DBWriter {
      * return: No return value.
      */
 
-    public void addItem(String id, String[] data) {
+    public void addItem(String id, double[] data) {
         if (mClient == null) {
             return;
         }

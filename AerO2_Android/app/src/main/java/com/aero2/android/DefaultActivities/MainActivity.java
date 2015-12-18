@@ -30,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private int m_interval = 1000;
     public static int value_count = 0;
     private final int max_value_count = 1000;
-    private String integrators[][];
-    private String new_integrator [];
+    private double integrators[][];
+    private double new_integrator [];
     public static TextView longitude_text;
     public static TextView latitude_text;
     public static TextView altitude_text;
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         m_handler = new Handler();
         dbWriter = new DBWriter(this);
         integrator = new Integrator(this);
-        integrators = new String [max_value_count][6];
+        integrators = new double [max_value_count][6];
 
         //Ask user to adjust settings
         setSupportActionBar(toolbar);

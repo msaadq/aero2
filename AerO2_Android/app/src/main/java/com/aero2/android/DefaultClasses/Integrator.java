@@ -28,13 +28,9 @@ public class Integrator {
     public static final String PASSWORD = "password";
 
     public Integrator(Activity activity){
-        try {
-            gps = new GPSTracker(activity);
-            sensor = new STMCommunicator(activity);
-            //sensor.bypassAuthentication();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
+        gps = new GPSTracker(activity);
+        //sensor = new STMCommunicator(activity);
+        //sensor.bypassAuthentication();
     }
 
     /**
@@ -46,35 +42,31 @@ public class Integrator {
      * longitude, latitude, altitude and time (in order)
      */
 
-    public String[] integrateSmog(){
+    public double[] integrateSmog(){
 
-        String [] integrated = new String [6];
-        SimpleDateFormat sdfDate = new SimpleDateFormat("yyMMdd;HHmmss");//dd/MM/yyyy
+        double [] integrated = new double[6];
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyMMdd.HHmmss");//dd/MM/yyyy
         Date date = new Date();
         String dateTime = sdfDate.format(date);
-        try {
 
 
-            Log.v("Status","Entering integrator try");
+        Log.v("Status","Entering integrator try");
+            /*
             sensor.authenticate("username","password");
-            int smog = sensor.getSmogValue();
-            Log.v("Status","Done with BT Service");
-            int airQuality = 98;
-            double[] newLocation = gps.getGps();
+            */
+        double smog = 5.0;
+        Log.v("Status","Done with BT Service");
+        int airQuality = 98;
+        double[] newLocation = gps.getGps();
 
-            integrated[0] = String.valueOf(dateTime);
-            integrated[1] = String.valueOf(newLocation[0]);
-            integrated[2] = String.valueOf(newLocation[1]);
-            integrated[3] = String.valueOf(newLocation[2]);
-            integrated[4] = String.valueOf(smog);
-            integrated[5] = String.valueOf(false);
+        integrated[0] = Double.parseDouble(dateTime);
+        integrated[1] = newLocation[0];
+        integrated[2] = newLocation[1];
+        integrated[3] = newLocation[2];
+        integrated[4] = smog;
 
-            Log.v("Hello", integrated[0] + " " + integrated[1] + " " + integrated[2] + " "
-                    + integrated[3] + " " +integrated[4]+ " "+integrated[5]);
-        }
-        catch (IOException ie){
-            ie.printStackTrace();
-        }
+        Log.v("Hello", integrated[0] + " " + integrated[1] + " " + integrated[2] + " "
+                + integrated[3] + " " + integrated[4] + " " + integrated[5]);
 
         return integrated;
     }

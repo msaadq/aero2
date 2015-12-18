@@ -18,38 +18,38 @@ public class SampleDataTable {
      * SampleDataTable Smog Value
      */
     @com.google.gson.annotations.SerializedName("smog")
-    private String mSmog;
+    private double mSmog;
 
     /**
      * SampleDataTable Longitude
      */
     @com.google.gson.annotations.SerializedName("long")
-    private String mLong;
+    private double mLong;
 
     /**
      * SampleDataTable Latitude
      */
     @com.google.gson.annotations.SerializedName("lat")
-    private String mLat;
+    private double mLat;
 
     /**
      * SampleDataTable Altitude
      */
     @com.google.gson.annotations.SerializedName("alt")
-    private String mAlt;
+    private double mAlt;
 
     /**
      * SampleDataTable Time
      */
     @com.google.gson.annotations.SerializedName("time")
-    private String mTime;
+    private double mTime;
 
 
     /**
      * SampleDataTable Normalized
      */
     @com.google.gson.annotations.SerializedName("normalized")
-    private String mNormalized;
+    private boolean mNormalized;
 
 
     /**
@@ -61,14 +61,14 @@ public class SampleDataTable {
     /**
      * Initializes a new SampleDataTable Row
      */
-    public SampleDataTable(String id, String[] integratedValues) {
+    public SampleDataTable(String id, double[] integratedValues) {
         this.setmId(id);
         this.setTime(integratedValues[0]);
         this.setLat(integratedValues[1]);
         this.setLong(integratedValues[2]);
         this.setAlt(integratedValues[3]);
         this.setSmog(integratedValues[4]);
-        this.setmNormalized(integratedValues[5]);
+        this.setmNormalized(false);
     }
 
     /**
@@ -81,39 +81,39 @@ public class SampleDataTable {
     /**
      * Sets the SampleDataTable Smog Value
      */
-    public final void setSmog(String smog) {
+    public final void setSmog(double smog) {
         mSmog = smog;
     }
 
     /**
      * Sets the SampleDataTable Longitude
      */
-    public final void setLong(String lon) {
+    public final void setLong(double lon) {
         mLong = lon;
     }
 
     /**
      * Sets the SampleDataTable Latitude
      */
-    public final void setLat(String lat) {
+    public final void setLat(double lat) {
         mLat = lat;
     }
 
     /**
      * Sets the SampleDataTable Altitude
      */
-    public final void setAlt(String alt) {
+    public final void setAlt(double alt) {
         mAlt = alt;
     }
 
     /**
      * Sets the SampleDataTable Time
      */
-    public final void setTime(String time) {
+    public final void setTime(double time) {
         mTime = time;
     }
 
-    public void setmNormalized(String Normalized) {
+    public void setmNormalized(boolean Normalized) {
         mNormalized = Normalized;
     }
 
@@ -129,40 +129,40 @@ public class SampleDataTable {
     /**
      * Returns the SampleDataTable Smog Value
      */
-    public String getSmog() {
+    public double getSmog() {
         return mSmog;
     }
 
     /**
      * Returns the SampleDataTable Longitude
      */
-    public String getLong() {
+    public double getLong() {
         return mLong;
     }
 
     /**
      * Returns the SampleDataTable Latitude
      */
-    public String getLat() {
+    public double getLat() {
         return mLat;
     }
 
     /**
      * Returns the SampleDataTable Altitude
      */
-    public String getAlt() {
+    public double getAlt() {
         return mAlt;
     }
 
     /**
      * Returns the SampleDataTable Time
      */
-    public String getTime() {
+    public double getTime() {
         return mTime;
     }
 
 
-    public String getmNormalized() {
+    public boolean getmNormalized() {
         return mNormalized;
     }
 }

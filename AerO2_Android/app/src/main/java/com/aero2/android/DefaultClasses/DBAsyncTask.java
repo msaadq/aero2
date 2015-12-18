@@ -12,7 +12,7 @@ package com.aero2.android.DefaultClasses;
  *
  * Created by usmankhan on 12/13/2015.
  */
-public class DBAsyncTask extends AsyncTask<String[][], Void, Void> {
+public class DBAsyncTask extends AsyncTask<double[][], Void, Void> {
 
     Activity activity;
     DBWriter dbWriter;
@@ -24,12 +24,12 @@ public class DBAsyncTask extends AsyncTask<String[][], Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(String[][]... params) {
+    protected Void doInBackground(double[][]... params) {
         Log.v("DBAsyncTask", "Entered doInBackground");
         int count  = MainActivity.value_count;
 
         for (int i=0; i< count; i++) {
-            dbWriter.addItem(params[0][i][0], params[0][i]);
+            dbWriter.addItem("Hello" + Integer.toString(i) , params[0][i]);
             Log.v("DBAsyncTask", "Added Item " + String.valueOf(i));
         }
 
