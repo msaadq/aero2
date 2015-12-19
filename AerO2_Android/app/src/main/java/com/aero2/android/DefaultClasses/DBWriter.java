@@ -51,16 +51,12 @@ public class DBWriter {
     public DBWriter(Activity activity, String url, String key) {
         try {
 
-            Log.d("App Status", "Entered Function");
-
             // Create the Mobile Service Client instance, using the provided URL and key
             mClient = new MobileServiceClient(url, key, activity);
-
             Log.d("App Status", "URL Successful");
 
             // Get the Mobile Service Table instance to use
             mTable = mClient.getTable(SampleDataTable.class);
-
             Log.d("App Status", "Table get successful");
 
         } catch (MalformedURLException e) {

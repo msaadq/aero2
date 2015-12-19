@@ -26,10 +26,6 @@ import java.util.Set;
 public class BTService {
     static private OutputStream outputStream;
 
-    static public Boolean getDeviceConnected() {
-        return deviceConnected;
-    }
-
     static private Boolean deviceConnected;
     static private InputStream inStream;
     static private Activity activity;
@@ -147,7 +143,7 @@ public class BTService {
             socket.connect();
             outputStream = socket.getOutputStream();
             inStream = socket.getInputStream();
-            Log.v("BTService","Input and Output Streams set");
+            Log.v("BTService", "Input and Output Streams set");
         }
         else {
             Log.e("On Screen Message", "No appropriate paired devices.");
@@ -166,7 +162,7 @@ public class BTService {
 
         outputStream = socket.getOutputStream();
         outputStream.write(message.getBytes());
-        Log.v("Appstatus","Mesage Written " + message);
+        Log.v("Appstatus", "Mesage Written " + message);
     }
 
     /**
@@ -217,4 +213,15 @@ public class BTService {
     private AsyncTask<Void, Void, Boolean> runAsyncTask(AsyncTask<Void, Void, Boolean> task) {
         return task.execute();
     }
+
+    /**
+     * Indicates if device is connected
+     * arg: None
+     * exception: None
+     * return: Boolean
+     */
+    static public Boolean getDeviceConnected() {
+        return deviceConnected;
+    }
+
 }
