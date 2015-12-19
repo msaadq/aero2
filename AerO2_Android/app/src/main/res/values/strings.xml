@@ -3,4 +3,6 @@
     <string name="title_activity_test">AerO2</string>
     <string name="action_settings">Settings</string>
     <string name="introduction_text">Welcome! Press \'Start\' as soon as you\'re ready.</string>
+    <string name="final_text">Thank you for contributing! Your values have been recorded.
+        Have a nice exercise!</string>
 </resources>

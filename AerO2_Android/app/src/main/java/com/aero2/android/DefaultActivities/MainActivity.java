@@ -1,6 +1,5 @@
 package com.aero2.android.DefaultActivities;
 
-
 import android.Manifest;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,28 +26,32 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Time between each GPS recording
-    private int m_interval = 1000;
+    //Main Activity Variables
+    private int m_interval = 1000;              // Time between each GPS recording
     public static int value_count = 0;
     private final int max_value_count = 1000;
-    private String integrators[][];
+    private final int N = 6;                    // Size of integrator array
+    private String integrators[][];             // 2-D array holding all records
     private String new_integrator [];
-    public static TextView longitude_text;
-    public static TextView latitude_text;
-    public static TextView altitude_text;
-    public static TextView smog_text;
-    TextView time_text;
-    TextView thank_you_text;
-    TextView value_count_text;
-    Date date;
-    GPSTracker gps;
-    Integrator integrator;
-    DBWriter dbWriter;
-    DBAsyncTask dbAsyncTask;
-    Button gps_button;
-    Button stop_button;
-    Handler m_handler;
 
+    //UI Elements
+    private TextView longitude_text;
+    private TextView latitude_text;
+    private TextView altitude_text;
+    private TextView smog_text;
+    private TextView time_text;
+    private TextView thank_you_text;
+    private TextView value_count_text;
+
+    //Global Objects
+    private Date date;
+    private GPSTracker gps;
+    private Integrator integrator;
+    private DBWriter dbWriter;
+    private DBAsyncTask dbAsyncTask;
+    private Button gps_button;
+    private Button stop_button;
+    private Handler m_handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         m_handler = new Handler();
         dbWriter = new DBWriter(this);
         integrator = new Integrator(this);
-        integrators = new String [max_value_count][6];
+        integrators = new String [max_value_count][N];
 
         //Ask user to adjust settings
         setSupportActionBar(toolbar);
@@ -80,20 +83,25 @@ public class MainActivity extends AppCompatActivity {
         this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 1);                         //Ask user for Manifest permission
 
+
+        //Stop Integrator Handler & show count
         stop_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                //Stop GPS Handler
+                //Stop Integrator Handler
                 m_handler.removeCallbacks(getIntegrator);
+
                 try {
                     showValueCount();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
                 Log.v("Info", "Stopped.");
             }
         });
 
+        //Start Integrator Handler
         gps_button.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
@@ -114,28 +122,36 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //
     Runnable getIntegrator = new Runnable() {
         @Override
         public void run() {
+            //Check if Bluetooth is connected
             if (BTService.getDeviceConnected() == true) {
-                Log.v("Status", "Capturing GPS Reading");
+
+                //Check if maximum limit is not exceeded
                 if (value_count <= max_value_count) {
 
+                    //Get smog and GPS values
                     new_integrator = integrator.integrateSmog();
 
+                    //Parse information
                     for (int i = 0; i < 6; i++) {
                         integrators[value_count][i] = new_integrator[i];
                     }
 
+                    //Add Date Information
                     SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
                     date = new Date();
 
+                    //Update UI Elements
                     time_text.setText("Time & Date: " + sdfDate.format(date));
                     longitude_text.setText("Longitude: " + new_integrator[1]);
                     latitude_text.setText("Latitude: " + new_integrator[2]);
                     altitude_text.setText("Altitude: " + new_integrator[3]);
                     smog_text.setText("Smog: " + new_integrator[4]);
 
+                    //Increment value count & restart handler
                     value_count++;
                     Log.v("Value Count", String.valueOf(value_count));
                     m_handler.postDelayed(getIntegrator, m_interval);
@@ -159,16 +175,14 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //Show count & Save data
     public void showValueCount() throws IOException {
         value_count_text.setText("Value Count: " + value_count);
-        Log.v("MainActivity","Calling constructor");
 
+        //Connect with Azure
         dbAsyncTask = new DBAsyncTask(this,dbWriter);
-        Log.v("MainActivity","Calling execute");
-
         dbAsyncTask.execute(integrators);
-        thank_you_text.setText("Thank you for contributing! Your values have been recorded." +
-                " Have a nice exercise!");
+        thank_you_text.setText(getString(R.string.final_text));
     }
 
 }
