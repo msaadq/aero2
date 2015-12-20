@@ -17,7 +17,7 @@ public class Integrator {
     private STMCommunicator sensor;
     private GPSTracker gps;
 
-    Integrator(Activity activity){
+    public Integrator(Activity activity){
         try{
             sensor = new STMCommunicator(activity);
             gps = new GPSTracker(activity);
