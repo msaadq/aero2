@@ -202,7 +202,7 @@ public class STMCommunicator {
         int[] sensorValues = new int[nSensors];
         int sensorValuesIndex = 0;
 
-        sensorValues[sensorValuesIndex++] = getSmogValue();
+        sensorValues[sensorValuesIndex++] = Integer.parseInt(getSmogValue());
 
         sensorValues[sensorValuesIndex++] = getAirQualityValue();
 
@@ -218,7 +218,8 @@ public class STMCommunicator {
      */
 
 
-    public int getSmogValue() throws IOException {
+    public String getSmogValue() throws IOException {
+        Log.v(String.valueOf(authenticationStatus),String.valueOf(smogAvailable));
         if(authenticationStatus && smogAvailable) {
 
             String temp;
@@ -227,12 +228,11 @@ public class STMCommunicator {
             Log.v("STMCommunicator", "Message Received in getSmogValue(): " + temp);
 
             if(temp.substring(0,4).equals(I_COM_SSG)) {
-                String smog = temp.substring(5, temp.length());
-                return Integer.parseInt(smog);
+                return temp.substring(5, temp.length());
             }
-            return 0;
+            return "0";
         }
-        return 0;
+        return "0";
     }
 
     /**

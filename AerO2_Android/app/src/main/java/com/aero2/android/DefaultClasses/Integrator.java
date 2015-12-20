@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
+import android.util.Log;
 
 import com.aero2.android.DefaultActivities.MainActivity;
 
@@ -26,7 +27,7 @@ public class Integrator {
     public static final String PASSWORD = "password";
 
     /**
-     * Initializes the constructor by instatiating
+     * Initializes the constructor by instantiating
      * GPSTracker & STMCommunicator Objects
      * arg: The Current Activity
      * exception: IOException
@@ -60,20 +61,17 @@ public class Integrator {
 
         try {
 
-            //Authenticate for first time
-            if (MainActivity.value_count == 1) {
-                sensor.authenticate("username", "password");
-            }
-
-            int smog = sensor.getSmogValue();
-            double[] newLocation = gps.getGps();
+            sensor.authenticate("username", "password");
+            String smog = sensor.getSmogValue();
+            String[] newLocation = gps.getGps();
 
             integrated[0] = String.valueOf(dateTime);
-            integrated[1] = String.valueOf(newLocation[0]);
-            integrated[2] = String.valueOf(newLocation[1]);
-            integrated[3] = String.valueOf(newLocation[2]);
-            integrated[4] = String.valueOf(smog);
+            integrated[1] = newLocation[0];
+            integrated[2] = newLocation[1];
+            integrated[3] = newLocation[2];
+            integrated[4] = smog;
             integrated[5] = String.valueOf(false);
+
         } catch (IOException ie) {
             ie.printStackTrace();
         }

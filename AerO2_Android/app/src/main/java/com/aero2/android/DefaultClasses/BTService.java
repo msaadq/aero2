@@ -81,7 +81,6 @@ public class BTService {
         };
 
         runAsyncTask(task);
-
     }
 
     /**
@@ -139,6 +138,7 @@ public class BTService {
             inStream = socket.getInputStream();
             Log.v("BTService", "Input and Output Streams set");
             deviceConnected = true;
+            Log.v("BTService","Setting deviceConnected True");
         }
         else {
             Log.e("On Screen Message", "No appropriate paired devices.");
@@ -216,6 +216,7 @@ public class BTService {
      * return: Boolean
      */
     static public Boolean getDeviceConnected() {
+        Log.v("BTService","Bluetooth is connected? "+String.valueOf(deviceConnected));
         return deviceConnected;
     }
 

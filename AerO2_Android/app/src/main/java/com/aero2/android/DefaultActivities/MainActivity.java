@@ -21,20 +21,23 @@ import com.aero2.android.DefaultClasses.Integrator;
 import com.aero2.android.R;
 
 import java.io.IOException;
+import java.security.Permission;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
     //Main Activity Variables
-    private int m_interval = 1000;              // Time between each GPS recording
+    private int m_interval = 1500;              // Time between each GPS recording
     public static int value_count = 0;
     private final int max_value_count = 1000;
     private final int N = 6;                    // Size of integrator array
     private String integrators[][];             // 2-D array holding all records
     private String new_integrator [];
+    private Boolean sessionStart;
 
     //UI Elements
+    private TextView update_message_text;
     private TextView longitude_text;
     private TextView latitude_text;
     private TextView altitude_text;
@@ -42,10 +45,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView time_text;
     private TextView thank_you_text;
     private TextView value_count_text;
+    private Toolbar toolbar;
 
     //Global Objects
     private Date date;
-    private GPSTracker gps;
+    public GPSTracker gps;
     private Integrator integrator;
     private DBWriter dbWriter;
     private DBAsyncTask dbAsyncTask;
@@ -59,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Instantiate UI Objects
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        update_message_text= (TextView) findViewById(R.id.update_message_text);
         longitude_text = (TextView) findViewById(R.id.longitude_text);
         latitude_text = (TextView) findViewById(R.id.latitude_text);
         altitude_text = (TextView) findViewById(R.id.altitude_text);
@@ -76,10 +81,10 @@ public class MainActivity extends AppCompatActivity {
         dbWriter = new DBWriter(this);
         integrator = new Integrator(this);
         integrators = new String [max_value_count][N];
+        sessionStart = true;
 
         //Ask user to adjust settings
         setSupportActionBar(toolbar);
-        gps.showSettingsAlert();            //Ask user to turn on location
         this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 1);                         //Ask user for Manifest permission
 
@@ -97,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                Log.v("Info", "Stopped.");
+                Log.v("MainActivity", "Stopped Integrator.");
             }
         });
 
@@ -105,7 +110,26 @@ public class MainActivity extends AppCompatActivity {
         gps_button.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
+
                 Log.v("gps_button","Inside setonClickListener()");
+                update_message_text.setText(R.string.warm_up_message);
+
+                //If the activity is not started for first time
+                if(!sessionStart){
+                    Log.v("MainActivity","Reinitializing objects");
+
+                    //Clear update & thank you texts if starting again.
+                    update_message_text.setText("");
+                    thank_you_text.setText("");
+
+                    //Reinitialize integrators
+                    integrators = new String [max_value_count][N];
+                    value_count = 0;
+                    }
+
+                //Session has already started.
+                sessionStart = false;
+
                 //Run GPS Handler
                 getIntegrator.run();
             }
@@ -122,12 +146,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //
+    //Collect Integrator values & update user
     Runnable getIntegrator = new Runnable() {
         @Override
         public void run() {
-            //Check if Bluetooth is connected
-            if (BTService.getDeviceConnected() == true) {
+
+            boolean valid = true;           //reference variable indicating if values are correct
+
+            //Check if Bluetooth is connected & GPS is turned 'on'
+            if (GPSTracker.getGPSStatus() && BTService.getDeviceConnected()) {
 
                 //Check if maximum limit is not exceeded
                 if (value_count <= max_value_count) {
@@ -140,22 +167,52 @@ public class MainActivity extends AppCompatActivity {
                         integrators[value_count][i] = new_integrator[i];
                     }
 
-                    //Add Date Information
-                    SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
-                    date = new Date();
+                    //Skip if the location values contain null
+                    for (int i = 1; i<4; i++) {
+                        if(integrators[value_count][i] == null){
+                            Log.v("MainActivity","Locations are null");
+                            valid = false;
+                        }
+                    }
 
-                    //Update UI Elements
-                    time_text.setText("Time & Date: " + sdfDate.format(date));
-                    longitude_text.setText("Longitude: " + new_integrator[1]);
-                    latitude_text.setText("Latitude: " + new_integrator[2]);
-                    altitude_text.setText("Altitude: " + new_integrator[3]);
-                    smog_text.setText("Smog: " + new_integrator[4]);
+                    //Skips if smog sensor's value is 0
+                    if (integrators[value_count][4].equals("0")){
+                        Log.v("MainActivity","Smog = 0");
+                        valid = false;
+                    }
 
-                    //Increment value count & restart handler
-                    value_count++;
-                    Log.v("Value Count", String.valueOf(value_count));
-                    m_handler.postDelayed(getIntegrator, m_interval);
+                    if (valid) {
+
+                        if (value_count ==0){
+                            update_message_text.setText("");
+                        }
+
+                        //Add Date Information
+                        SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
+                        date = new Date();
+
+                        //Update UI Elements
+                        time_text.setText("Time & Date: " + sdfDate.format(date));
+                        longitude_text.setText("Longitude: " + new_integrator[1]);
+                        latitude_text.setText("Latitude: " + new_integrator[2]);
+                        altitude_text.setText("Altitude: " + new_integrator[3]);
+                        smog_text.setText("Smog: " + new_integrator[4]);
+
+                        //Increment value count & restart handler
+                        value_count++;
+                        Log.v("Value Count", String.valueOf(value_count));
+                        m_handler.postDelayed(getIntegrator, m_interval);
+                    }
+
+                    else{
+                        m_handler.postDelayed(getIntegrator, 500);
+                        update_message_text.setText(R.string.warm_up_message);
+                    }
+
                 }
+            }
+            else{
+                update_message_text.setText(R.string.bt_gps_error_message);
             }
         }
     };

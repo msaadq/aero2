@@ -5,4 +5,6 @@
     <string name="introduction_text">Welcome! Press \'Start\' as soon as you\'re ready.</string>
     <string name="final_text">Thank you for contributing! Your values have been recorded.
         Have a nice exercise!</string>
+    <string name="warm_up_message">Hold on, device is warming up!</string>
+    <string name="bt_gps_error_message">Oops, please try again or make sure your BT and GPS are turned on!</string>
 </resources>

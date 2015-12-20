@@ -26,31 +26,57 @@ import com.aero2.android.DefaultActivities.MainActivity;
 
 public class GPSTracker {
 
-    private int value_count;
-    // Maximum number of expected values
-    private final int max_value_count;
     private Context context;
-    double locations [];
+    private String locations [];
+    private static boolean gpsEnabled;
+    private static LocationManager locationManager;
+    public static Boolean settingDialogShown = false;   //Indicates if the setting dialog has been
+                                                        //shown to user
+
+    /**
+     * Initializes the constructor and creating
+     * settings dialog if GPS is not enabled.
+     * arg: The Current Activity
+     * exception: None
+     * return: No return value.
+     */
 
     public GPSTracker(Context context){
 
         this.context=context;
-        value_count = 0;
-        max_value_count = 1000;
-        locations = new double [3];
+        locations = new String [3];
+
+        // Acquire a reference to the system Location Manager
+        locationManager = (LocationManager) context.getSystemService
+                (Context.LOCATION_SERVICE);
+
+        getGPSStatus();
+
+        if (!gpsEnabled) {
+
+            //If setting Dialog is not already shown, display it
+            if (!settingDialogShown) {
+                Log.v("Status", "GPS not enabled.");
+                showSettingsAlert();
+                settingDialogShown = true;
+            }
+        }
     }
 
-    public double[] getGps(){
+    /**
+     * Get the GPS coordinates: Longitude, Latitude & Altitude
+     * arg: None
+     * exception: IOException
+     * return: String array containing longitude, latitude
+     *  and altitude (in order)
+     */
 
-        boolean GPS_enabled = false;
+    public String[] getGps(){
+
         Location new_location = null;
 
         // Select GPS for getting data
         String locationProvider = LocationManager.GPS_PROVIDER;
-
-        // Acquire a reference to the system Location Manager
-        LocationManager locationManager = (LocationManager) context.getSystemService
-                (Context.LOCATION_SERVICE);
 
         // Define a listener that responds to location updates
         LocationListener locationListener = new LocationListener() {
@@ -63,44 +89,42 @@ public class GPSTracker {
             public void onProviderEnabled(String provider) {}
 
             public void onProviderDisabled(String provider) {}
+
         };
-        GPS_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
-        if (!GPS_enabled) {
-            Log.v("Status","GPS not enabled.");
-            //If GPS is not enabled, finish taking values
-            value_count = max_value_count;
-        }
+        try {
+            //Ask for permission on run-time
+            if (ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED ){
 
-        if (GPS_enabled) {
-            try {
-                if (ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED ){
-                    Log.v("Status","Permission Resolved!");
-                    locationManager.requestLocationUpdates(locationProvider, 0, 0, locationListener);
-                    Log.v("Status", "Location Requested!");
-                    new_location = locationManager.getLastKnownLocation(locationProvider);
-                    Log.v("Status","GPS Enabled!");
-                }
-            } catch (Exception e) {
-                Log.e("WExcepotionm in true", "Permission Denied");
+                locationManager.requestLocationUpdates(locationProvider, 0, 0, locationListener);
+                Log.v("Status: ", "Location Requested!");
+                new_location = locationManager.getLastKnownLocation(locationProvider);
+
             }
 
-            if (new_location != null) {
+        } catch (Exception e) {
+            Log.e("Exception", "Permission Denied");
+        }
 
-                //Add parameters of new location to 1-d array
-                locations[0] = new_location.getLongitude();
-                locations[1] = new_location.getLatitude();
-                locations[2] = new_location.getAltitude();
-                Log.v("Value",String.valueOf(locations[0]));
-            }
+        if (new_location != null) {
+
+            locations[0] = String.valueOf(new_location.getLongitude());
+            locations[1] = String.valueOf(new_location.getLatitude());
+            locations[2] = String.valueOf(new_location.getAltitude());
 
         }
-        value_count++;
         return locations;
     }
 
-    public void showSettingsAlert(){
+    /**
+     * Creates a setting dialog to enable GPS
+     * arg: None
+     * exception: None
+     * return: None
+     */
+
+    private void showSettingsAlert(){
 
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
         // Setting Dialog Title
@@ -129,8 +153,19 @@ public class GPSTracker {
         alertDialog.show();
     }
 
-    public int getValueCount(){
-        return value_count;
+
+    /**
+     * Returns GPS Status to indicate if it is enabled.
+     * arg: None
+     * exception: None
+     * return: Boolean indicating GPS Status
+     */
+
+    public static boolean getGPSStatus(){
+
+        gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        Log.v("GPSTracker","GPS is on? "+String.valueOf(gpsEnabled));
+        return gpsEnabled;
     }
 
 }
