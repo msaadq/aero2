@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:paddingTop="30dp"
+    android:layout_margin="@dimen/abc_action_bar_icon_vertical_padding_material"
+    android:background="#00292929"
+    android:focusableInTouchMode="false"
+    android:foreground="#00ffffff"
+    android:foregroundTint="#ffffffa9"
+    android:id="@+id/grid_card">
+    <android.support.v7.widget.CardView
+        android:layout_height="100dp"
+        android:layout_width="match_parent"
+        android:background="#00ffffff"
+        android:backgroundTint="#fff0ff97"
+        android:elevation="10dp"
+        android:clickable="true">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/item_text_air"
+            android:text="hollo"
+            android:textColor="#ff9e1513"
+            android:background="#00ffffff"
+            android:backgroundTint="#fff3ffc5"
+            android:elevation="10dp"
+            android:elegantTextHeight="false"
+            android:ellipsize="marquee" />
+
+    </android.support.v7.widget.CardView>
+
+</FrameLayout>
+

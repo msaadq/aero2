@@ -14,6 +14,11 @@ import com.aero2.android.DefaultActivities.MainActivity;
  * Instantiates STMCommunicator's and GPSTracker's objects and
  * integrates them.
  *
+ * USE CASE:
+ *
+ * First initialize by passing on the activity. Next, call integrateSmog()
+ * method which will return all parameters in a 1-d array.
+ *
  * Created by Usman on 11/17/2015.
  */
 

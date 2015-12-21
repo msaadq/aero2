@@ -40,6 +40,7 @@ public class DBWriter {
         this(activity, DEFAULT_URL, DEFAULT_KEY);
     }
 
+
     /**
      * Parametrized Constructor
      * This calls the parametrized constructor with provided URL and Key
@@ -104,7 +105,7 @@ public class DBWriter {
      * return: No return value.
      */
 
-    private SampleDataTable addItemInTable(SampleDataTable sampleDataTable) throws ExecutionException, InterruptedException {
+    public SampleDataTable addItemInTable(SampleDataTable sampleDataTable) throws ExecutionException, InterruptedException {
         SampleDataTable entity = mTable.insert(sampleDataTable).get();
         return entity;
     }

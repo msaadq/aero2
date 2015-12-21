@@ -21,6 +21,13 @@ import com.aero2.android.DefaultActivities.MainActivity;
  * Determines the gps location after every 2 seconds and returns a 1-D array
  * that contains longitude, latitude, and altitude.
  *
+ * USE CASE:
+ *
+ * First initialize by passing on the activity. Next, call getGps()
+ * method which returns longitude, latitude and altitude in form of
+ * a 1-d array.
+ *
+ *
  * Created by Usman on 11/14/2015
  */
 
