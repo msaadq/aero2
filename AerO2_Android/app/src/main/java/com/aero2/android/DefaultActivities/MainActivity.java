@@ -18,6 +18,8 @@ import com.aero2.android.DefaultClasses.DBAsyncTask;
 import com.aero2.android.DefaultClasses.DBWriter;
 import com.aero2.android.DefaultClasses.GPSTracker;
 import com.aero2.android.DefaultClasses.Integrator;
+import com.aero2.android.DefaultClasses.SQLiteAPI;
+import com.aero2.android.DefaultClasses.SQLiteAsyncTask;
 import com.aero2.android.R;
 
 import java.io.IOException;
@@ -53,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
     private Integrator integrator;
     private DBWriter dbWriter;
     private DBAsyncTask dbAsyncTask;
+    private SQLiteAsyncTask sqLiteAsyncTask;
+    private SQLiteAPI sqLiteAPI;
     private Button gps_button;
     private Button stop_button;
     private Handler m_handler;
@@ -79,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         gps = new GPSTracker(this);
         m_handler = new Handler();
         dbWriter = new DBWriter(this);
+        sqLiteAPI = new SQLiteAPI(this);
         integrator = new Integrator(this);
         integrators = new String [max_value_count][N];
         sessionStart = true;
@@ -235,10 +240,13 @@ public class MainActivity extends AppCompatActivity {
     //Show count & Save data
     public void showValueCount() throws IOException {
         value_count_text.setText("Value Count: " + value_count);
-
+        sqLiteAsyncTask = new SQLiteAsyncTask(MainActivity.this,sqLiteAPI);
+        sqLiteAsyncTask.execute(integrators);
+        /*
         //Connect with Azure
         dbAsyncTask = new DBAsyncTask(this,dbWriter);
         dbAsyncTask.execute(integrators);
+        */
         thank_you_text.setText(getString(R.string.final_text));
     }
 

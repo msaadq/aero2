@@ -25,11 +25,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class AirDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     public static final String DATABASE_NAME = "air.db";
 
     public AirDbHelper(Context context) {
+
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -40,7 +41,6 @@ public class AirDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_AIR_TABLE = "CREATE TABLE " + AirContract.AirEntry.TABLE_NAME + " (" +
                 com.aero2.android.DefaultActivities.Data.AirContract.AirEntry._ID + " INTEGER PRIMARY KEY," +
                 AirContract.AirEntry.COLUMN_SMOG_VALUE + " TEXT NOT NULL, " +
-                AirContract.AirEntry.COLUMN_AIR_QUALITY+"TEXT NOT NULL"+
                 AirContract.AirEntry.COLUMN_TIME + " TEXT UNIQUE NOT NULL, " +
                 AirContract.AirEntry.COLUMN_LONG + " TEXT NOT NULL, " +
                 AirContract.AirEntry.COLUMN_LAT + " TEXT NOT NULL, " +

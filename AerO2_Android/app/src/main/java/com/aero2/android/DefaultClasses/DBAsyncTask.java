@@ -7,8 +7,7 @@ package com.aero2.android.DefaultClasses;
         import com.aero2.android.DefaultActivities.MainActivity;
 
 /**
- * Instantiates STMCommunicator which in turn creates a BTService
- * object to connect application with smog sensor.
+ * Uploads the data to azure.
  *
  * Created by usmankhan on 12/13/2015.
  */
