@@ -44,14 +44,6 @@ public class SampleDataTable {
     @com.google.gson.annotations.SerializedName("time")
     private String mTime;
 
-
-    /**
-     * SampleDataTable Normalized
-     */
-    @com.google.gson.annotations.SerializedName("normalized")
-    private String mNormalized;
-
-
     /**
      * DBListItem constructor
      */
@@ -68,7 +60,6 @@ public class SampleDataTable {
         this.setLong(integratedValues[2]);
         this.setAlt(integratedValues[3]);
         this.setSmog(integratedValues[4]);
-        this.setmNormalized(integratedValues[5]);
     }
 
     /**
@@ -111,10 +102,6 @@ public class SampleDataTable {
      */
     public final void setTime(String time) {
         mTime = time;
-    }
-
-    public void setmNormalized(String Normalized) {
-        mNormalized = Normalized;
     }
 
     /**
@@ -161,8 +148,4 @@ public class SampleDataTable {
         return mTime;
     }
 
-
-    public String getmNormalized() {
-        return mNormalized;
-    }
 }

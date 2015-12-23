@@ -14,6 +14,10 @@ import com.aero2.android.DefaultActivities.Data.AirDbHelper;
 /**
 
  * Implementation of SQLite Functions.
+ * USAGE:
+ *      - Initialize by passing on context.
+ *      - Call a function to perform appropriate action.
+ *
  * Created by Muddassir on 12/13/2015.
  */
 
@@ -32,9 +36,11 @@ public class SQLiteAPI {
      */
 
     public SQLiteAPI(Context context){
+
         contextLocal=context;
         mDbHelper = new AirDbHelper(contextLocal);
         db = mDbHelper.getReadableDatabase();
+
     }
 
     /**
@@ -67,11 +73,11 @@ public class SQLiteAPI {
 
         String[] COLUMNS={
                 AirContract.AirEntry.TABLE_NAME+"."+ AirContract.AirEntry._ID,
-                AirContract.AirEntry.COLUMN_TIME,
+                AirContract.AirEntry.COLUMN_SMOG_VALUE,
                 AirContract.AirEntry.COLUMN_LONG,
                 AirContract.AirEntry.COLUMN_LAT,
                 AirContract.AirEntry.COLUMN_ALT,
-                AirContract.AirEntry.COLUMN_SMOG_VALUE
+                AirContract.AirEntry.COLUMN_TIME
         } ;
 
         //Get cursor position

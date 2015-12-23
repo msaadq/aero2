@@ -23,7 +23,6 @@ import com.aero2.android.DefaultClasses.SQLiteAsyncTask;
 import com.aero2.android.R;
 
 import java.io.IOException;
-import java.security.Permission;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -88,6 +87,9 @@ public class MainActivity extends AppCompatActivity {
         integrators = new String [max_value_count][N];
         sessionStart = true;
 
+        //Start save data in Azure
+        saveAzure();
+
         //Ask user to adjust settings
         setSupportActionBar(toolbar);
         this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -116,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
 
             public void onClick(View v) {
 
-                Log.v("gps_button","Inside setonClickListener()");
                 update_message_text.setText(R.string.warm_up_message);
 
                 //If the activity is not started for first time
@@ -130,7 +131,8 @@ public class MainActivity extends AppCompatActivity {
                     //Reinitialize integrators
                     integrators = new String [max_value_count][N];
                     value_count = 0;
-                    }
+
+                }
 
                 //Session has already started.
                 sessionStart = false;
@@ -151,7 +153,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //Collect Integrator values & update user
+    /**
+     * Runnable Handler that calls Integrator class and
+     * updates UI.
+     * arg: None
+     * exception: None
+     * return: No return value.
+     */
+
     Runnable getIntegrator = new Runnable() {
         @Override
         public void run() {
@@ -188,32 +197,19 @@ public class MainActivity extends AppCompatActivity {
 
                     if (valid) {
 
-                        if (value_count ==0){
-                            update_message_text.setText("");
-                        }
-
-                        //Add Date Information
-                        SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
-                        date = new Date();
-
-                        //Update UI Elements
-                        time_text.setText("Time & Date: " + sdfDate.format(date));
-                        longitude_text.setText("Longitude: " + new_integrator[1]);
-                        latitude_text.setText("Latitude: " + new_integrator[2]);
-                        altitude_text.setText("Altitude: " + new_integrator[3]);
-                        smog_text.setText("Smog: " + new_integrator[4]);
-
-                        //Increment value count & restart handler
+                        updateUI(new_integrator);
                         value_count++;
                         Log.v("Value Count", String.valueOf(value_count));
                         m_handler.postDelayed(getIntegrator, m_interval);
+
                     }
 
                     else{
+
                         m_handler.postDelayed(getIntegrator, 500);
                         update_message_text.setText(R.string.warm_up_message);
-                    }
 
+                    }
                 }
             }
             else{
@@ -237,17 +233,61 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    //Show count & Save data
+    /**
+     * Shows value count & saves data to local storage.
+     * arg: None
+     * exception: IO Exception
+     * return: No return value.
+     */
+
     public void showValueCount() throws IOException {
+
         value_count_text.setText("Value Count: " + value_count);
         sqLiteAsyncTask = new SQLiteAsyncTask(MainActivity.this,sqLiteAPI);
         sqLiteAsyncTask.execute(integrators);
-        /*
-        //Connect with Azure
-        dbAsyncTask = new DBAsyncTask(this,dbWriter);
-        dbAsyncTask.execute(integrators);
-        */
+
         thank_you_text.setText(getString(R.string.final_text));
+
+    }
+
+    /**
+     * Saves data in Azure.
+     * arg: None
+     * exception: None
+     * return: No return value.
+     */
+
+    public void saveAzure(){
+
+        dbAsyncTask = new DBAsyncTask(this,dbWriter,sqLiteAPI);
+        dbAsyncTask.execute(integrators);
+
+    }
+
+    /**
+     * Updates UI elements.
+     * arg: None
+     * exception: None
+     * return: No return value.
+     */
+
+    public void updateUI(String[] new_integrator){
+
+        if (value_count ==0){
+            update_message_text.setText("");
+        }
+
+        //Add Date Information
+        SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
+        date = new Date();
+
+        //Update UI Elements
+        time_text.setText("Time & Date: " + sdfDate.format(date));
+        longitude_text.setText("Longitude: " + new_integrator[1]);
+        latitude_text.setText("Latitude: " + new_integrator[2]);
+        altitude_text.setText("Altitude: " + new_integrator[3]);
+        smog_text.setText("Smog: " + new_integrator[4]);
+
     }
 
 }

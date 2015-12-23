@@ -15,9 +15,9 @@ import com.aero2.android.DefaultActivities.MainActivity;
  * integrates them.
  *
  * USE CASE:
- *
- * First initialize by passing on the activity. Next, call integrateSmog()
- * method which will return all parameters in a 1-d array.
+ *        - First initialize by passing on the activity.
+ *        - Next, call integrateSmog() method which will return all
+ *        parameters in a 1-d array.
  *
  * Created by Usman on 11/17/2015.
  */
@@ -60,7 +60,8 @@ public class Integrator {
     public String[] integrateSmog() {
 
         String[] integrated = new String[6];
-        SimpleDateFormat sdfDate = new SimpleDateFormat("yyMMdd;HHmmss");   //dd/MM/yyyy
+        //SimpleDateFormat sdfDate = new SimpleDateFormat("HHmmss");
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyMMdd.HHmmss");   //dd/MM/yyyy
         Date date = new Date();
         String dateTime = sdfDate.format(date);
 
@@ -75,6 +76,7 @@ public class Integrator {
             integrated[2] = newLocation[1];
             integrated[3] = newLocation[2];
             integrated[4] = smog;
+            //TO DO: REMOVE integrated[5]
             integrated[5] = String.valueOf(false);
 
         } catch (IOException ie) {

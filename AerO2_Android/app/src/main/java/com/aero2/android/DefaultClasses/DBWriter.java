@@ -87,9 +87,15 @@ public class DBWriter {
             protected Void doInBackground(Void... params) {
                 try {
                     addItemInTable(mSampleDataTable);
-                    Log.v("DBWriter","Data Saved");
+                    Log.e("DBWriter","Data Saved");
+
+                    ///
+
+                    //Delete from local storage here.
+
+                    ///
                 } catch (final Exception e) {
-                    Log.d("Exception", "Data Cannot be saved");
+                    Log.e("Exception", "Data Cannot be saved");
                 }
                 return null;
             }
