@@ -43,6 +43,7 @@ public class Integrator {
         try {
             gps = new GPSTracker(activity);
             sensor = new STMCommunicator(activity);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,7 +61,6 @@ public class Integrator {
     public String[] integrateSmog() {
 
         String[] integrated = new String[6];
-        //SimpleDateFormat sdfDate = new SimpleDateFormat("HHmmss");
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyMMdd.HHmmss");   //dd/MM/yyyy
         Date date = new Date();
         String dateTime = sdfDate.format(date);
@@ -76,8 +76,6 @@ public class Integrator {
             integrated[2] = newLocation[1];
             integrated[3] = newLocation[2];
             integrated[4] = smog;
-            //TO DO: REMOVE integrated[5]
-            integrated[5] = String.valueOf(false);
 
         } catch (IOException ie) {
             ie.printStackTrace();

@@ -114,11 +114,11 @@ public class SQLiteAPI {
 
         String[] COLUMNS={
                 AirContract.AirEntry.TABLE_NAME+"."+ AirContract.AirEntry._ID,
-                AirContract.AirEntry.COLUMN_SMOG_VALUE,
                 AirContract.AirEntry.COLUMN_TIME,
                 AirContract.AirEntry.COLUMN_LONG,
                 AirContract.AirEntry.COLUMN_LAT,
-                AirContract.AirEntry.COLUMN_ALT
+                AirContract.AirEntry.COLUMN_ALT,
+                AirContract.AirEntry.COLUMN_SMOG_VALUE
         } ;
 
         //Get cursor position
@@ -201,7 +201,7 @@ public class SQLiteAPI {
         values.put(AirContract.AirEntry.COLUMN_ALT,params[3]);
         values.put(AirContract.AirEntry.COLUMN_SMOG_VALUE, params[4]);
 
-        long newRowId = db.insert(AirContract.AirEntry.TABLE_NAME,null,values);
+        long newRowId = db.insert(AirContract.AirEntry.TABLE_NAME, null, values);
         Log.v("Row id: ", String.valueOf(newRowId));
 
     }
@@ -218,6 +218,15 @@ public class SQLiteAPI {
 
         db.delete(AirContract.AirEntry.TABLE_NAME, null, null);
 
+    }
+
+    public void deleteEntry(String rowId){
+
+        String selection = AirContract.AirEntry.TABLE_NAME+"."+ AirContract.AirEntry._ID + " LIKE ?";
+        // Specify arguments in placeholder order.
+        String[] selectionArgs = { rowId };
+        // Issue SQL statement.
+        db.delete(AirContract.AirEntry.TABLE_NAME, selection, selectionArgs);
     }
 
 }

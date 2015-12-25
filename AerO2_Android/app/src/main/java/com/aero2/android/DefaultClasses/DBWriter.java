@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.aero2.android.DefaultActivities.MainActivity;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 
@@ -74,10 +75,11 @@ public class DBWriter {
      * return: No return value.
      */
 
-    public void addItem(String id, String[] data) {
+    public void addItem(String id, String[] data, final String rowId, final SQLiteAPI sqLiteAPI) {
         if (mClient == null) {
             return;
         }
+
         // Create a new item
         final SampleDataTable mSampleDataTable = new SampleDataTable(id, data);
 
@@ -87,13 +89,9 @@ public class DBWriter {
             protected Void doInBackground(Void... params) {
                 try {
                     addItemInTable(mSampleDataTable);
-                    Log.e("DBWriter","Data Saved");
+                    Log.e("DBWriter", "Data Saved");
+                    sqLiteAPI.deleteEntry(rowId);
 
-                    ///
-
-                    //Delete from local storage here.
-
-                    ///
                 } catch (final Exception e) {
                     Log.e("Exception", "Data Cannot be saved");
                 }

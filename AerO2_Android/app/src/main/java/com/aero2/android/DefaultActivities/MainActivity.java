@@ -1,6 +1,7 @@
 package com.aero2.android.DefaultActivities;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private int m_interval = 1500;              // Time between each GPS recording
     public static int value_count = 0;
     private final int max_value_count = 1000;
-    private final int N = 6;                    // Size of integrator array
+    private final int N = 5;                    // Size of integrator array
     private String integrators[][];             // 2-D array holding all records
     private String new_integrator [];
     private Boolean sessionStart;
@@ -47,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView thank_you_text;
     private TextView value_count_text;
     private Toolbar toolbar;
+    private Button gps_button;
+    private Button stop_button;
+    private Handler m_handler;
 
     //Global Objects
     private Date date;
@@ -56,9 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private DBAsyncTask dbAsyncTask;
     private SQLiteAsyncTask sqLiteAsyncTask;
     private SQLiteAPI sqLiteAPI;
-    private Button gps_button;
-    private Button stop_button;
-    private Handler m_handler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         integrators = new String [max_value_count][N];
         sessionStart = true;
 
-        //Start save data in Azure
+        //Start saving data in Azure
         saveAzure();
 
         //Ask user to adjust settings
@@ -118,7 +120,20 @@ public class MainActivity extends AppCompatActivity {
 
             public void onClick(View v) {
 
-                update_message_text.setText(R.string.warm_up_message);
+                if (!BTService.getDeviceConnected()) {
+                    try{
+
+                        Thread.sleep(1000);
+                        if (!BTService.getDeviceConnected()) {
+                            integrator = null;
+                            integrator = new Integrator(MainActivity.this);
+                            Thread.sleep(2000);
+                        }
+                    } catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+
+                }
 
                 //If the activity is not started for first time
                 if(!sessionStart){
@@ -127,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
                     //Clear update & thank you texts if starting again.
                     update_message_text.setText("");
                     thank_you_text.setText("");
+                    value_count_text.setText("");
 
                     //Reinitialize integrators
                     integrators = new String [max_value_count][N];
@@ -139,15 +155,6 @@ public class MainActivity extends AppCompatActivity {
 
                 //Run GPS Handler
                 getIntegrator.run();
-            }
-        });
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Relevant Action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
             }
         });
 
@@ -168,7 +175,8 @@ public class MainActivity extends AppCompatActivity {
             boolean valid = true;           //reference variable indicating if values are correct
 
             //Check if Bluetooth is connected & GPS is turned 'on'
-            if (GPSTracker.getGPSStatus() && BTService.getDeviceConnected()) {
+            if (GPSTracker.getGPSStatus() && BTService.getDeviceConnected()
+                    && BTService.getBluetoothAdapter()) {
 
                 //Check if maximum limit is not exceeded
                 if (value_count <= max_value_count) {
@@ -177,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                     new_integrator = integrator.integrateSmog();
 
                     //Parse information
-                    for (int i = 0; i < 6; i++) {
+                    for (int i = 0; i < N; i++) {
                         integrators[value_count][i] = new_integrator[i];
                     }
 
@@ -205,33 +213,18 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     else{
-
-                        m_handler.postDelayed(getIntegrator, 500);
                         update_message_text.setText(R.string.warm_up_message);
-
+                        m_handler.postDelayed(getIntegrator, 500);
                     }
                 }
             }
             else{
                 update_message_text.setText(R.string.bt_gps_error_message);
             }
+
         }
     };
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     /**
      * Shows value count & saves data to local storage.

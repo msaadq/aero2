@@ -45,23 +45,19 @@ public class DBAsyncTask extends AsyncTask<String[][], Void, Void> {
         for (int i=0;i<count;i++){
             for (int j=0;j<5;j++){
 
-                //nIntegrators[i][j] = "0";
-                /*if(j==1){
-                    nIntegrators[i][j] = "0";
-                }
-                else {
-                 */
                 nIntegrators[i][j] = integrators[i][j + 1];
-
                 Log.v("nInegrator: ",nIntegrators[i][j]);
             }
         }
 
         //Add item in mobile activity
         for (int i = 0; i < count; i++) {
-            dbWriter.addItem(null, nIntegrators[i]);
-            //dbWriter.addItem(nIntegrators[i][1], nIntegrators[i]);
+
+            String rowId = integrators[i][0];
+            dbWriter.addItem(null, nIntegrators[i], rowId, sqLiteAPI);
             Log.v("DBAsyncTask", "Added Item " + String.valueOf(i));
+
+
         }
 
         return null;
