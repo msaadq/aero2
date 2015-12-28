@@ -5,9 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aero2.android.DefaultActivities.MainActivity;
+import com.aero2.android.R;
 
 /**
  *
@@ -121,10 +125,10 @@ public class Integrator {
      * return: String
      */
 
-    public String init (){
+    public void init (TextView smog_text, TextView location_text, TextView time_text,
+                      TextView count_text){
 
         Boolean valid = true;
-
 
         if (GPSTracker.getGPSStatus() && BTService.getDeviceConnected()
                 && BTService.getBluetoothAdapter()) {
@@ -154,29 +158,52 @@ public class Integrator {
                 if (value_count == 0){
                     start_lat =(int) (Float.parseFloat(integrators[0][1]) * 100);
                     Log.e("Start lat: ",String.valueOf(start_lat));
+
                     start_lon =(int) (Float.parseFloat(integrators[0][2]) * 100);
                     Log.e("Start lon: ",String.valueOf(start_lon));
                 }
 
+                int curr_lat = (int) (Float.parseFloat(integrators[0][1]) * 100);
+                int curr_lon = (int) (Float.parseFloat(integrators[0][2]) * 100);
+
+                SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");   //dd/MM/yyyy
+                Date date = new Date();
+                String time = sdfDate.format(date);
+
                 value_count++;
                 Log.v("Value Count", String.valueOf(value_count));
 
-                return integrators[value_count-1][4];
+                Toast toast = Toast.makeText(activity, R.string.update_message_6, Toast.LENGTH_SHORT);
+                toast.show();
+
+                smog_text.setText(String.valueOf(integrators[value_count - 1][4]));
+                location_text.setText(String.format("%.2f", Double.valueOf(
+                        integrators[value_count-1][1]))+", "+  String.format("%.2f", Double.valueOf(
+                                integrators[value_count - 1][2])));
+                        time_text.setText(time);
+                count_text.setText("["+String.valueOf(value_count)+"]");
+
             }
 
             else{
-                return "0";         //Values are invalid
+                Toast toast = Toast.makeText(activity, R.string.update_message_0,
+                        Toast.LENGTH_SHORT);
+                toast.show();
             }
         }
 
         else if(!GPSTracker.getGPSStatus()){
-            return "-1";            //GPS is turned off
+            Toast toast = Toast.makeText(activity, R.string.update_message_1,
+                    Toast.LENGTH_SHORT);
+            toast.show();
         }
 
         else if(!BTService.getBluetoothAdapter()){
             Log.v("BTAdapter status:","Disconnected");
             BTService.setDeviceConnected(false);
-            return "-2";            //BT is turned off
+            Toast toast = Toast.makeText(activity, R.string.update_message_2,
+                    Toast.LENGTH_SHORT);
+            toast.show();
         }
 
         else if (!BTService.getDeviceConnected()){
@@ -190,16 +217,23 @@ public class Integrator {
                     Log.d("STMCommunicator ", "Failed to reinitialize BT");
                 }
 
-                return "-3";      //BT has reinitialized; will connect again
+                //BT has reinitialized; will connect again
+                Toast toast = Toast.makeText(activity, R.string.update_message_3,
+                        Toast.LENGTH_SHORT);
+                toast.show();
+
             }
             else{
                 Log.v("Counter status: ","Incrementing counter");
                 counter ++;
-                return "-4";      //BT is in process of connecting
+
+                //BT is in process of connecting
+                Toast toast = Toast.makeText(activity, R.string.update_message_4,
+                        Toast.LENGTH_SHORT);
+                toast.show();
             }
         }
 
-        return "-5";
     }
 
     /**
@@ -226,12 +260,11 @@ public class Integrator {
         temp[0][4] = String.valueOf(sum/value_count);
         Log.v("Smog Averaged",temp[0][4]);
 
-
+        value_count = 1;
         sqLiteAsyncTask = new SQLiteAsyncTask(activity,sqLiteAPI);
         sqLiteAsyncTask.execute(integrators);
 
         //Reinitialize
-        value_count = 0;
         integrators = new String [maxValueCount][N];;
     }
 

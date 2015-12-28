@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aero2.android.DefaultClasses.Integrator;
@@ -18,12 +19,15 @@ public class MainActivity extends AppCompatActivity {
 
     //Main Activity Variables
     private int m_interval = 1500;              // Time between each Integrator call
-    private String smog;
 
     //UI Elements
-    private TextView update_message_text;
     private TextView smog_text;
+    private TextView location_text;
+    private TextView time_text;
+    private TextView count_text;
     private TextView thank_you_text;
+    private ImageView location_image;
+    private ImageView time_image;
     private Toolbar toolbar;
     private Button gps_button;
     private Button stop_button;
@@ -39,15 +43,23 @@ public class MainActivity extends AppCompatActivity {
 
         //Instantiate UI Objects
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        update_message_text= (TextView) findViewById(R.id.update_message_text);
         smog_text = (TextView) findViewById(R.id.smog_text);
+        location_text = (TextView) findViewById(R.id.location_text);
+        time_text = (TextView) findViewById(R.id.time_text);
+        count_text = (TextView) findViewById(R.id.count_text);
         thank_you_text = (TextView) findViewById(R.id.thank_you_text);
+        location_image = (ImageView) findViewById(R.id.location_image);
+        time_image = (ImageView) findViewById(R.id.time_image);
         gps_button = (Button) findViewById(R.id.gps_button);
         stop_button = (Button) findViewById(R.id.stop_button);
 
         //Instantiate Objects
         m_handler = new Handler();
         integrator = new Integrator(this);
+
+        //Set visibility of ImageViews
+        location_image.setVisibility(View.INVISIBLE);
+        time_image.setVisibility(View.INVISIBLE);
 
         //Start saving data in Azure
         integrator.saveAzure();
@@ -62,8 +74,14 @@ public class MainActivity extends AppCompatActivity {
         gps_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                //Show default value of smog as 0
+                //Set defaults
                 smog_text.setText("0");
+                location_text.setText("--,--");
+                time_text.setText("--:--:--");
+                count_text.setText("0");
+
+                location_image.setVisibility(View.VISIBLE);
+                time_image.setVisibility(View.VISIBLE);
                 //Run GPS Handler
                 getIntegrator.run();
             }
@@ -95,30 +113,8 @@ public class MainActivity extends AppCompatActivity {
     Runnable getIntegrator = new Runnable() {
         @Override
         public void run() {
-            smog = integrator.init();
 
-            if (smog == "0"){
-                update_message_text.setText(R.string.update_message_0);
-            }
-            else if (smog == "-1"){
-                update_message_text.setText(R.string.update_message_1);
-            }
-            else if (smog == "-2"){
-                update_message_text.setText(R.string.update_message_2);
-            }
-            else if (smog == "-3"){
-                update_message_text.setText(R.string.update_message_3);
-            }
-            else if (smog == "-4"){
-                update_message_text.setText(R.string.update_message_4);
-            }
-            else if (smog == "-5"){
-                update_message_text.setText(R.string.update_message_5);
-            }
-            else{
-                update_message_text.setText(R.string.update_message_6);
-                smog_text.setText(smog);
-            }
+            integrator.init(smog_text, location_text, time_text, count_text);
 
             //Call again after delay of m_interval
             m_handler.postDelayed(getIntegrator,m_interval);
