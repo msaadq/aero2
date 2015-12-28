@@ -16,20 +16,35 @@ import com.aero2.android.DefaultActivities.MainActivity;
  *
  * USE CASE:
  *        - First initialize by passing on the activity.
- *        - Next, call integrateSmog() method which will return all
- *        parameters in a 1-d array.
+ *        - Call init() method which in turns calls private method
+ *        integrateSmog()
+ *        - saveSQL() method saves data in local SQL Storage.
+ *        - saveAzure() method saves data in Azure.
  *
  * Created by Usman on 11/17/2015.
  */
 
 public class Integrator {
 
+    //Local class variables
+    private final int maxValueCount = 10000;
+    private final int maxCounter = 8;
+    private final int N = 5;                    // Size of integrator array
+    public static int value_count = 0;
+    private int counter;
+    private String integrators[][];             // 2-D array holding all records
+    private String new_integrator [];
+    private int start_lat, start_lon;
+    private int[] corner;
+
+    //Global variables
+    private Activity activity;
     STMCommunicator sensor;
     GPSTracker gps;
-
-    // Authentication Strings
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
+    private SQLiteAsyncTask sqLiteAsyncTask;
+    public SQLiteAPI sqLiteAPI;
+    public DBWriter dbWriter;
+    private DBAsyncTask dbAsyncTask;
 
     /**
      * Initializes the constructor by instantiating
@@ -40,12 +55,21 @@ public class Integrator {
      */
 
     public Integrator(Activity activity) {
+
+        this.activity = activity;
+
+        integrators = new String [maxValueCount][N];
+        corner = new int[4];
+        counter = 0;
+
         try {
+            dbWriter = new DBWriter(activity);
             gps = new GPSTracker(activity);
             sensor = new STMCommunicator(activity);
+            sqLiteAPI = new SQLiteAPI(activity);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d("Integrator ", "Initialization failed.");
         }
     }
 
@@ -58,7 +82,11 @@ public class Integrator {
      * (in order)
      */
 
-    public String[] integrateSmog() {
+    private String[] integrateSmog() {
+
+        if (!BTService.getBluetoothAdapter()){
+            return null;
+        }
 
         String[] integrated = new String[6];
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyMMdd.HHmmss");   //dd/MM/yyyy
@@ -84,4 +112,185 @@ public class Integrator {
         return integrated;
     }
 
+
+    /**
+     * Calls integrateSmog() method and handles exception.
+     * AVAILABLE FOR OUTSIDE APIS.
+     * arg: None
+     * exception: IOException
+     * return: String
+     */
+
+    public String init (){
+
+        Boolean valid = true;
+
+
+        if (GPSTracker.getGPSStatus() && BTService.getDeviceConnected()
+                && BTService.getBluetoothAdapter()) {
+            new_integrator = integrateSmog();
+
+            //Parse information
+            for (int i = 0; i < N; i++) {
+                integrators[value_count][i] = new_integrator[i];
+            }
+
+            //Skip if the location values contain null
+            for (int i = 1; i<4; i++) {
+                if(integrators[value_count][i] == null){
+                    Log.v("MainActivity","Locations are null");
+                    valid = false;
+                }
+            }
+
+            //Skips if smog sensor's value is 0
+            if (integrators[value_count][4].equals("0")){
+                Log.v("MainActivity", "Smog = 0");
+                valid = false;
+            }
+
+            if (valid) {
+
+                if (value_count == 0){
+                    start_lat =(int) (Float.parseFloat(integrators[0][1]) * 100);
+                    Log.e("Start lat: ",String.valueOf(start_lat));
+                    start_lon =(int) (Float.parseFloat(integrators[0][2]) * 100);
+                    Log.e("Start lon: ",String.valueOf(start_lon));
+                }
+
+                value_count++;
+                Log.v("Value Count", String.valueOf(value_count));
+
+                return integrators[value_count-1][4];
+            }
+
+            else{
+                return "0";         //Values are invalid
+            }
+        }
+
+        else if(!GPSTracker.getGPSStatus()){
+            return "-1";            //GPS is turned off
+        }
+
+        else if(!BTService.getBluetoothAdapter()){
+            Log.v("BTAdapter status:","Disconnected");
+            BTService.setDeviceConnected(false);
+            return "-2";            //BT is turned off
+        }
+
+        else if (!BTService.getDeviceConnected()){
+
+            if (counter > maxCounter){
+
+                try {
+                    sensor = new STMCommunicator(activity);
+                    counter = 0;
+                }catch (IOException e){
+                    Log.d("STMCommunicator ", "Failed to reinitialize BT");
+                }
+
+                return "-3";      //BT has reinitialized; will connect again
+            }
+            else{
+                Log.v("Counter status: ","Incrementing counter");
+                counter ++;
+                return "-4";      //BT is in process of connecting
+            }
+        }
+
+        return "-5";
+    }
+
+    /**
+     * Saves data to local storage.
+     * arg: None
+     * exception: None
+     * return: No return value.
+     */
+
+    public void saveSQL (){
+        computeReference();
+
+        String[][] temp = new String[1][N];
+        temp[0][0] = integrators[0][0];
+        temp[0][1] = integrators[0][1];
+        temp[0][2] = integrators[0][2];
+        temp[0][3] = integrators[0][3];
+
+        int sum = 0;
+        for (int i=0;i<value_count;i++){
+            sum += Integer.parseInt(integrators[i][4]);
+        }
+
+        temp[0][4] = String.valueOf(sum/value_count);
+        Log.v("Smog Averaged",temp[0][4]);
+
+
+        sqLiteAsyncTask = new SQLiteAsyncTask(activity,sqLiteAPI);
+        sqLiteAsyncTask.execute(integrators);
+
+        //Reinitialize
+        value_count = 0;
+        integrators = new String [maxValueCount][N];;
+    }
+
+    /**
+     * Saves data in Azure.
+     * arg: None
+     * exception: None
+     * return: No return value.
+     */
+
+    public void saveAzure(){
+
+        dbAsyncTask = new DBAsyncTask(activity,dbWriter,sqLiteAPI);
+        dbAsyncTask.execute(integrators);
+    }
+
+    /**
+     * Calculates reference corner points.
+     * arg: Starting latitude & longitude (int)
+     * exception: None
+     * return: Int array of reference values:
+     * Lower Latitude, Lower Longitude, Upper Latitude,
+     * Upper longitude.
+     */
+
+    private void computeReference(){
+
+        //Start from 1 less
+        for (int i = start_lat-1; i>0; i--){
+            if ((i%5) == 0){
+                corner[0] = i;         //Lower latitude
+                Log.e("Ref",String.valueOf(corner[0]));
+                break;
+            }
+        }
+
+        //Start from 1 less
+        for (int j = start_lon-1; j>0; j--){
+            if ((j%5) == 0){
+                corner[1] = j;         //Lower longitude
+                Log.e("Ref",String.valueOf(corner[1]));
+                break;
+            }
+        }
+
+        for (int i = start_lat;; i++){
+            if ((i%5) == 0){
+                corner[2] = i;         //Upper latitude
+                Log.e("Ref",String.valueOf(corner[2]));
+                break;
+            }
+        }
+
+        for (int j = start_lon;; j++){
+            if ((j%5) == 0){
+                corner[3] = j;         //Upper longitude
+                Log.e("Ref",String.valueOf(corner[3]));
+                break;
+            }
+        }
+    }
 }

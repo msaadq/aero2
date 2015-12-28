@@ -33,7 +33,8 @@ public class SQLiteAsyncTask extends AsyncTask<String[][], Void, Void> {
     protected Void doInBackground(String[][]... params) {
 
         Log.v("SQLiteAsyncTask", "Entered doInBackground");
-        int count  = MainActivity.value_count;
+        int count  = params[0].length;
+        Log.v("Count:",String.valueOf(count));
 
         //Push all values to SQLite
         for (int i=0; i< count; i++) {

@@ -20,7 +20,7 @@ import android.net.Uri;
 import android.test.AndroidTestCase;
 
 import com.aero2.android.DefaultActivities.Data.AirContract;
-import com.aero2.android.DefaultActivities.Data.AirProvider;
+
 
 /*
     Uncomment this class when you are ready to test your UriMatcher.  Note that this class utilizes
@@ -38,13 +38,4 @@ public class TestUriMatcher extends AndroidTestCase {
 
 
 
-
-    public void testUriMatcher() {
-        UriMatcher testMatcher = AirProvider.buildUriMatcher();
-
-        assertEquals("Error: The WEATHER URI was matched incorrectly.",
-                testMatcher.match(TEST_AIR_DIR), AirProvider.AIR);
-        assertEquals("Error: The WEATHER WITH LOCATION URI was matched incorrectly.",
-                testMatcher.match(TEST_AIR_WITH_VALUE_DIR), AirProvider.TUPLE_AIR);
-    }
 }

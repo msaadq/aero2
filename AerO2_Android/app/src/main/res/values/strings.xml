@@ -5,6 +5,12 @@
     <string name="introduction_text">Welcome! Press \'Start\' as soon as you\'re ready.</string>
     <string name="final_text">Thank you for contributing! Your values have been recorded.
         Have a nice exercise!</string>
-    <string name="warm_up_message">Hold on, device is warming up!</string>
-    <string name="bt_gps_error_message">Oops, please try again or make sure your BT and GPS are turned on!</string>
+    <string name="update_message_0">Hold on, device is warming up!</string>
+    <string name="update_message_1">Oops, your GPS is turned off!</string>
+    <string name="update_message_2">Oops, your Bluetooth is turned off!</string>
+    <string name="update_message_3">Hold on, we are device you up!</string>
+    <string name="update_message_4">Hold on, we are setting you up!</string>
+    <string name="update_message_5">Oops, something went awry! Please try connecting again!</string>
+    <string name="update_message_6">Here you go!</string>
+
 </resources>
