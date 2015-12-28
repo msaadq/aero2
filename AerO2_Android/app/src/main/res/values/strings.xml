@@ -7,4 +7,5 @@
         Have a nice exercise!</string>
     <string name="warm_up_message">Hold on, device is warming up!</string>
     <string name="bt_gps_error_message">Oops, please try again or make sure your BT and GPS are turned on!</string>
+    <string name="polygon_demo_label">Smog Map</string>
 </resources>
