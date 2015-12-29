@@ -1,10 +1,11 @@
-package com.aero2.android.DefaultClasses;
+package com.aero2.android.DefaultClasses.Azure;
 
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.aero2.android.DefaultActivities.MainActivity;
+import com.aero2.android.DefaultClasses.DataTables.SampleDataTable;
+import com.aero2.android.DefaultClasses.SQLite.SQLiteAPI;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 

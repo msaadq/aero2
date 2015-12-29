@@ -5,12 +5,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
-import android.content.Context;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.aero2.android.DefaultActivities.MainActivity;
+import com.aero2.android.DefaultClasses.Azure.DBAsyncTask;
+import com.aero2.android.DefaultClasses.Azure.DBWriter;
+import com.aero2.android.DefaultClasses.Hardware.BTService;
+import com.aero2.android.DefaultClasses.Hardware.STMCommunicator;
+import com.aero2.android.DefaultClasses.SQLite.SQLiteAPI;
+import com.aero2.android.DefaultClasses.SQLite.SQLiteAsyncTask;
 import com.aero2.android.R;
 
 /**

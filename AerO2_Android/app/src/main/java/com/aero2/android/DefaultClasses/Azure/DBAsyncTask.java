@@ -1,10 +1,10 @@
-package com.aero2.android.DefaultClasses;
+package com.aero2.android.DefaultClasses.Azure;
 
         import android.app.Activity;
         import android.os.AsyncTask;
         import android.util.Log;
 
-        import com.aero2.android.DefaultActivities.MainActivity;
+        import com.aero2.android.DefaultClasses.SQLite.SQLiteAPI;
 
 /**
  * Uploads the data to azure.
@@ -56,7 +56,6 @@ public class DBAsyncTask extends AsyncTask<String[][], Void, Void> {
             String rowId = integrators[i][0];
             dbWriter.addItem(null, nIntegrators[i], rowId, sqLiteAPI);
             Log.v("DBAsyncTask", "Added Item " + String.valueOf(i));
-
 
         }
 

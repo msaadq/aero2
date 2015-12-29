@@ -1,4 +1,4 @@
-package com.aero2.android.DefaultClasses;
+package com.aero2.android.DefaultClasses.DataTables;
 
 /**
  * Represents a Row in Mapping Table

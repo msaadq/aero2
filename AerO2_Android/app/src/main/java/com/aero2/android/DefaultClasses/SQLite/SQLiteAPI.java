@@ -1,4 +1,4 @@
-package com.aero2.android.DefaultClasses;
+package com.aero2.android.DefaultClasses.SQLite;
 
 import android.content.ContentValues;
 import android.content.Context;

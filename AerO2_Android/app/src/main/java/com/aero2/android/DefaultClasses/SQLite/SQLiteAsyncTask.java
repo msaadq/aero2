@@ -1,10 +1,10 @@
-package com.aero2.android.DefaultClasses;
+package com.aero2.android.DefaultClasses.SQLite;
 
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.aero2.android.DefaultActivities.MainActivity;
+import com.aero2.android.DefaultClasses.Integrator;
 
 /**
  * Calls SQLiteAPI and upload data in local storage.

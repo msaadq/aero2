@@ -1,4 +1,4 @@
-package com.aero2.android.DefaultClasses;
+package com.aero2.android.DefaultClasses.Hardware;
 
 import android.app.Activity;
 import android.util.Log;
