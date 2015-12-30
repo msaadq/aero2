@@ -8,11 +8,11 @@ from geopy.geocoders import Nominatim
 
 # Helper Function
 def find_place(key, origin, ptype, radius='1000'):
-    '''
-	Calls Google Place API and returns the nearest place within 
+    """
+	Calls Google Place API and returns the nearest place within
 	the radius provided by user.
 	Supported ptypes: https://developers.google.com/places/supported_types
-	'''
+	"""
 
     web_link = 'https://maps.googleapis.com/maps/api/place/nearbysearch/xml?key=' + key
     web_link += '&location=' + origin[0] + ',' + origin[1] + '&radius=' + radius + '&type=' + ptype
@@ -29,11 +29,11 @@ def find_place(key, origin, ptype, radius='1000'):
 
 # Helper Function
 def calDuration(key, origin, destination, departure_time='now', traffic_model='best_guess'):
-    '''
+    """
 	Calls Google Distance API and returns the duration/km.
 	departure_time is number of seconds in int from December, 1970.
 	traffic model can be 'best_guess', 'optimistic', or 'pessimistic'
-	'''
+	"""
 
     web_link = 'https://maps.googleapis.com/maps/api/distancematrix/xml?key' + key
     web_link += '&origins=' + origin[0] + ',' + origin[1] + '&destinations=' + destination[0] + ','

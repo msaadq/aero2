@@ -2,10 +2,10 @@ import Maps as map
 import DataBaseLayer as dbl
 import math
 
-class DataTraining:
 
+class DataTraining:
     VERIFICATION_THRESHOLD = 0.8
-    
+
     DEFAULT_TIME_INDEX = 0
     DEFAULT_LAT_INDEX = 1
     DEFAULT_LONG_INDEX = 2
@@ -16,7 +16,6 @@ class DataTraining:
     DEFAULT_R_INDEX_INDEX = 3
     DEFAULT_I_INDEX_INDEX = 4
     DEFAULT_SAMPLED_INDEX = 5
-
 
     def __init__(self):
         pass
@@ -36,7 +35,8 @@ class DataTraining:
     '''
 
     def _save_all_properties(self, city_name):
-        return self._save_nodes_properties(self._map_properties(self._get_all_coordinates(map.get_corner_points(city_name))))
+        return self._save_nodes_properties(
+            self._map_properties(self._get_all_coordinates(map.get_corner_points(city_name))))
 
     def _get_all_coordinates(self, corner_coordinates):
         nodes_coordinates = []
@@ -44,7 +44,8 @@ class DataTraining:
         if corner_coordinates == [[]]:
             return [[]]
 
-        y1, y2, x1, x2 = corner_coordinates[0][0], corner_coordinates[2][0], corner_coordinates[0][1], corner_coordinates[2][1]
+        y1, y2, x1, x2 = corner_coordinates[0][0], corner_coordinates[2][0], corner_coordinates[0][1], \
+                         corner_coordinates[2][1]
 
         if x1 > x2:
             x1, x2 = x2, x1
@@ -57,7 +58,7 @@ class DataTraining:
         print self._calc_distance_on_unit_sphere(y2, x1, y2, x1 + long_interval)
 
         latitude = y2
-        
+
         while latitude > y1:
             longitude = x1
 
@@ -69,7 +70,8 @@ class DataTraining:
 
         return nodes_coordinates
 
-    def _map_properties(self, nodes_coordinates, time_stamps):
+    @staticmethod
+    def _map_properties(nodes_coordinates, time_stamps):
         output_table = []
 
         if nodes_coordinates == [[]]:
@@ -77,7 +79,8 @@ class DataTraining:
 
         i = 0
         for single_coordinates in nodes_coordinates:
-            output_table.append(single_coordinates, time_stamps[i], maps.get_altitude(single_coordinates), maps.get_road_index(single_coordinates), maps.get_industry_index(single_coordinates))
+            output_table.append([single_coordinates, time_stamps[i], map.get_altitude(single_coordinates),
+                                map.get_road_index(single_coordinates), map.get_industry_index(single_coordinates)])
             i += 1
 
         return output_table
@@ -88,27 +91,28 @@ class DataTraining:
 
         return self._database.insert_multiple(self._database.PROP_TABLE_NAME, nodes_properties_table)
 
-
     '''
     Functions inside update_database
     '''
 
-
     def _normalize_all(self):
-        not_normalized_data_table = self._database.select_data(self._database.SAMPLE_TABLE_NAME, self._database.key_value_string_gen("normalized", 0))
+        not_normalized_data_table = self._database.select_data(self._database.SAMPLE_TABLE_NAME,
+                                                               self._database.key_value_string_gen("normalized", 0))
         normalized_data_table = []
         temp = []
         average = 0.0
 
         for data_row in not_normalized_data_table:
-            temp.append(self._database.select_data(self._database.SAMPLE_TABLE_NAME, self._database.nearby_string_gen(data_row[0], data_row[1], 10)))
+            temp.append(self._database.select_data(self._database.SAMPLE_TABLE_NAME,
+                                                   self._database.nearby_string_gen(data_row[0], data_row[1], 10)))
 
             for data in temp:
                 average += data[self.DEFAULT_SMOG_INDEX]
 
             average /= len(temp)
 
-            insert_row = [temp[0][DEFAULT_LAT_INDEX], temp[0][DEFAULT_LONG_INDEX], temp[0][DEFAULT_ALT_INDEX], average, 1]
+            insert_row = [temp[0][DEFAULT_LAT_INDEX], temp[0][DEFAULT_LONG_INDEX], temp[0][DEFAULT_ALT_INDEX], average,
+                          1]
 
             self._database.insert_row(self._database.SAMPLE_TABLE_NAME, insert_row)
 
@@ -134,7 +138,8 @@ class DataTraining:
         pass
 
     def _get_non_sampled_nodes(self):
-        return self._database.select_data(self._database.SAMPLE_TABLE_NAME, self._database.key_value_string_gen("sampled", 0))
+        return self._database.select_data(self._database.SAMPLE_TABLE_NAME,
+                                          self._database.key_value_string_gen("sampled", 0))
 
     def _get_table_output(self, table_without_outputs):
         pass
@@ -146,16 +151,16 @@ class DataTraining:
         return self._calc_distance_on_unit_sphere(ref_lat, long_min, ref_lat, long_max)
 
     def _calc_distance_on_unit_sphere(self, lat1, long1, lat2, long2):
-    
+
         earth_radius = 6373000
         degrees_to_radians = math.pi / 180.0
-            
+
         phi1 = (90.0 - lat1) * degrees_to_radians
         phi2 = (90.0 - lat2) * degrees_to_radians
-            
+
         theta1 = long1 * degrees_to_radians
         theta2 = long2 * degrees_to_radians
-            
+
         cos = (math.sin(phi1) * math.sin(phi2) * math.cos(theta1 - theta2) + math.cos(phi1) * math.cos(phi2))
         arc = math.acos(cos)
 
