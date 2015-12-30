@@ -8,6 +8,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "smog_sensor_interface.h"
 #include "uart_functionality.h"
+#include "battery_level_sensor.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
