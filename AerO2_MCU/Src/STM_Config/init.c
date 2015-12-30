@@ -20,6 +20,9 @@ void initSTM(void) {
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
+  MX_ADC2_Init();
   MX_USART1_UART_Init();
-	
+  
+  /* Disable the Smog Sensor */
+  disableSmogSensor();
 }

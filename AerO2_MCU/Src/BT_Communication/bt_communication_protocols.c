@@ -186,11 +186,11 @@ void smogEnable(void) {
 	if(authenticationStatus && receivedString[5] == '1') {
 		smogAvailable = true;
 		sendCommand(I_COM_NSG, "1");
-		
+		enableSmogSensor();
 	} else {
+        disableSmogSensor();
 		smogAvailable = false;
 		sendCommand(I_COM_NSG, "0");
-		
 	}
 }
 
@@ -226,6 +226,8 @@ void reqSmogData(void) {
 	if(smogAvailable) {
 		char smogData[3];
 		int iSmogData = 0;
+        char *batteryPercentage;
+        sprintf(batteryPercentage, "%d", getBatteryPercentage());
 		
 		for(int i = 0; i < 1000; i++) {
 			iSmogData += getSmogSensorValue();
@@ -233,6 +235,10 @@ void reqSmogData(void) {
 		iSmogData /= 1000;
 		
 		sprintf(smogData, "%d", iSmogData);
+        
+        strcat(smogData, ":");
+        strcat(smogData, batteryPercentage);
+        
 		sendCommand(I_COM_SSG, smogData);
 		
 	} else {
@@ -293,12 +299,11 @@ void sendCommand(char * command, char * parameters) {
  * return: Concatenated Strings with ":" between them
  */
 
-char * commandBuilder(char *s1, char *s2)
-{
+char * commandBuilder(char *s1, char *s2) {
     char *result = malloc(strlen(s1)+strlen(s2)+2);
     
     strcpy(result, s1);
-		strcat(result, ":");
+	strcat(result, ":");
     strcat(result, s2);
 	
     return result;

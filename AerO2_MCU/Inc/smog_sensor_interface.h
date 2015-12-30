@@ -8,6 +8,27 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 #include "adc.h"
+#include "gpio.h"
+
+/**
+ * Enable Smog Sensor
+ * Enables the smog sensor
+ * arg: None
+ * exception: None
+ * return: None
+ */
+
+void enableSmogSensor(void);
+
+/**
+ * Disable Smog Sensor
+ * Disables the smog sensor
+ * arg: None
+ * exception: None
+ * return: None
+ */
+
+void disableSmogSensor(void);
 
 /**
  * Get Smog Sensor Value
