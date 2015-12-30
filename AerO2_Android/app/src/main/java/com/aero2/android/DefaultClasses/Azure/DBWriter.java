@@ -38,8 +38,8 @@ public class DBWriter {
      * return: No return value.
      */
 
-    public DBWriter(Activity activity) {
-        this(activity, DEFAULT_URL, DEFAULT_KEY);
+    public DBWriter(Activity activity, Class table) {
+        this(activity, table, DEFAULT_URL, DEFAULT_KEY);
     }
 
 
@@ -51,7 +51,7 @@ public class DBWriter {
      * return: No return value.
      */
 
-    public DBWriter(Activity activity, String url, String key) {
+    public DBWriter(Activity activity, Class table, String url, String key) {
         try {
 
             // Create the Mobile Service Client instance, using the provided URL and key
@@ -59,7 +59,7 @@ public class DBWriter {
             Log.d("App Status", "URL Successful");
 
             // Get the Mobile Service Table instance to use
-            mTable = mClient.getTable(SampleDataTable.class);
+            mTable = mClient.getTable(table);
             Log.d("App Status", "Table get successful");
 
         } catch (MalformedURLException e) {
@@ -72,11 +72,11 @@ public class DBWriter {
     /**
      * Adds a new Row to the database
      * arg: Double array
-     * exception: None
+     * exception: ExecutionException & InterruptedException
      * return: No return value.
      */
 
-    public void addItem(String id, Double[] data, final String rowId, final SQLiteAPI sqLiteAPI) {
+    public void addItem(String id, Double[] data) throws ExecutionException, InterruptedException {
         if (mClient == null) {
             return;
         }
@@ -85,44 +85,15 @@ public class DBWriter {
         final SampleDataTable mSampleDataTable = new SampleDataTable(id, data);
 
         // Insert the new item
-        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>(){
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    addItemInTable(mSampleDataTable);
-                    Log.e("DBWriter", "Data Saved");
-                    sqLiteAPI.deleteEntry(rowId);
+        try {
+            mTable.insert(mSampleDataTable);
+            Log.e("DBWriter", "Data Saved");
 
-                } catch (final Exception e) {
-                    Log.e("Exception", "Data Cannot be saved");
-                }
-                return null;
-            }
-        };
+        } catch (final Exception e) {
+            Log.e("Exception", "Data Cannot be saved");
+        }
 
-        runAsyncTask(task);
     }
 
-    /**
-     * Adds a compatible List SampleDataTable to the Database table
-     * arg: DBListItem
-     * exception: ExecutionException, InterruptedException
-     * return: No return value.
-     */
 
-    public SampleDataTable addItemInTable(SampleDataTable sampleDataTable) throws ExecutionException, InterruptedException {
-        SampleDataTable entity = mTable.insert(sampleDataTable).get();
-        return entity;
-    }
-
-    /**
-     * Executes the AsyncTask
-     * arg: AsyncTask
-     * exception: None
-     * return: No return value.
-     */
-
-    private AsyncTask<Void, Void, Void> runAsyncTask(AsyncTask<Void, Void, Void> task) {
-        return task.execute();
-    }
 }

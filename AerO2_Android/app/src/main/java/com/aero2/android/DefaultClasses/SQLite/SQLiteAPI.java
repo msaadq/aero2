@@ -44,23 +44,6 @@ public class SQLiteAPI {
     }
 
     /**
-     * Check whether the device is online.
-     * arg: None
-     * exception: None
-     * return: boolean
-     */
-
-    public boolean isOnline() {
-
-        ConnectivityManager cm = (ConnectivityManager)
-                contextLocal.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-
-    }
-
-    /**
      * Get all values from local database and return
      * as 2-d double array.
      * arg: None
@@ -162,6 +145,7 @@ public class SQLiteAPI {
         values.put(AirContract.AirEntry.COLUMN_LAT,String.valueOf(params[2]));
         values.put(AirContract.AirEntry.COLUMN_ALT,String.valueOf(params[3]));
         values.put(AirContract.AirEntry.COLUMN_SMOG_VALUE, String.valueOf(params[4]));
+        Log.v("Value of smog: ",String.valueOf(params[4]));
         values.put(AirContract.AirEntry.COLUMN_NORMALIZED, String.valueOf(params[5]));
 
         long newRowId = db.insert(AirContract.AirEntry.TABLE_NAME, null, values);
@@ -182,6 +166,13 @@ public class SQLiteAPI {
         db.delete(AirContract.AirEntry.TABLE_NAME, null, null);
 
     }
+
+    /**
+     * Delete specific rows based on selection criteria.
+     * arg: None
+     * exception: None
+     * return: None
+     */
 
     public void deleteEntry(String rowId){
 

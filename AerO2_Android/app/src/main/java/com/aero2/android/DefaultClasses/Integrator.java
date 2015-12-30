@@ -9,8 +9,9 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.aero2.android.DefaultClasses.Azure.DBAsyncTask;
+import com.aero2.android.DefaultClasses.Azure.AzureHandler;
 import com.aero2.android.DefaultClasses.Azure.DBWriter;
+import com.aero2.android.DefaultClasses.DataTables.SampleDataTable;
 import com.aero2.android.DefaultClasses.Hardware.BTService;
 import com.aero2.android.DefaultClasses.Hardware.STMCommunicator;
 import com.aero2.android.DefaultClasses.SQLite.SQLiteAPI;
@@ -51,8 +52,7 @@ public class Integrator {
     GPSTracker gps;
     private SQLiteAsyncTask sqLiteAsyncTask;
     public SQLiteAPI sqLiteAPI;
-    public DBWriter dbWriter;
-    private DBAsyncTask dbAsyncTask;
+    private AzureHandler azureHandler;
 
     /**
      * Initializes the constructor by instantiating
@@ -71,7 +71,6 @@ public class Integrator {
         counter = 0;
 
         try {
-            dbWriter = new DBWriter(activity);
             gps = new GPSTracker(activity);
             sensor = new STMCommunicator(activity);
             sqLiteAPI = new SQLiteAPI(activity);
@@ -275,7 +274,7 @@ public class Integrator {
 
         //Call SQLiteAPI
         sqLiteAsyncTask = new SQLiteAsyncTask(activity,sqLiteAPI);
-        sqLiteAsyncTask.execute(integrators);
+        sqLiteAsyncTask.execute(temp);
 
         //Reinitialize
         integrators = new Double [maxValueCount][N];;
@@ -290,8 +289,8 @@ public class Integrator {
 
     public void saveAzure(){
 
-        dbAsyncTask = new DBAsyncTask(activity,dbWriter,sqLiteAPI);
-        dbAsyncTask.execute(integrators);
+        azureHandler = new AzureHandler(activity);
+        azureHandler.postSamples(sqLiteAPI);
     }
 
     /**
