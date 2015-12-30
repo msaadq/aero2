@@ -22,14 +22,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * Manages a local database for weather data.
  */
-public class SmogDbHelper extends SQLiteOpenHelper {
+public class AirAzureDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
     private static final int DATABASE_VERSION = 5;
 
-    public static final String DATABASE_NAME = "air.db";
+    public static final String DATABASE_NAME = "airazure.db";
 
-    public SmogDbHelper(Context context) {
+    public AirAzureDbHelper(Context context) {
 
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -38,17 +38,16 @@ public class SmogDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         //Creating the Work Table
         //has one _ID column and six other columns for various functions of the app
-        final String SQL_CREATE_AIR_TABLE = "CREATE TABLE " + AirContract.AirEntry.TABLE_NAME + " (" +
-                AirContract.AirEntry._ID + " INTEGER PRIMARY KEY," +
-                AirContract.AirEntry.COLUMN_SMOG_VALUE + " TEXT NOT NULL, " +
-                AirContract.AirEntry.COLUMN_TIME + " TEXT UNIQUE NOT NULL, " +
-                AirContract.AirEntry.COLUMN_LONG + " TEXT NOT NULL, " +
-                AirContract.AirEntry.COLUMN_LAT + " TEXT NOT NULL, " +
-                AirContract.AirEntry.COLUMN_ALT + " TEXT NOT NULL " +
+        final String SQL_CREATE_AIR_AZURE_TABLE = "CREATE TABLE " + AirAzureContract.AirAzureEntry.TABLE_NAME + " (" +
+                AirAzureContract.AirAzureEntry._ID + " INTEGER PRIMARY KEY," +
+                AirAzureContract.AirAzureEntry.COLUMN_AIR_INDEX+" TEXT NOT NULL, "+
+                AirAzureContract.AirAzureEntry.COLUMN_TIME + " TEXT UNIQUE NOT NULL, " +
+                AirAzureContract.AirAzureEntry.COLUMN_LONG + " TEXT NOT NULL, " +
+                AirAzureContract.AirAzureEntry.COLUMN_LAT + " TEXT NOT NULL, " +
                 " );";
 
 
-        sqLiteDatabase.execSQL(SQL_CREATE_AIR_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_AIR_AZURE_TABLE);
     }
 
     @Override
@@ -59,7 +58,7 @@ public class SmogDbHelper extends SQLiteOpenHelper {
         // It does NOT depend on the version number for your application.
         // If you want to update the schema without wiping data, commenting out the next 2 lines
         // should be your top priority before modifying this method.
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + AirContract.AirEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + AirAzureContract.AirAzureEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }
