@@ -47,3 +47,6 @@ out/
 ehthumbs.db
 Thumbs.db
 build/
+
+# User specific files
+app/src/main/res/values/google_maps_api.xml
