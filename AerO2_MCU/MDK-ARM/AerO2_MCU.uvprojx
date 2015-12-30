@@ -535,6 +535,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\BT_Communication\bt_communication_protocols.c</FilePath>
             </File>
+            <File>
+              <FileName>battery_level_sensor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\Sensor_Interfaces\battery_level_sensor.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
