@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import urllib2
 
+from geopy.geocoders import Nominatim
+
 
 # Helper Function
 def find_place(key, origin, ptype, radius='1000'):
@@ -133,15 +135,28 @@ These functions need to be defined here
 '''
 
 
-def get_corner_coordinates(self, city_name):
+def get_corner_coordinates(city_name):
+    corner_coordinates = []
+
+    geo_locator = Nominatim()
+
+    try:
+        location = geo_locator.geocode(city_name)
+    except:
+        return [[]]
+
+    center_lat = round(location.latitude, 2)
+    center_long = round(location.longitude, 2)
+
+    y1, y2, x1, x2 = round(center_lat + 0.05, 2), round(center_lat - 0.08, 2), round(center_long - 0.08, 2), round(center_long + 0.07, 2)
+    
+    corner_coordinates = [[y1, x1], [y1, x2], [y2, x2], [y2, x1]]
+    
+    return corner_coordinates 
+    
+
+def get_road_index(node_coordinates):
     pass
 
-
-def get_road_index(self, node_coordinates):
+def get_industry_index(node_coordinates):
     pass
-
-
-def get_industry_index(self, node_coordinates):
-    pass
-
-

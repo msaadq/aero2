@@ -10,12 +10,12 @@ class DataBaseLayer:
     # Default Table names
     SAMPLE_TABLE_NAME = "aero2.SampleDataTable"
     RESULTS_TABLE_NAME = "aero2.ResultDataTable"
-    PROP_TABLE_NAME = "aero2.ResultDataTable"
+    PROP_TABLE_NAME = "aero2.PropertiesTable"
 
     # Default Columns for the tables
     SAMPLE_COLUMNS = "time, lat, long, alt, smog, normalized"
-    RESULTS_COLUMNS = "time, lat, long, alt, smog"
-    PROP_COLUMNS = "lat, long, alt, r_index, i_index"
+    RESULTS_COLUMNS = "time, lat, long, air_index"
+    PROP_COLUMNS = "time, lat, long, alt, r_index, i_index, sampled"
 
     # Threshold Values for Smog
     SMOG_MAX = 10000
@@ -35,7 +35,7 @@ class DataBaseLayer:
     '''
     Selects the table according to the where_params
     Args: self, Table Name (String), Where String (String)
-	Return: Table (String[][])
+	Return: Table (String[])
     '''
 
     def select_data(self, table_name, where_params=None):
@@ -52,10 +52,10 @@ class DataBaseLayer:
                 data_table.append([str(row.time), str(row.lat), str(row.long), str(row.alt), str(row.smog), str(row.normalized)])
         elif table_name == self.RESULTS_TABLE_NAME:
             for row in rows_table:
-                data_table.append([str(row.time), str(row.lat), str(row.long), str(row.alt), str(row.smog)])
+                data_table.append([str(row.time), str(row.lat), str(row.long), str(row.air_index)])
         elif table_name == self.PROP_TABLE_NAME:
             for row in rows_table:
-                data_table.append([str(row.lat), str(row.long), str(row.alt), str(row.r_index), str(row.i_index)])
+                data_table.append([str(row.time), str(row.lat), str(row.long), str(row.alt), str(row.r_index), str(row.i_index), str(row.sampled)])
 
         return data_table
 

@@ -1,0 +1,25 @@
+1) SampleDataTable
+    -Attributes:
+        0) time (number)
+        1) lat (number)
+        2) long (number)
+        3) alt (number)
+        4) smog (number)
+        5) normalized (number)
+        
+2) ResultsDataTable
+    -Attributes:
+        0) time (number)
+        1) lat (number)
+        2) long (number)
+        3) air_index (number)
+        
+3) PropertiesTable
+    -Attributes:
+        0) time (number)
+        1) lat (number)
+        2) long (number)
+        3) alt (number)
+        3) r_index (number)
+        4) i_index (number)
+        5) sampled (number)

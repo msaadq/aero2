@@ -1,14 +1,25 @@
-import maps
+import Maps as map
 import DataBaseLayer as dbl
 import math
 
 class DataTraining:
 
     VERIFICATION_THRESHOLD = 0.8
-    _database
+    
+    DEFAULT_TIME_INDEX = 0
+    DEFAULT_LAT_INDEX = 1
+    DEFAULT_LONG_INDEX = 2
+    DEFAULT_ALT_INDEX = 3
+    DEFAULT_SMOG_INDEX = 4
+    DEFAULT_NORMALIZED_INDEX = 5
+    DEFAULT_AIR_INDEX_INDEX = 3
+    DEFAULT_R_INDEX_INDEX = 3
+    DEFAULT_I_INDEX_INDEX = 4
+    DEFAULT_SAMPLED_INDEX = 5
+
 
     def __init__(self):
-        self._database = dbl.DataBaseLayer()
+        pass
 
     def initialize(self, city_name):
         return self._save_all_properties(city_name)
@@ -25,28 +36,45 @@ class DataTraining:
     '''
 
     def _save_all_properties(self, city_name):
-        return self._save_nodes_properties(self._map_properties(self._get_all_coordinates(maps.get_corner_points(city_name))))
+        return self._save_nodes_properties(self._map_properties(self._get_all_coordinates(map.get_corner_points(city_name))))
 
     def _get_all_coordinates(self, corner_coordinates):
-        all_coordinates = []
+        nodes_coordinates = []
 
-        x1, x2, y1, y2 = corner_coordinates[0][1], corner_coordinates[1][1], corner_coordinates[0][0], corner_coordinates[3][0]
+        if corner_coordinates == [[]]:
+            return [[]]
 
-        long_interval = abs(x1 - x2) / (self._calc_distance_from_long(x1, x2, y1) / 20.0)
-        lat_interval = abs(y1 - y2) / (self._calc_distance_from_lat(y1, y2, x1) / 20.0)
+        y1, y2, x1, x2 = corner_coordinates[0][0], corner_coordinates[2][0], corner_coordinates[0][1], corner_coordinates[2][1]
 
-        latitude = y1
-        longitude = x1
+        if x1 > x2:
+            x1, x2 = x2, x1
+        if y1 > y2:
+            y1, y2 = y2, y1
+
+        long_interval = (x2 - x1) / (self._calc_distance_on_unit_sphere(y1, x1, y1, x2) / 20.0)
+        lat_interval = (y2 - y1) / (self._calc_distance_on_unit_sphere(y1, x1, y2, x1) / 20.0)
+
+        print self._calc_distance_on_unit_sphere(y2, x1, y2, x1 + long_interval)
+
+        latitude = y2
         
-        while latitude < y2 and longitude < x2:
-            all_coordinates.append([latitude, longitude])
-            latitude += lat_interval
-            longitude += long_interval
+        while latitude > y1:
+            longitude = x1
 
-        return all_coordinates
+            while longitude < x2:
+                nodes_coordinates.append([latitude, longitude])
+                longitude += long_interval
+
+            latitude -= lat_interval
+
+        return nodes_coordinates
 
     def _map_properties(self, nodes_coordinates, time_stamps):
         output_table = []
+
+        if nodes_coordinates == [[]]:
+            return [[]]
+
         i = 0
         for single_coordinates in nodes_coordinates:
             output_table.append(single_coordinates, time_stamps[i], maps.get_altitude(single_coordinates), maps.get_road_index(single_coordinates), maps.get_industry_index(single_coordinates))
@@ -55,7 +83,10 @@ class DataTraining:
         return output_table
 
     def _save_nodes_properties(self, nodes_properties_table):
-        self._database.insert_multiple(self._database.PROP_TABLE_NAME, nodes_properties_table)
+        if nodes_properties_table == [[]]:
+            return 0
+
+        return self._database.insert_multiple(self._database.PROP_TABLE_NAME, nodes_properties_table)
 
 
     '''
@@ -64,10 +95,22 @@ class DataTraining:
 
 
     def _normalize_all(self):
-        pass
+        not_normalized_data_table = self._database.select_data(self._database.SAMPLE_TABLE_NAME, self._database.key_value_string_gen("normalized", 0))
+        normalized_data_table = []
+        temp = []
+        average = 0.0
 
-    def _normalize_coordinates(self, coordinates):
-        pass
+        for data_row in not_normalized_data_table:
+            temp.append(self._database.select_data(self._database.SAMPLE_TABLE_NAME, self._database.nearby_string_gen(data_row[0], data_row[1], 10)))
+
+            for data in temp:
+                average += data[self.DEFAULT_SMOG_INDEX]
+
+            average /= len(temp)
+
+            insert_row = [temp[0][DEFAULT_LAT_INDEX], temp[0][DEFAULT_LONG_INDEX], temp[0][DEFAULT_ALT_INDEX], average, 1]
+
+            self._database.insert_row(self._database.SAMPLE_TABLE_NAME, insert_row)
 
     def _train_system(self):
         pass
@@ -91,7 +134,7 @@ class DataTraining:
         pass
 
     def _get_non_sampled_nodes(self):
-        pass
+        return self._database.select_data(self._database.SAMPLE_TABLE_NAME, self._database.key_value_string_gen("sampled", 0))
 
     def _get_table_output(self, table_without_outputs):
         pass
@@ -100,38 +143,20 @@ class DataTraining:
         return self._calc_distance_on_unit_sphere(lat_min, ref_long, lat_max, ref_long)
 
     def _calc_distance_from_long(self, long_min, long_max, ref_lat):
-    
-        print ref_lat
-        print long_min
-        print long_max
         return self._calc_distance_on_unit_sphere(ref_lat, long_min, ref_lat, long_max)
 
-    def _calc_distance_on_unit_sphere(lat1, long1, lat2, long2):
+    def _calc_distance_on_unit_sphere(self, lat1, long1, lat2, long2):
+    
+        earth_radius = 6373000
+        degrees_to_radians = math.pi / 180.0
+            
+        phi1 = (90.0 - lat1) * degrees_to_radians
+        phi2 = (90.0 - lat2) * degrees_to_radians
+            
+        theta1 = long1 * degrees_to_radians
+        theta2 = long2 * degrees_to_radians
+            
+        cos = (math.sin(phi1) * math.sin(phi2) * math.cos(theta1 - theta2) + math.cos(phi1) * math.cos(phi2))
+        arc = math.acos(cos)
 
-        # Convert latitude and longitude to 
-        # spherical coordinates in radians.
-        degrees_to_radians = math.pi/180.0
-            
-        # phi = 90 - latitude
-        phi1 = (90.0 - lat1)*degrees_to_radians
-        phi2 = (90.0 - lat2)*degrees_to_radians
-            
-        # theta = longitude
-        theta1 = long1*degrees_to_radians
-        theta2 = long2*degrees_to_radians
-            
-        # Compute spherical distance from spherical coordinates.
-            
-        # For two locations in spherical coordinates 
-        # (1, theta, phi) and (1, theta', phi')
-        # cosine( arc length ) = 
-        #    sin phi sin phi' cos(theta-theta') + cos phi cos phi'
-        # distance = rho * arc length
-        
-        cos = (math.sin(phi1)*math.sin(phi2)*math.cos(theta1 - theta2) + 
-            math.cos(phi1)*math.cos(phi2))
-        arc = math.acos( cos )
-
-        # Remember to multiply arc by the radius of the earth 
-        # in your favorite set of units to get length.
-        return arc * 6373
+        return arc * earth_radius

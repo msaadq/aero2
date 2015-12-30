@@ -3,8 +3,8 @@ Machine Learning Algorithm
 Routines:
 	-initialize:
 		-save_all_properties: city_name -> no_of_modifications
-			-get_corner_points: city_name -> Array[2][4] corners
-			-get_all_coordinates: Array[2][4] corners -> table[N][2] coordinates
+			-get_corner_points: city_name -> Array[4][2] corners
+			-get_all_coordinates: Array[4][2] corners -> table[N][2] coordinates
 			-map_properties: table[N][2] coordinates -> table[][]
 				-get_road_index: Array[2] coordinates -> road_index
 				-get_industry_index: Array[2] coordinates -> industry_index
@@ -21,8 +21,8 @@ Routines:
 				-get_single_output: List[] -> list_with_smog[]
 			-update_results_table: samples_table[][] -> no_of_modifications
 
-		-update_results: None -> no_of_modifications (dependant on verification_index)
-			-get_nonsampled: None -> table[][]
-			-get_table_output: table[][] -> results_table[][]
-				-get_single_output: List[] -> list_with_smog[]
-			-update_results_table: table[][] -> no_of_modifications
+        -update_results: None -> no_of_modifications (dependant on verification_index)
+            -get_nonsampled: None -> table[][]
+            -get_table_output: table[][] -> results_table[][]
+                -get_single_output: List[] -> list_with_smog[]
+            -update_results_table: table[][] -> no_of_modifications
