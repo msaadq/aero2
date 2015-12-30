@@ -1,9 +1,9 @@
 package com.aero2.android.DefaultClasses.DataTables;
 
 /**
- * Represents a Row in Mapping Table
+ * Represents a Row in ResultsDataTable
  *
- * Created by Saad on 12/8/2015.
+ * Created by Usman on 12/29/2015.
  */
 
 public class ResultDataTable {
@@ -60,6 +60,8 @@ public class ResultDataTable {
         return mAirIndex;
     }
 
+    public Double getTime() { return mTime;}
+
     // Setter Functions
 
     public void setLong(Double mLong) {
@@ -70,13 +72,7 @@ public class ResultDataTable {
         this.mLat = mLat;
     }
 
-    public void setId(String mId) {
-        this.mId = mId;
-    }
-
-    public Double getTime() {
-        return mTime;
-    }
+    public void setId(String mId) { this.mId = mId; }
 
     public void setTime(Double mTime) {
         this.mTime = mTime;

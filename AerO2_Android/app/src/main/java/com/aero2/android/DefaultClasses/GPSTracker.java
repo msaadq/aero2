@@ -32,7 +32,7 @@ import com.aero2.android.DefaultActivities.MainActivity;
 public class GPSTracker {
 
     private Context context;
-    private String locations [];
+    private Double locations [];
     private static boolean gpsEnabled;
     private static LocationManager locationManager;
     public static Boolean settingDialogShown = false;   //Indicates if the setting dialog has been
@@ -49,7 +49,7 @@ public class GPSTracker {
     public GPSTracker(Context context){
 
         this.context=context;
-        locations = new String [3];
+        locations = new Double [3];
 
         // Acquire a reference to the system Location Manager
         locationManager = (LocationManager) context.getSystemService
@@ -69,14 +69,14 @@ public class GPSTracker {
     }
 
     /**
-     * Get the GPS coordinates: Longitude, Latitude & Altitude
+     * Get the GPS coordinates: Latitude, Longitude & Altitude
      * arg: None
      * exception: IOException
-     * return: String array containing longitude, latitude
+     * return: Double array containing latitude, longitude
      *  and altitude (in order)
      */
 
-    public String[] getGps(){
+    public Double[] getGps(){
 
         Location new_location = null;
 
@@ -114,9 +114,9 @@ public class GPSTracker {
 
         if (new_location != null) {
 
-            locations[0] = String.valueOf(new_location.getLongitude());
-            locations[1] = String.valueOf(new_location.getLatitude());
-            locations[2] = String.valueOf(new_location.getAltitude());
+            locations[0] = new_location.getLongitude();
+            locations[1] = new_location.getLatitude();
+            locations[2] = new_location.getAltitude();
 
         }
         return locations;

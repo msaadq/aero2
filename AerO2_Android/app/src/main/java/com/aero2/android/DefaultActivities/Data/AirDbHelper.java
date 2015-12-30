@@ -44,7 +44,8 @@ public class AirDbHelper extends SQLiteOpenHelper {
                 AirContract.AirEntry.COLUMN_TIME + " TEXT UNIQUE NOT NULL, " +
                 AirContract.AirEntry.COLUMN_LONG + " TEXT NOT NULL, " +
                 AirContract.AirEntry.COLUMN_LAT + " TEXT NOT NULL, " +
-                AirContract.AirEntry.COLUMN_ALT + " TEXT NOT NULL " +
+                AirContract.AirEntry.COLUMN_ALT + " TEXT NOT NULL, " +
+                AirContract.AirEntry.COLUMN_NORMALIZED + " TEXT NOT NULL " +
                 " );";
 
 

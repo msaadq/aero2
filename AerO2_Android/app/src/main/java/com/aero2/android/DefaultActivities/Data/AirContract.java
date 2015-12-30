@@ -68,7 +68,7 @@ public class AirContract {
         public static final String COLUMN_SMOG_VALUE = "smog_value_of_air";
 
         //air quality
-        public static final String COLUMN_AIR_QUALITY="air_quality";
+        public static final String COLUMN_NORMALIZED="normalized";
 
         //time at which the value was taken
         public static final String COLUMN_TIME = "time_of_air";

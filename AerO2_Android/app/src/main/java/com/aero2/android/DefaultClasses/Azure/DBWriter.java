@@ -76,7 +76,7 @@ public class DBWriter {
      * return: No return value.
      */
 
-    public void addItem(String id, String[] data, final String rowId, final SQLiteAPI sqLiteAPI) {
+    public void addItem(String id, Double[] data, final String rowId, final SQLiteAPI sqLiteAPI) {
         if (mClient == null) {
             return;
         }

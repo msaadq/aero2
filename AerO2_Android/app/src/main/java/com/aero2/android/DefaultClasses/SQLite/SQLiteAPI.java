@@ -66,59 +66,21 @@ public class SQLiteAPI {
      * arg: None
      * exception: None
      * return: 2-d double array containing row id, time,
-     * longitude, latitude, altitude & smog (in order)
+     * longitude, latitude, altitude, smog & normalized (in order)
      */
 
-    public double[][] getAllAirDouble(){
+    public Double[][] getAllAirDouble(){
 
-        String[] COLUMNS={
-                AirContract.AirEntry.TABLE_NAME+"."+ AirContract.AirEntry._ID,
-                AirContract.AirEntry.COLUMN_SMOG_VALUE,
-                AirContract.AirEntry.COLUMN_LONG,
-                AirContract.AirEntry.COLUMN_LAT,
-                AirContract.AirEntry.COLUMN_ALT,
-                AirContract.AirEntry.COLUMN_TIME
-        } ;
-
-        //Get cursor position
-        Cursor airCursor = db.query(AirContract.AirEntry.TABLE_NAME, COLUMNS, null,
-                null, null, null, null);
-
-        int noOfRows=airCursor.getCount();
-        double[][] allAir=new double[noOfRows][5];
-
-        //Copy values from each row
-        for(int i=0;i<noOfRows;i++)
-        {
-            airCursor.moveToPosition(i);
-            for(int j=0;j<5;j++)
-            {
-                allAir[i][j]=Double.valueOf(airCursor.getString(j));
-            }
-        }
-
-        return allAir;
-
-    }
-
-    /**
-     * Get all values from local database and return
-     * as 2-d string array.
-     * arg: None
-     * exception: None
-     * return: 2-d string array containing row id, time,
-     * longitude, latitude, altitude & smog (in order)
-     */
-
-    public String[][] getAllAirStrings(){
-
+        //Number of columns in table
+        int N=7;
         String[] COLUMNS={
                 AirContract.AirEntry.TABLE_NAME+"."+ AirContract.AirEntry._ID,
                 AirContract.AirEntry.COLUMN_TIME,
                 AirContract.AirEntry.COLUMN_LONG,
                 AirContract.AirEntry.COLUMN_LAT,
                 AirContract.AirEntry.COLUMN_ALT,
-                AirContract.AirEntry.COLUMN_SMOG_VALUE
+                AirContract.AirEntry.COLUMN_SMOG_VALUE,
+                AirContract.AirEntry.COLUMN_NORMALIZED
         } ;
 
         //Get cursor position
@@ -126,21 +88,21 @@ public class SQLiteAPI {
                 null, null, null, null);
 
         int noOfRows=airCursor.getCount();
-        String[][] allAir=new String[noOfRows][6];
+        Double[][] allAir = new Double[noOfRows][N];
 
-        //Get values from each row
+        //Copy values from each row
         for(int i=0;i<noOfRows;i++)
         {
             airCursor.moveToPosition(i);
-            for(int j=0;j<6;j++)
+            for(int j=0;j<N;j++)
             {
-                allAir[i][j]=airCursor.getString(j);
+                allAir[i][j]=Double.valueOf(airCursor.getString(j));
             }
         }
 
         return allAir;
-
     }
+
 
     /**
      * Get number of rows in local database.
@@ -191,15 +153,16 @@ public class SQLiteAPI {
      * return: None
      */
 
-    public void addAirValue(String[] params){
+    public void addAirValue(Double[] params){
 
         ContentValues values=new ContentValues();
 
-        values.put(AirContract.AirEntry.COLUMN_TIME,params[0]);
-        values.put(AirContract.AirEntry.COLUMN_LONG,params[1]);
-        values.put(AirContract.AirEntry.COLUMN_LAT,params[2]);
-        values.put(AirContract.AirEntry.COLUMN_ALT,params[3]);
-        values.put(AirContract.AirEntry.COLUMN_SMOG_VALUE, params[4]);
+        values.put(AirContract.AirEntry.COLUMN_TIME,String.valueOf(params[0]));
+        values.put(AirContract.AirEntry.COLUMN_LONG,String.valueOf(params[1]));
+        values.put(AirContract.AirEntry.COLUMN_LAT,String.valueOf(params[2]));
+        values.put(AirContract.AirEntry.COLUMN_ALT,String.valueOf(params[3]));
+        values.put(AirContract.AirEntry.COLUMN_SMOG_VALUE, String.valueOf(params[4]));
+        values.put(AirContract.AirEntry.COLUMN_NORMALIZED, String.valueOf(params[5]));
 
         long newRowId = db.insert(AirContract.AirEntry.TABLE_NAME, null, values);
         Log.v("Row id: ", String.valueOf(newRowId));
@@ -222,11 +185,12 @@ public class SQLiteAPI {
 
     public void deleteEntry(String rowId){
 
-        String selection = AirContract.AirEntry.TABLE_NAME+"."+ AirContract.AirEntry._ID + " LIKE ?";
+        String selection = AirContract.AirEntry._ID + "=?";
         // Specify arguments in placeholder order.
         String[] selectionArgs = { rowId };
         // Issue SQL statement.
         db.delete(AirContract.AirEntry.TABLE_NAME, selection, selectionArgs);
+        Log.v("Deleted",String.valueOf(rowId));
     }
 
 }

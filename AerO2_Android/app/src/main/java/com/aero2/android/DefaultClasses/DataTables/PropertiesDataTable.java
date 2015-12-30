@@ -1,9 +1,9 @@
 package com.aero2.android.DefaultClasses.DataTables;
 
 /**
- * Represents a Row in Mapping Table
+ * Represents a Row in PropertiesDataTable
  *
- * Created by Saad on 12/8/2015.
+ * Created by Usman on 12/29/2015.
  */
 
 public class PropertiesDataTable {
@@ -70,7 +70,6 @@ public class PropertiesDataTable {
         return mLat;
     }
 
-
     public Double getLong() {
         return mLong;
     }
@@ -109,22 +108,17 @@ public class PropertiesDataTable {
         this.mAlt = mAlt;
     }
 
-
-
     public void setLong(Double mLong) {
         this.mLong = mLong;
     }
-
 
     public void setrIndex(Double mrIndex) {
         this.mrIndex = mrIndex;
     }
 
-
     public void setiIndex(Double miINDEX) {
         this.miINDEX = miINDEX;
     }
-
 
     public void setSampled(Double mSampled) {
         this.mSampled = mSampled;

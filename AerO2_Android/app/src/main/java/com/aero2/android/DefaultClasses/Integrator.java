@@ -37,13 +37,13 @@ public class Integrator {
     //Local class variables
     private final int maxValueCount = 10000;
     private final int maxCounter = 8;
-    private final int N = 5;                    // Size of integrator array
+    private final int N = 6;                    // Size of integrator array
     public static int value_count = 0;
     private int counter;
-    private String integrators[][];             // 2-D array holding all records
-    private String new_integrator [];
-    private int start_lat, start_lon;
-    private int[] corner;
+    private Double integrators[][];             // 2-D array holding all records
+    private Double new_integrator [];
+    private Double start_lat, start_lon;
+    //private int[] corner;
 
     //Global variables
     private Activity activity;
@@ -66,8 +66,8 @@ public class Integrator {
 
         this.activity = activity;
 
-        integrators = new String [maxValueCount][N];
-        corner = new int[4];
+        integrators = new Double [maxValueCount][N];
+        //corner = new int[4];
         counter = 0;
 
         try {
@@ -75,6 +75,7 @@ public class Integrator {
             gps = new GPSTracker(activity);
             sensor = new STMCommunicator(activity);
             sqLiteAPI = new SQLiteAPI(activity);
+
 
         } catch (IOException e) {
             Log.d("Integrator ", "Initialization failed.");
@@ -90,13 +91,13 @@ public class Integrator {
      * (in order)
      */
 
-    private String[] integrateSmog() {
+    private Double[] integrateSmog() {
 
         if (!BTService.getBluetoothAdapter()){
             return null;
         }
 
-        String[] integrated = new String[6];
+        Double[] integrated = new Double[N];
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyMMdd.HHmmss");   //dd/MM/yyyy
         Date date = new Date();
         String dateTime = sdfDate.format(date);
@@ -105,13 +106,14 @@ public class Integrator {
 
             sensor.authenticate("username", "password");
             String smog = sensor.getSmogValue();
-            String[] newLocation = gps.getGps();
+            Double[] newLocation = gps.getGps();
 
-            integrated[0] = String.valueOf(dateTime);
+            integrated[0] = Double.valueOf(dateTime);
             integrated[1] = newLocation[0];
             integrated[2] = newLocation[1];
             integrated[3] = newLocation[2];
-            integrated[4] = smog;
+            integrated[4] = Double.valueOf(smog);
+            integrated[5] = 0.0;                    //Normalized is set to default '0'
 
         } catch (IOException ie) {
             ie.printStackTrace();
@@ -152,7 +154,7 @@ public class Integrator {
             }
 
             //Skips if smog sensor's value is 0
-            if (integrators[value_count][4].equals("0")){
+            if (integrators[value_count][4] == 0 || integrators[value_count][4] > 1024 ){
                 Log.v("MainActivity", "Smog = 0");
                 valid = false;
             }
@@ -160,15 +162,15 @@ public class Integrator {
             if (valid) {
 
                 if (value_count == 0){
-                    start_lat =(int) (Float.parseFloat(integrators[0][1]) * 100);
+                    start_lat = integrators[0][1];
                     Log.e("Start lat: ",String.valueOf(start_lat));
 
-                    start_lon =(int) (Float.parseFloat(integrators[0][2]) * 100);
+                    start_lon = integrators[0][2];
                     Log.e("Start lon: ",String.valueOf(start_lon));
                 }
 
-                int curr_lat = (int) (Float.parseFloat(integrators[0][1]) * 100);
-                int curr_lon = (int) (Float.parseFloat(integrators[0][2]) * 100);
+                //int curr_lat = (int) (Float.parseFloat(integrators[0][1]) * 100);
+                //int curr_lon = (int) (Float.parseFloat(integrators[0][2]) * 100);
 
                 SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");   //dd/MM/yyyy
                 Date date = new Date();
@@ -180,11 +182,11 @@ public class Integrator {
                 Toast toast = Toast.makeText(activity, R.string.update_message_6, Toast.LENGTH_SHORT);
                 toast.show();
 
-                smog_text.setText(String.valueOf(integrators[value_count - 1][4]));
-                location_text.setText(String.format("%.2f", Double.valueOf(
-                        integrators[value_count-1][1]))+", "+  String.format("%.2f", Double.valueOf(
-                                integrators[value_count - 1][2])));
-                        time_text.setText(time);
+                time_text.setText(time);
+                location_text.setText(String.format("%.2f", integrators[value_count - 1][1])
+                        + ", " + String.format("%.2f", integrators[value_count - 1][2]));
+
+                smog_text.setText(String.valueOf((integrators[value_count - 1][4]).longValue()));
                 count_text.setText("["+String.valueOf(value_count)+"]");
 
             }
@@ -248,28 +250,35 @@ public class Integrator {
      */
 
     public void saveSQL (){
-        computeReference();
 
-        String[][] temp = new String[1][N];
+        //Save just 1 row in SQL
+        Double[][] temp = new Double[1][N];
+
+        //Save starting time & location
         temp[0][0] = integrators[0][0];
         temp[0][1] = integrators[0][1];
         temp[0][2] = integrators[0][2];
         temp[0][3] = integrators[0][3];
+        temp[0][5] = integrators[0][5];
 
-        int sum = 0;
+        //Average the smog value
+        Double sum = 0.0;
         for (int i=0;i<value_count;i++){
-            sum += Integer.parseInt(integrators[i][4]);
+            sum += integrators[i][4];
         }
 
-        temp[0][4] = String.valueOf(sum/value_count);
-        Log.v("Smog Averaged",temp[0][4]);
+        temp[0][4] = sum/value_count;
+        Log.v("Smog Averaged",String.valueOf(temp[0][4]));
 
+        //Set value count to 1
         value_count = 1;
+
+        //Call SQLiteAPI
         sqLiteAsyncTask = new SQLiteAsyncTask(activity,sqLiteAPI);
         sqLiteAsyncTask.execute(integrators);
 
         //Reinitialize
-        integrators = new String [maxValueCount][N];;
+        integrators = new Double [maxValueCount][N];;
     }
 
     /**
@@ -296,38 +305,6 @@ public class Integrator {
 
     private void computeReference(){
 
-        //Start from 1 less
-        for (int i = start_lat-1; i>0; i--){
-            if ((i%5) == 0){
-                corner[0] = i;         //Lower latitude
-                Log.e("Ref",String.valueOf(corner[0]));
-                break;
-            }
-        }
 
-        //Start from 1 less
-        for (int j = start_lon-1; j>0; j--){
-            if ((j%5) == 0){
-                corner[1] = j;         //Lower longitude
-                Log.e("Ref",String.valueOf(corner[1]));
-                break;
-            }
-        }
-
-        for (int i = start_lat;; i++){
-            if ((i%5) == 0){
-                corner[2] = i;         //Upper latitude
-                Log.e("Ref",String.valueOf(corner[2]));
-                break;
-            }
-        }
-
-        for (int j = start_lon;; j++){
-            if ((j%5) == 0){
-                corner[3] = j;         //Upper longitude
-                Log.e("Ref",String.valueOf(corner[3]));
-                break;
-            }
-        }
     }
 }

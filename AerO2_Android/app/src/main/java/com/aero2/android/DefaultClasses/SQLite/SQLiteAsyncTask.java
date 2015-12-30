@@ -16,7 +16,7 @@ import com.aero2.android.DefaultClasses.Integrator;
  *
  * Created by usmankhan on 12/13/2015.
  */
-public class SQLiteAsyncTask extends AsyncTask<String[][], Void, Void> {
+public class SQLiteAsyncTask extends AsyncTask<Double[][], Void, Void> {
 
     Activity activity;
     SQLiteAPI sqLiteAPI;
@@ -30,7 +30,7 @@ public class SQLiteAsyncTask extends AsyncTask<String[][], Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(String[][]... params) {
+    protected Void doInBackground(Double[][]... params) {
 
         Log.v("SQLiteAsyncTask", "Entered doInBackground");
         int count  = Integrator.value_count;
