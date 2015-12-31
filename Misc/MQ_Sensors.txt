@@ -1,0 +1,40 @@
+
+MQ5 DESCRIPTION:
+
+Sensitive material of MQ-5 gas sensor is SnO2 [Indium Tin Oxide], which has lower 
+conductivity in clean air. When the target combustible gas exists, the sensor has
+higher conductivity and increases with increase in concentration of target gases. 
+The target gases are:
+
+1- Methane
+2- Butane
+3- Propane
+4- Other combustible gases
+
+MQ-5 gas sensor has:
+
+- High sensitivity to LPG, natural gas , town gas 
+- Low sensitivity to smoke & alcohol
+
+http://www.dfrobot.com/image/data/SEN0130/MQ-5.pdf
+
+MQ135 Description:
+
+Sensitive material of MQ-5 gas sensor is also SnO2 [Indium Tin Oxide]. Sensor has 
+high sensitivity to smoke and ammonia, and is more strongly related to air 
+pollution.
+
+https://www.olimex.com/Products/Components/Sensors/SNS-MQ135/resources/SNS-MQ135.pdf
+
+
+Sensors' Comparison:
+
+http://www.chip.tomsk.ru/chip/chipdoc.nsf/cae24731d248549fc6256d53006dcde3/4a695e8a89015d00c6256efe0047417e!OpenDocument
+
+
+UNITS:
+The sensor measures conductivity and, therefore, only through calibration can the
+units be derived.
+
+In general, EPA (US Environment Protection Agency) refers to ppbv (parts per billion
+by volume) or ppmv(parts per million by volume) to refer to air quality index. 

@@ -112,6 +112,7 @@ public class STMCommunicator {
 
         }
 
+
         // Step 2 : Send the Username and wait for approval
         sendCommand(O_COM_USR, username+"\n");
 
@@ -226,7 +227,7 @@ public class STMCommunicator {
             Log.v("STMCommunicator", "Message Received in getSmogValue(): " + temp);
 
             if(temp.substring(0,4).equals(I_COM_SSG)) {
-                String smog = temp.substring(5,temp.length());
+                String smog = temp.substring(5, temp.length());
                 return Integer.parseInt(smog);
             }
             return 0;

@@ -10,6 +10,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include "system_clock.h"
+#include "smog_sensor_interface.h"
 
 /**
  * Initialize STM

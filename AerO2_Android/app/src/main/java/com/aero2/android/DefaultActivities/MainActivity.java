@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.aero2.android.DefaultClasses.BTService;
 import com.aero2.android.DefaultClasses.DBAsyncTask;
 import com.aero2.android.DefaultClasses.DBWriter;
 import com.aero2.android.DefaultClasses.GPSTracker;
@@ -53,8 +54,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
+        //Instantiate UI Objects
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         longitude_text = (TextView) findViewById(R.id.longitude_text);
         latitude_text = (TextView) findViewById(R.id.latitude_text);
         altitude_text = (TextView) findViewById(R.id.altitude_text);
@@ -78,13 +80,11 @@ public class MainActivity extends AppCompatActivity {
         this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 1);                         //Ask user for Manifest permission
 
-        //dbWriter.addItem("Fake Data", fakeData);
-
         stop_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
                 //Stop GPS Handler
-                m_handler.removeCallbacks(mStatusChecker);
+                m_handler.removeCallbacks(getIntegrator);
                 try {
                     showValueCount();
                 } catch (IOException e) {
@@ -94,14 +94,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
         gps_button.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
                 Log.v("gps_button","Inside setonClickListener()");
                 //Run GPS Handler
-                mStatusChecker.run();
+                getIntegrator.run();
             }
         });
 
@@ -116,32 +114,32 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    Runnable mStatusChecker = new Runnable() {
+    Runnable getIntegrator = new Runnable() {
         @Override
         public void run() {
+            if (BTService.getDeviceConnected() == true) {
+                Log.v("Status", "Capturing GPS Reading");
+                if (value_count <= max_value_count) {
 
-            Log.v("Status", "Capturing GPS Reading");
-            if (value_count <= max_value_count) {
+                    new_integrator = integrator.integrateSmog();
 
-                new_integrator = integrator.integrateSmog();
+                    for (int i = 0; i < 6; i++) {
+                        integrators[value_count][i] = new_integrator[i];
+                    }
 
-                for (int i=0; i<6;i++) {
-                    integrators[value_count][i] = new_integrator[i];
+                    SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
+                    date = new Date();
+
+                    time_text.setText("Time & Date: " + sdfDate.format(date));
+                    longitude_text.setText("Longitude: " + new_integrator[1]);
+                    latitude_text.setText("Latitude: " + new_integrator[2]);
+                    altitude_text.setText("Altitude: " + new_integrator[3]);
+                    smog_text.setText("Smog: " + new_integrator[4]);
+
+                    value_count++;
+                    Log.v("Value Count", String.valueOf(value_count));
+                    m_handler.postDelayed(getIntegrator, m_interval);
                 }
-
-                SimpleDateFormat sdfDate = new SimpleDateFormat("HH:mm:ss");
-                date=new Date();
-
-                time_text.setText("Time & Date: " + sdfDate.format(date));
-                longitude_text.setText("Longitude: " + new_integrator[1]);
-                latitude_text.setText("Latitude: " + new_integrator[2]);
-                altitude_text.setText("Altitude: " + new_integrator[3]);
-                smog_text.setText("Smog: " +new_integrator[4]);
-
-                //value_count = gps.getValueCount();
-                value_count ++;
-                Log.v("Value Count",String.valueOf(value_count));
-                m_handler.postDelayed(mStatusChecker, m_interval);
             }
         }
     };

@@ -8,6 +8,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "smog_sensor_interface.h"
 #include "uart_functionality.h"
+#include "battery_level_sensor.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,27 +71,17 @@ void smogEnable(void);
  * return: No return value
  */
 
-void airQualityEnable(void);
-
-/**
- * Request Smog Data
- * Deals with the smog data requests and sends values accordingly
- * arg: None
- * exception: None
- * return: No return value
- */
-
 void reqSmogData(void);
 
 /**
- * Request Air Quality Data
- * Deals with the smog data requests and sends values accordingly
+ * Request Battery Status
+ * Deals with the battery percentage status requests and sends data accordingly
  * arg: None
  * exception: None
  * return: No return value
  */
 
-void reqAirQualityData(void);
+void reqBatteryStatus(void);
 
 /**
  * Send Command
@@ -111,6 +102,17 @@ void sendCommand(char * command, char * parameters);
  */
 
 char * commandBuilder(char *command, char *parameters);
+
+
+/**
+ * Compare Command
+ * Comapares String to contain the pre defined commands
+ * arg: 2 Strings
+ * exception: None
+ * return: bool
+ */
+
+bool compareCommand(char *receivedCommand, const char *sampleCommand);
 
 #ifdef __cplusplus
 }
