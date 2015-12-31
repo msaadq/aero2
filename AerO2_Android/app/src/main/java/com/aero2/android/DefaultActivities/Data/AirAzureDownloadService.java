@@ -8,20 +8,14 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p/>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
+
 public class AirAzureDownloadService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
+
+
     public static final String DOWNLOAD_AZURE_AIR_DATA = "com.aero2.android.DefaultActivities.Data.download.AZUREAIRDATA";
     public static final String UPDATE_LOCAL_CACHE = "com.aero2.android.DefaultActivities.Data.update.LOCALCACHE";
 
-    // TODO: Rename parameters
+
     public static final String LATITUDE_LIMIT_TOP = "com.aero2.android.DefaultActivities.Data.latitude.LIMITTOP";
     public static final String LATITUDE_LIMIT_BOTTOM = "com.aero2.android.DefaultActivities.Data.latitude.LIMITBOTTOM";
     public static final String LONGITUDE_LIMIT_LEFT = "com.aero2.android.DefaultActivities.Data.longitude.LIMITLEFT";
@@ -35,17 +29,13 @@ public class AirAzureDownloadService extends IntentService {
         super("AirAzureDownloadService");
     }
 
-    /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
+
+
+
     // TODO: Customize helper method
     public void startActionDownloadAzureAirData(Context context, String latLimitTop, String latLimitBottom, String longLimitLeft, String longLimitRight) {
         Log.v("StartAction","Staritng Download Action");
         localContext=context;
-        mDbHelper=new AirAzureDbHelper(localContext);
 
         Intent intent = new Intent(context, AirAzureDownloadService.class);
         intent.setAction(DOWNLOAD_AZURE_AIR_DATA);
@@ -71,20 +61,19 @@ public class AirAzureDownloadService extends IntentService {
         }
     }
 
-    /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionDownloadAzureAirData(String latLimitTop, String latLimitBottom,String longLimitLeft,String longLimitRight) {
-        // TODO: Handle action Foo
 
+
+
+    private void handleActionDownloadAzureAirData(String latLimitTop, String latLimitBottom,String longLimitLeft,String longLimitRight) {
+
+        mDbHelper=new AirAzureDbHelper(getApplicationContext());
 
         db=mDbHelper.getWritableDatabase();
         if(db==null){
             Log.v("Database2"," unable to get database");
         }
-        for(int i=0;i<10;i++){
-            for(int j=0;j<10;j++){
+        for(int i=0;i<50;i++){
+            for(int j=0;j<50;j++){
                 double random=-1;
                 while(random<0||random>1.024){
                     random=Math.random();

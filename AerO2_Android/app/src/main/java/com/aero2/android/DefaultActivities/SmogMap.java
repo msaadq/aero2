@@ -16,8 +16,11 @@
 
 package com.aero2.android.DefaultActivities;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
@@ -117,7 +120,7 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,Loa
             }
         });
 
-       /* Intent alarmIntent = new Intent(SmogMap.this, AirAzureDownloadService.AlarmReceiver.class);
+        Intent alarmIntent = new Intent(SmogMap.this, AirAzureDownloadService.AlarmReceiver.class);
         alarmIntent.putExtra(AirAzureDownloadService.LONGITUDE_LIMIT_LEFT, "0");
         alarmIntent.putExtra(AirAzureDownloadService.LONGITUDE_LIMIT_RIGHT, "0");
         alarmIntent.putExtra(AirAzureDownloadService.LATITUDE_LIMIT_TOP, "0");
@@ -129,19 +132,16 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,Loa
 
         AlarmManager am=(AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
 
-        Log.v("OnCreate","AlarmManager Created");
+        Log.v("OnCreate", "AlarmManager Created");
         //Set the AlarmManager to wake up the system.
         am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10, pi);
-//*/
-//
-        AirAzureDownloadService airAzureDownloadService=new AirAzureDownloadService();
-        airAzureDownloadService.startActionDownloadAzureAirData(getApplicationContext(), "0", "0", "0", "0");
+
 
 //          gps=new GPSTracker(getApplicationContext());
             SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
-        getLoaderManager().initLoader(AZURE_LOADER, null, this);
+        //getLoaderManager().initLoader(AZURE_LOADER, null, this);
 
     }
 
@@ -157,6 +157,63 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,Loa
         map.getUiSettings().setZoomControlsEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
 
+        SimpleCursorLoader simpleCursorLoader=new SimpleCursorLoader(getApplicationContext(),map) {
+            @Override
+            public Cursor loadInBackground() {
+                AirAzureDbHelper airAzureDbHelper=new AirAzureDbHelper(getApplicationContext());
+                SQLiteDatabase db=airAzureDbHelper.getReadableDatabase();
+                String[] projection=new String[]{
+                        AirAzureContract.AirAzureEntry.COLUMN_AIR_INDEX,
+                        AirAzureContract.AirAzureEntry.COLUMN_LAT,
+                        AirAzureContract.AirAzureEntry.COLUMN_LONG
+                };
+                Cursor mCursor;
+                mCursor=db.query(AirAzureContract.AirAzureEntry.TABLE_NAME,projection,null,null,null,null,null);
+                return mCursor;
+            }
+        };
+        Cursor cursor;
+        cursor=simpleCursorLoader.loadInBackground();
+        // Create the gradient.
+        int[] colors = {
+                Color.rgb(0, 255, 0), // green
+                Color.rgb(255,255,0),
+                Color.rgb(220, 0, 0)    // red
+        };
+
+        float[] startPoints = {
+                0f, 0.5f,1f
+        };
+
+        Gradient gradient = new Gradient(colors, startPoints);
+
+        List<WeightedLatLng> list = new ArrayList<WeightedLatLng>();
+        WeightedLatLng[][] weightedLatLng=new WeightedLatLng[50][50];
+        int k=0;
+        Log.v("CusorLength:"," cursor length is "+cursor.getCount());
+            for (int i = 0; i < weightedLatLng.length; i++) {
+                for (int j = 0; j < weightedLatLng[0].length; j++) {
+                    if(cursor.moveToFirst()) {
+                        cursor.moveToPosition(k);
+                        double random = Double.valueOf(cursor.getString(0));
+                        weightedLatLng[i][j] = new WeightedLatLng(new LatLng(Double.valueOf(cursor.getString(1)), Double.valueOf(cursor.getString(2))), random);
+                        Log.v("RandomValue", "random smog value: " + random);
+                        list.add(weightedLatLng[i][j]);
+                        k++;
+                    }
+                }
+            }
+
+        if(cursor.getCount()>0) {
+            //Make a Weighted heatmap of the Smog
+            HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
+                    .weightedData(list)
+                    .gradient(gradient)
+                    .opacity(0.3)
+                    .radius(10)
+                    .build();
+            map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        }
         googleMap=map;
         // Add a tile overlay to the map, using the heat map tile provider.
 
@@ -205,38 +262,7 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,Loa
         SQLiteDatabase db=mOpenHelper.getReadableDatabase();
         Cursor  data= db.query(AirAzureContract.AirAzureEntry.TABLE_NAME,
                 projection, null, null, null, null, sortOrder);
-        Log.v("Loader","Entered the OnLoadFinished Method");
-        // Create the gradient.
-        int[] colors = {
-                Color.rgb(0, 255, 0), // green
-                Color.rgb(255,255,0),
-                Color.rgb(220, 0, 0)    // red
-        };
-
-        float[] startPoints = {
-                0f, 0.5f,1f
-        };
-
-        Gradient gradient = new Gradient(colors, startPoints);
-
-        List<WeightedLatLng> list = new ArrayList<WeightedLatLng>();
-        WeightedLatLng[][] weightedLatLng=new WeightedLatLng[100][100];
-        for(int i=0;i<weightedLatLng.length;i++){
-            for(int j=0;j<weightedLatLng[0].length;j++){
-                double random=Double.valueOf(data.getString(0));
-                weightedLatLng[i][j]=new WeightedLatLng(new LatLng(Double.valueOf(data.getString(1)),Double.valueOf(data.getString(2))),random);
-                Log.v("RandomValue","random smog value: "+ random);
-                list.add(weightedLatLng[i][j]);
-            }
-        }
-        //Make a Weighted heatmap of the Smog
-        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
-                .weightedData(list)
-                .gradient(gradient)
-                .opacity(0.3)
-                .radius(10)
-                .build();
-        googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        Log.v("Loader", "Entered the OnLoadFinished Method");
 
         Log.v("Loader","about to return data form cache data table");
         return null;
