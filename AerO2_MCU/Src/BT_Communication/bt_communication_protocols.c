@@ -9,18 +9,14 @@ static const char* O_COM_AUT = "OAUT"; // Authenticate
 static const char* O_COM_USR = "OUSR"; // Set Username
 static const char* O_COM_PAS = "OPAS"; // Set Password
 static const char* O_COM_NSG = "ONSG"; // Enable / Disable Smog Sensor
-static const char* O_COM_NAQ = "ONAQ"; // Enable / Disable Air Quality Sensor
 static const char* O_COM_SSG = "OSSG"; // Request Smog Data
-static const char* O_COM_SAQ = "OSAQ"; // Request Air Quality Data
 
 // All the available In commands
 static char* I_COM_AUT = "IAUT"; // Authentication Status
 static char* I_COM_USR = "IUSR"; // Username Status
 static char* I_COM_PAS = "IPAS"; // Password Status
 static char* I_COM_NSG = "INSG"; // Smog Sensor Status
-static char* I_COM_NAQ = "INAQ"; // Air Quality Sensor Status
 static char* I_COM_SSG = "ISSG"; // Received Smog Data
-static char* I_COM_SAQ = "ISAQ"; // Received Air Quality Data
 
 // Booleans representing program status
 bool communicationEnded = false;
@@ -28,7 +24,7 @@ bool btAvailable = false;
 bool authenticationStatus = false;
 bool userCorrect = false;
 bool passwordCorrect = false;
-bool smogAvailable = false;
+bool smogAvailable = true; // Debugging changes
 bool airQualityAvailable = false;
 
 // Complete Received Command
@@ -47,51 +43,29 @@ void btRoutine(void) {
 	
 	sendString("Started");
 	
-	char receivedCommand[5];
 	int i;
 	
 	while(!communicationEnded) {
 		receivedString = readString();
 		
-		i = 0;
-		
-		HAL_Delay(1);
-		
-		for(; receivedString[i] != '\0' && i < 4; i++) {
-			receivedCommand[i] = receivedString[i];
+		HAL_Delay(2);
+        
+		for(i = 5; i < 25 && receivedString != '\0'; i++) {
+			receivedParameters[i - 5] = receivedString[i];      
 		}
-		
-		if(i < 4) { break; }
-		else { i = 5; }
-		
-		for(; i < 25 && receivedString != '\0'; i++) {
-			receivedParameters[i - 5] = receivedString[i];
-		}
-		
-		if(strcmp(receivedCommand, O_COM_AUT) == 0) {
-			autRoutine();
 			
-		} else if (strcmp(receivedCommand, O_COM_USR) == 0) {
-			userRoutine();
-			
-		} else if (strcmp(receivedCommand, O_COM_PAS) == 0) {
-			passRoutine();
-			
-		} else if (strcmp(receivedCommand, O_COM_NSG) == 0) {
-			smogEnable();
-			
-		} else if (strcmp(receivedCommand, O_COM_NAQ) == 0) {
-			airQualityEnable();
-
-		} else if (strcmp(receivedCommand, O_COM_SSG) == 0) {
-			reqSmogData();
-			
-		} else if (strcmp(receivedCommand, O_COM_SAQ) == 0) {
-			reqAirQualityData();
-			
+		if(compareCommand(receivedString, O_COM_AUT)) {
+			autRoutine();			
+		} else if (compareCommand(receivedString, O_COM_USR)) {
+			userRoutine();		
+		} else if (compareCommand(receivedString, O_COM_PAS)) {
+			passRoutine();		
+		} else if (compareCommand(receivedString, O_COM_NSG)) {
+			smogEnable();		
+		} else if (compareCommand(receivedString, O_COM_SSG)) {
+			reqSmogData();	
 		} else {
-			sendCommand("IINV","COMMAND_REJECTED");
-			
+			sendCommand("IINV","COMMAND_REJECTED");		
 		}
 	}
 }
@@ -197,26 +171,6 @@ void smogEnable(void) {
 }
 
 /**
- * Air Quality Sensor Enabler / Disabler
- * Disables or enables the Air Quality Sensor
- * arg: None
- * exception: None
- * return: No return value
- */
-
-void airQualityEnable(void) {
-	if(authenticationStatus && receivedString[5] == '1') {
-		airQualityAvailable = true;
-		sendCommand(I_COM_NAQ, "1");
-		
-	} else {
-		airQualityAvailable = false;
-		sendCommand(I_COM_NAQ, "0");
-		
-	}
-}
-
-/**
  * Request Smog Data
  * Deals with the smog data requests and sends values accordingly
  * arg: None
@@ -228,16 +182,17 @@ void reqSmogData(void) {
 	if(smogAvailable) {
 		char smogData[3];
 		int iSmogData = 0;
-		char *batteryPercentage;
-		sprintf(batteryPercentage, "%d", getBatteryPercentage());
+		char batteryPercentage[3];
+		
 		
 		for(int i = 0; i < 1000; i++) {
 			iSmogData += getSmogSensorValue();
 		}	
 		iSmogData /= 1000;
 		
-		sprintf(smogData, "%d", iSmogData);
+        sprintf(batteryPercentage, "%d", getBatteryPercentage());
         
+		sprintf(smogData, "%d", iSmogData);
 		strcat(smogData, ":");
 		strcat(smogData, batteryPercentage);
         
@@ -246,34 +201,6 @@ void reqSmogData(void) {
 	} else {
 		sendCommand(I_COM_NSG, "0");
 		
-	}
-}
-
-/**
- * Request Air Quality Data
- * Deals with the smog data requests and sends values accordingly
- * arg: None
- * exception: None
- * return: No return value
- */
-
-void reqAirQualityData(void) {
-	if(airQualityAvailable) {
-		char airQualityData[3];
-		/*
-		int iAirQualityData = 0;
-		
-		for(int i = 0; i < 100; i++) {
-			iAirQualityData += getAirQualitySensorValue();
-		}	
-		iAirQualityData /= 100;
-		
-		sprintf(airQualityData, "%d", iAirQualityData);
-		*/
-		sendCommand(I_COM_SAQ, airQualityData);
-		
-	} else {
-		sendCommand(I_COM_NAQ, "0");		
 	}
 }
 
@@ -309,3 +236,29 @@ char * commandBuilder(char *s1, char *s2) {
 	
     return result;
 }
+
+/**
+ * Compare Command
+ * Comapares String to contain the pre defined commands
+ * arg: 2 Strings
+ * exception: None
+ * return: bool
+ */
+
+bool compareCommand(char *receivedCommand, const char *sampleCommand) {
+    bool containsCommand = true;
+    
+    for(int i = 0; i < 4; i++) {
+			if(receivedCommand == '\0') {
+				containsCommand = false;
+				break;
+			}
+			
+			if(receivedCommand[i] != sampleCommand[i]) {
+				containsCommand = false;
+			}
+		}
+	
+    return containsCommand;
+}
+

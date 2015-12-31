@@ -113,6 +113,17 @@ void sendCommand(char * command, char * parameters);
 
 char * commandBuilder(char *command, char *parameters);
 
+
+/**
+ * Compare Command
+ * Comapares String to contain the pre defined commands
+ * arg: 2 Strings
+ * exception: None
+ * return: bool
+ */
+
+bool compareCommand(char *receivedCommand, const char *sampleCommand);
+
 #ifdef __cplusplus
 }
 #endif
