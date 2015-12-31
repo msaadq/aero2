@@ -190,8 +190,8 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback{
 
         // Create the gradient.
         int[] colors = {
-                Color.rgb(0, 255, 0), // green
-                Color.rgb(255,255,0),
+                Color.rgb(0, 255, 0),   // green
+                Color.rgb(255,255,0),   // yellow
                 Color.rgb(220, 0, 0)    // red
         };
 
@@ -201,27 +201,11 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback{
 
         Gradient gradient = new Gradient(colors, startPoints);
 
-        List<WeightedLatLng> list = new ArrayList<WeightedLatLng>();
-        WeightedLatLng[][] weightedLatLng=new WeightedLatLng[50][50];
-        int k=0;
-        Log.v("CusorLength:"," cursor length is "+cursor.getCount());
-            for (int i = 0; i < weightedLatLng.length; i++) {
-                for (int j = 0; j < weightedLatLng[0].length; j++) {
-                    if(cursor.moveToFirst()) {
-                        cursor.moveToPosition(k);
-                        double random = Double.valueOf(cursor.getString(0));
-                        weightedLatLng[i][j] = new WeightedLatLng(new LatLng(Double.valueOf(cursor.getString(1)), Double.valueOf(cursor.getString(2))), random);
-                        Log.v("RandomValue", "random smog value: " + random);
-                        list.add(weightedLatLng[i][j]);
-                        k++;
-                    }
-                }
-            }
 
         if(cursor.getCount()>0) {
             //Make a Weighted heatmap of the Smog
             HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
-                    .weightedData(list)
+                    .weightedData(getListForHeatMap(cursor))
                     .gradient(gradient)
                     .opacity(0.3)
                     .radius(10)
@@ -245,4 +229,23 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback{
         map.addMarker(markerOptions);*/
     }
 
+    //Gets WeightedLatLong list (weighted with air index values) for the heatmap
+    public List<WeightedLatLng> getListForHeatMap(Cursor cursor){
+        List<WeightedLatLng> list = new ArrayList<WeightedLatLng>();
+        WeightedLatLng[] weightedLatLng=new WeightedLatLng[cursor.getCount()];
+        Log.v("CusorLength:"," cursor length is "+cursor.getCount());
+        if(cursor.moveToFirst()) {
+
+            for (int i = 0; i < cursor.getCount(); i++) {
+
+                cursor.moveToPosition(i);
+                double random = Double.valueOf(cursor.getString(0));
+                weightedLatLng[i] = new WeightedLatLng(new LatLng(Double.valueOf(cursor.getString(1)), Double.valueOf(cursor.getString(2))), random);
+                Log.v("RandomValue", "random smog value: " + random);
+                list.add(weightedLatLng[i]);
+
+            }
+        }
+        return list;
+    }
 }
