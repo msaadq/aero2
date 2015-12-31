@@ -10,6 +10,7 @@ static const char* O_COM_USR = "OUSR"; // Set Username
 static const char* O_COM_PAS = "OPAS"; // Set Password
 static const char* O_COM_NSG = "ONSG"; // Enable / Disable Smog Sensor
 static const char* O_COM_SSG = "OSSG"; // Request Smog Data
+static const char* O_COM_BAT = "OBAT"; // Request Battery Percentage
 
 // All the available In commands
 static char* I_COM_AUT = "IAUT"; // Authentication Status
@@ -17,6 +18,7 @@ static char* I_COM_USR = "IUSR"; // Username Status
 static char* I_COM_PAS = "IPAS"; // Password Status
 static char* I_COM_NSG = "INSG"; // Smog Sensor Status
 static char* I_COM_SSG = "ISSG"; // Received Smog Data
+static char* I_COM_BAT = "IBAT"; // Received Battery Percentage
 
 // Booleans representing program status
 bool communicationEnded = false;
@@ -24,12 +26,12 @@ bool btAvailable = false;
 bool authenticationStatus = false;
 bool userCorrect = false;
 bool passwordCorrect = false;
-bool smogAvailable = true; // Debugging changes
+bool smogAvailable = false;
 bool airQualityAvailable = false;
 
 // Complete Received Command
 char * receivedString;
-char receivedParameters[20];
+char * receivedParameters;
 
 /**
  * Bluetooth Routine
@@ -41,18 +43,15 @@ char receivedParameters[20];
 
 void btRoutine(void) {
 	
-	sendString("Started");
-	
-	int i;
+	sendString("Started BT Routine. Connect using 4 Letter Commands.");
 	
 	while(!communicationEnded) {
 		receivedString = readString();
 		
 		HAL_Delay(2);
-        
-		for(i = 5; i < 25 && receivedString != '\0'; i++) {
-			receivedParameters[i - 5] = receivedString[i];      
-		}
+		
+		receivedParameters = strtok(receivedString, ":"); 
+		receivedParameters = strtok(NULL, "\n");  
 			
 		if(compareCommand(receivedString, O_COM_AUT)) {
 			autRoutine();			
@@ -64,6 +63,8 @@ void btRoutine(void) {
 			smogEnable();		
 		} else if (compareCommand(receivedString, O_COM_SSG)) {
 			reqSmogData();	
+		} else if (compareCommand(receivedString, O_COM_BAT)) {
+			reqBatteryStatus();	
 		} else {
 			sendCommand("IINV","COMMAND_REJECTED");		
 		}
@@ -182,24 +183,46 @@ void reqSmogData(void) {
 	if(smogAvailable) {
 		char smogData[3];
 		int iSmogData = 0;
-		char batteryPercentage[3];
-		
 		
 		for(int i = 0; i < 1000; i++) {
 			iSmogData += getSmogSensorValue();
 		}	
 		iSmogData /= 1000;
 		
-        sprintf(batteryPercentage, "%d", getBatteryPercentage());
-        
 		sprintf(smogData, "%d", iSmogData);
-		strcat(smogData, ":");
-		strcat(smogData, batteryPercentage);
-        
+		       
 		sendCommand(I_COM_SSG, smogData);
 		
 	} else {
 		sendCommand(I_COM_NSG, "0");
+		
+	}
+}
+
+/**
+ * Request Battery Status
+ * Deals with the battery percentage status requests and sends data accordingly
+ * arg: None
+ * exception: None
+ * return: No return value
+ */
+
+void reqBatteryStatus(void) {
+	if(authenticationStatus) {
+		char batteryPercentage[3];
+		int iBatteryPercentage = 0;
+		
+		for(int i = 0; i < 1000; i++) {
+			iBatteryPercentage += getBatteryPercentage();
+		}	
+		iBatteryPercentage /= 1000;
+		
+		sprintf(batteryPercentage, "%d", iBatteryPercentage);
+		       
+		sendCommand(I_COM_BAT, batteryPercentage);
+		
+	} else {
+		sendCommand(I_COM_PAS, "0");
 		
 	}
 }

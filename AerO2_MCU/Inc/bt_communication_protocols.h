@@ -71,27 +71,17 @@ void smogEnable(void);
  * return: No return value
  */
 
-void airQualityEnable(void);
-
-/**
- * Request Smog Data
- * Deals with the smog data requests and sends values accordingly
- * arg: None
- * exception: None
- * return: No return value
- */
-
 void reqSmogData(void);
 
 /**
- * Request Air Quality Data
- * Deals with the smog data requests and sends values accordingly
+ * Request Battery Status
+ * Deals with the battery percentage status requests and sends data accordingly
  * arg: None
  * exception: None
  * return: No return value
  */
 
-void reqAirQualityData(void);
+void reqBatteryStatus(void);
 
 /**
  * Send Command

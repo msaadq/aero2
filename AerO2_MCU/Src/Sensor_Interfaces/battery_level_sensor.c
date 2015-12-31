@@ -16,7 +16,7 @@ int getBatteryPercentage(void){
 	adcValue = HAL_ADC_GetValue(&hadc2);
 	HAL_ADC_Stop(&hadc2);	
 	
-    int percentage = ((int) adcValue / MAX_LEVEL) * 100;
+  int percentage = ((int) adcValue / MAX_LEVEL) * 100;
 	
 	return percentage;
 }
