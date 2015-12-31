@@ -18,12 +18,10 @@ package com.aero2.android.DefaultActivities;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.LoaderManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -53,9 +51,7 @@ import java.util.List;
 /**
  * This shows how to draw polygons on a map.
  */
-public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,LoaderManager.LoaderCallbacks<Cursor>{
-
-    private static GoogleMap googleMap;
+public class SmogMap extends AppCompatActivity implements OnMapReadyCallback{
 
     //************Variables related to Smog Map***************************************
 
@@ -74,15 +70,15 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,Loa
     //************Variables related to Smog Map***************************************
 
 
+    //UI ELEMENTS
     private FloatingActionButton legendButton;
 
     private FloatingActionButton recordActivityButtom;
 
+    //Status check booleans
     private boolean gps_enabled=false;
 
     private boolean network_enabled=false;
-
-    private static final int AZURE_LOADER = 0;
 
 
 
@@ -145,6 +141,10 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,Loa
 
     }
 
+
+    //****************************************************************************************************
+    //*******************  ALL MAP RELATED WORK IS DONE IN THIS FUNCTION  ********************************
+    //****************************************************************************************************
     @Override
     public void onMapReady(GoogleMap map) {
 
@@ -152,14 +152,16 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,Loa
         // Ideally this string would be localised.
         map.setContentDescription("Google Map with polygons.");
 
-
+        //MAP CAMERA
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(33.685570, 73.023332), 17));
         map.getUiSettings().setZoomControlsEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
 
-        SimpleCursorLoader simpleCursorLoader=new SimpleCursorLoader(getApplicationContext(),map) {
+        //Using the simple cursor loader class to query the cache on a background thread
+        SimpleCursorLoader simpleCursorLoader=new SimpleCursorLoader(getApplicationContext()) {
             @Override
             public Cursor loadInBackground() {
+                //All this work is done in the background thread
                 AirAzureDbHelper airAzureDbHelper=new AirAzureDbHelper(getApplicationContext());
                 SQLiteDatabase db=airAzureDbHelper.getReadableDatabase();
                 String[] projection=new String[]{
@@ -172,8 +174,20 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,Loa
                 return mCursor;
             }
         };
+
+
+
+        //Getting a cursor containing the map data from the results cache
         Cursor cursor;
         cursor=simpleCursorLoader.loadInBackground();
+
+
+
+
+
+        //******************************** Setting up the overlay on the Map Using the cursor *************************************
+        //   STARTS HERE
+
         // Create the gradient.
         int[] colors = {
                 Color.rgb(0, 255, 0), // green
@@ -214,11 +228,11 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,Loa
                     .build();
             map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
         }
-        googleMap=map;
-        // Add a tile overlay to the map, using the heat map tile provider.
 
-        //CreateMapOverlay createMapOverlay=new CreateMapOverlay();
-        //createMapOverlay.execute(map);
+        //ENDS HERE
+        //******************************** Setting up the overlay on the Map using the cursor *************************************
+
+
 
         //add a marker at the place the user is standing.
         //when touched it shows the smog value at the current position.
@@ -231,50 +245,4 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,Loa
         map.addMarker(markerOptions);*/
     }
 
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v("Loader","Enter the OnCreateLoader method");
-
-        String[] projection=new String[]{
-                AirAzureContract.AirAzureEntry.COLUMN_AIR_INDEX,
-                AirAzureContract.AirAzureEntry.COLUMN_LAT,
-                AirAzureContract.AirAzureEntry.COLUMN_LONG
-        };
-
-        String sLatLongLimit =
-                AirAzureContract.AirAzureEntry.TABLE_NAME+
-                        "." + AirAzureContract.AirAzureEntry.COLUMN_LONG + " >= ? AND "
-                            + AirAzureContract.AirAzureEntry.COLUMN_LONG + " <= ? AND "
-                            + AirAzureContract.AirAzureEntry.COLUMN_LAT  + " <= ? AND "
-                            + AirAzureContract.AirAzureEntry.COLUMN_LAT + " >= ?";
-
-        AirAzureDbHelper mOpenHelper=new AirAzureDbHelper(SmogMap.this);
-
-        String[] selectionArgs=new String[]{
-                LONG_LEFT_LIM,
-                LONG_RIGHT_LIM,
-                LAT_TOP_LIM,
-                LAT_BOTTOM_LIM
-        };
-
-        String sortOrder = AirAzureContract.AirAzureEntry.COLUMN_LAT + " ASC";
-        SQLiteDatabase db=mOpenHelper.getReadableDatabase();
-        Cursor  data= db.query(AirAzureContract.AirAzureEntry.TABLE_NAME,
-                projection, null, null, null, null, sortOrder);
-        Log.v("Loader", "Entered the OnLoadFinished Method");
-
-        Log.v("Loader","about to return data form cache data table");
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
 }

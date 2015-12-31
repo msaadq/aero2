@@ -11,6 +11,7 @@ import android.util.Log;
 
 public class AirAzureDownloadService extends IntentService {
 
+    //TODO add download code in the handleActionDownloadAzureAir Data
 
     public static final String DOWNLOAD_AZURE_AIR_DATA = "com.aero2.android.DefaultActivities.Data.download.AZUREAIRDATA";
     public static final String UPDATE_LOCAL_CACHE = "com.aero2.android.DefaultActivities.Data.update.LOCALCACHE";
@@ -66,6 +67,10 @@ public class AirAzureDownloadService extends IntentService {
 
     private void handleActionDownloadAzureAirData(String latLimitTop, String latLimitBottom,String longLimitLeft,String longLimitRight) {
 
+        // /TODO Implement azure results download code here
+
+        //This code inserts random values in the localResults cache
+        //Starts Here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         mDbHelper=new AirAzureDbHelper(getApplicationContext());
 
         db=mDbHelper.getWritableDatabase();
@@ -81,7 +86,8 @@ public class AirAzureDownloadService extends IntentService {
                 if(i>7||j>7){
                     random=0.00001;
                 }
-
+                //Local Cache insert
+                //Starts Here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 ContentValues values=new ContentValues();
 
                 values.put(AirAzureContract.AirAzureEntry.COLUMN_AIR_INDEX,random*1000);
@@ -98,10 +104,14 @@ public class AirAzureDownloadService extends IntentService {
                 }else{
                     Log.v("Database2","Data base reference is null");
                 }
+                //Local Cache insert
+                //ENDS HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                 Log.v("RandomValue", "random smog value: " + random * 1000);
             }
         }
+        //This code inserts random values in the localResults cache
+        //Ends Here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     public static class AlarmReceiver extends BroadcastReceiver {

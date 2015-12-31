@@ -3,10 +3,7 @@ package com.aero2.android.DefaultActivities;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
-import com.aero2.android.DefaultActivities.Data.AirAzureContract;
-import com.aero2.android.DefaultActivities.Data.AirAzureDbHelper;
 import com.google.android.gms.maps.GoogleMap;
 
 /**
@@ -16,9 +13,8 @@ public abstract class SimpleCursorLoader extends AsyncTaskLoader<Cursor> {
     private Cursor mCursor;
     GoogleMap googleMap;
 
-    public SimpleCursorLoader(Context context,GoogleMap map) {
+    public SimpleCursorLoader(Context context) {
         super(context);
-        googleMap=map;
     }
 
     /* Runs on a worker thread */
@@ -56,15 +52,7 @@ public abstract class SimpleCursorLoader extends AsyncTaskLoader<Cursor> {
      */
     @Override
     protected void onStartLoading() {
-        AirAzureDbHelper airAzureDbHelper=new AirAzureDbHelper(getContext());
-        SQLiteDatabase db=airAzureDbHelper.getReadableDatabase();
-        String[] projection=new String[]{
-                AirAzureContract.AirAzureEntry.COLUMN_AIR_INDEX,
-                AirAzureContract.AirAzureEntry.COLUMN_LAT,
-                AirAzureContract.AirAzureEntry.COLUMN_LONG
-        };
 
-        mCursor=db.query(AirAzureContract.AirAzureEntry.TABLE_NAME,projection,null,null,null,null,null);
         if (mCursor != null) {
             deliverResult(mCursor);
         }
