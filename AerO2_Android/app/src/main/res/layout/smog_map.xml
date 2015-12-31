@@ -14,6 +14,7 @@
      limitations under the License.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -21,7 +22,26 @@
         android:id="@+id/map"
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        >
     </fragment>
+    <android.support.design.widget.FloatingActionButton android:id="@+id/legend"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/ic_dialog_map"
+        app:backgroundTint="#00aa72"
+        android:tint="#ffffff"
+        android:adjustViewBounds="false"
+        android:alpha="0.7" />
+    <android.support.design.widget.FloatingActionButton android:id="@+id/record"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/presence_online"
+        android:layout_alignParentBottom="true"
+        app:backgroundTint="#ffffff"
+        android:contextClickable="false"
+        android:tint="#ff0000"
+        android:alpha="0.7" />
+
 
 </RelativeLayout>

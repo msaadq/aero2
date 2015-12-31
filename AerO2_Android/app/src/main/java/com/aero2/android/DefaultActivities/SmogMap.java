@@ -16,13 +16,23 @@
 
 package com.aero2.android.DefaultActivities;
 
+import android.app.AlertDialog;
+import android.app.LoaderManager;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 
-
+import com.aero2.android.DefaultActivities.Data.AirAzureContract;
+import com.aero2.android.DefaultActivities.Data.AirAzureDbHelper;
+import com.aero2.android.DefaultActivities.Data.AirAzureDownloadService;
 import com.aero2.android.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,8 +50,9 @@ import java.util.List;
 /**
  * This shows how to draw polygons on a map.
  */
-public class SmogMap extends AppCompatActivity implements OnMapReadyCallback {
+public class SmogMap extends AppCompatActivity implements OnMapReadyCallback,LoaderManager.LoaderCallbacks<Cursor>{
 
+    private static GoogleMap googleMap;
 
     //************Variables related to Smog Map***************************************
 
@@ -49,16 +60,26 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final int MAXIMUN_SMOG_VALUE=1024;
 
+    private static String LONG_LEFT_LIM;
+
+    private static String LONG_RIGHT_LIM;
+
+    private static String LAT_TOP_LIM;
+
+    private static String LAT_BOTTOM_LIM;
 
     //************Variables related to Smog Map***************************************
 
 
-    private FloatingActionButton floatingActionButton;
+    private FloatingActionButton legendButton;
+
+    private FloatingActionButton recordActivityButtom;
 
     private boolean gps_enabled=false;
 
     private boolean network_enabled=false;
 
+    private static final int AZURE_LOADER = 0;
 
 
 
@@ -66,14 +87,62 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.smog_map);
-        floatingActionButton=(FloatingActionButton) findViewById(R.id.fab);
+        legendButton=(FloatingActionButton) findViewById(R.id.legend);
+        recordActivityButtom=(FloatingActionButton) findViewById(R.id.record);
 
+        legendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Add code for showing legend dialog here
 
-//        gps=new GPSTracker(getApplicationContext());
+                final AlertDialog.Builder builder = new AlertDialog.Builder(SmogMap.this);
+                builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User clicked OK button
+                    }
+                });
+                builder.setTitle("LEGEND AERO2 MAP");
+                builder.setView(R.layout.legend_layout);
+// Create the AlertDialog
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
 
-        SupportMapFragment mapFragment =
+        recordActivityButtom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent recordActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(recordActivityIntent);
+            }
+        });
+
+       /* Intent alarmIntent = new Intent(SmogMap.this, AirAzureDownloadService.AlarmReceiver.class);
+        alarmIntent.putExtra(AirAzureDownloadService.LONGITUDE_LIMIT_LEFT, "0");
+        alarmIntent.putExtra(AirAzureDownloadService.LONGITUDE_LIMIT_RIGHT, "0");
+        alarmIntent.putExtra(AirAzureDownloadService.LATITUDE_LIMIT_TOP, "0");
+        alarmIntent.putExtra(AirAzureDownloadService.LATITUDE_LIMIT_BOTTOM, "0");
+        alarmIntent.setAction(AirAzureDownloadService.DOWNLOAD_AZURE_AIR_DATA);
+        //Wrap in a pending intent which only fires once.
+        Log.v("OnCreate","Alarm Intent Created");
+        PendingIntent pi = PendingIntent.getBroadcast(SmogMap.this, 0,alarmIntent,PendingIntent.FLAG_ONE_SHOT);//getBroadcast(context, 0, i, 0);
+
+        AlarmManager am=(AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+
+        Log.v("OnCreate","AlarmManager Created");
+        //Set the AlarmManager to wake up the system.
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10, pi);
+//*/
+//
+        AirAzureDownloadService airAzureDownloadService=new AirAzureDownloadService();
+        airAzureDownloadService.startActionDownloadAzureAirData(getApplicationContext(), "0", "0", "0", "0");
+
+//          gps=new GPSTracker(getApplicationContext());
+            SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+            mapFragment.getMapAsync(this);
+        getLoaderManager().initLoader(AZURE_LOADER, null, this);
+
     }
 
     @Override
@@ -88,6 +157,55 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback {
         map.getUiSettings().setZoomControlsEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
 
+        googleMap=map;
+        // Add a tile overlay to the map, using the heat map tile provider.
+
+        //CreateMapOverlay createMapOverlay=new CreateMapOverlay();
+        //createMapOverlay.execute(map);
+
+        //add a marker at the place the user is standing.
+        //when touched it shows the smog value at the current position.
+  /*
+        MarkerOptions markerOptions=new MarkerOptions().draggable(false)
+                .flat(true)
+                .position(CURRENT_LAT_LONG)
+                .title("Smog: 225")
+                .alpha(5);
+        map.addMarker(markerOptions);*/
+    }
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v("Loader","Enter the OnCreateLoader method");
+
+        String[] projection=new String[]{
+                AirAzureContract.AirAzureEntry.COLUMN_AIR_INDEX,
+                AirAzureContract.AirAzureEntry.COLUMN_LAT,
+                AirAzureContract.AirAzureEntry.COLUMN_LONG
+        };
+
+        String sLatLongLimit =
+                AirAzureContract.AirAzureEntry.TABLE_NAME+
+                        "." + AirAzureContract.AirAzureEntry.COLUMN_LONG + " >= ? AND "
+                            + AirAzureContract.AirAzureEntry.COLUMN_LONG + " <= ? AND "
+                            + AirAzureContract.AirAzureEntry.COLUMN_LAT  + " <= ? AND "
+                            + AirAzureContract.AirAzureEntry.COLUMN_LAT + " >= ?";
+
+        AirAzureDbHelper mOpenHelper=new AirAzureDbHelper(SmogMap.this);
+
+        String[] selectionArgs=new String[]{
+                LONG_LEFT_LIM,
+                LONG_RIGHT_LIM,
+                LAT_TOP_LIM,
+                LAT_BOTTOM_LIM
+        };
+
+        String sortOrder = AirAzureContract.AirAzureEntry.COLUMN_LAT + " ASC";
+        SQLiteDatabase db=mOpenHelper.getReadableDatabase();
+        Cursor  data= db.query(AirAzureContract.AirAzureEntry.TABLE_NAME,
+                projection, null, null, null, null, sortOrder);
+        Log.v("Loader","Entered the OnLoadFinished Method");
         // Create the gradient.
         int[] colors = {
                 Color.rgb(0, 255, 0), // green
@@ -105,15 +223,9 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback {
         WeightedLatLng[][] weightedLatLng=new WeightedLatLng[100][100];
         for(int i=0;i<weightedLatLng.length;i++){
             for(int j=0;j<weightedLatLng[0].length;j++){
-                double random=-1;
-                while(random<0||random>1.024){
-                    random=Math.random();
-                }
-                if(i>70||j>70){
-                    random=0.00001;
-                }
-                weightedLatLng[i][j]=new WeightedLatLng(new LatLng(33.685570-0.0002*j,73.023332+0.0002*i),random*1000);
-                Log.v("RandomValue","random smog value: "+ random*1000);
+                double random=Double.valueOf(data.getString(0));
+                weightedLatLng[i][j]=new WeightedLatLng(new LatLng(Double.valueOf(data.getString(1)),Double.valueOf(data.getString(2))),random);
+                Log.v("RandomValue","random smog value: "+ random);
                 list.add(weightedLatLng[i][j]);
             }
         }
@@ -124,22 +236,19 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback {
                 .opacity(0.3)
                 .radius(10)
                 .build();
-        // Add a tile overlay to the map, using the heat map tile provider.
-        map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-        //CreateMapOverlay createMapOverlay=new CreateMapOverlay();
-        //createMapOverlay.execute(map);
+        googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
 
-        //add a marker at the place the user is standing.
-        //when touched it shows the smog value at the current position.
-  /*
-        MarkerOptions markerOptions=new MarkerOptions().draggable(false)
-                .flat(true)
-                .position(CURRENT_LAT_LONG)
-                .title("Smog: 225")
-                .alpha(5);
-        map.addMarker(markerOptions);*/
+        Log.v("Loader","about to return data form cache data table");
+        return null;
     }
 
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
+    }
 
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
 }

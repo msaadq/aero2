@@ -43,7 +43,7 @@ public class AirAzureDbHelper extends SQLiteOpenHelper {
                 AirAzureContract.AirAzureEntry.COLUMN_AIR_INDEX+" TEXT NOT NULL, "+
                 AirAzureContract.AirAzureEntry.COLUMN_TIME + " TEXT UNIQUE NOT NULL, " +
                 AirAzureContract.AirAzureEntry.COLUMN_LONG + " TEXT NOT NULL, " +
-                AirAzureContract.AirAzureEntry.COLUMN_LAT + " TEXT NOT NULL, " +
+                AirAzureContract.AirAzureEntry.COLUMN_LAT + " TEXT NOT NULL " +
                 " );";
 
 
