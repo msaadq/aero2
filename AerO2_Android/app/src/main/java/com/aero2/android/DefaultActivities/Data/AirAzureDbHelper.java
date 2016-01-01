@@ -41,7 +41,7 @@ public class AirAzureDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_AIR_AZURE_TABLE = "CREATE TABLE " + AirAzureContract.AirAzureEntry.TABLE_NAME + " (" +
                 AirAzureContract.AirAzureEntry._ID + " INTEGER PRIMARY KEY," +
                 AirAzureContract.AirAzureEntry.COLUMN_AIR_INDEX+" TEXT NOT NULL, "+
-                AirAzureContract.AirAzureEntry.COLUMN_TIME + " TEXT UNIQUE NOT NULL, " +
+                AirAzureContract.AirAzureEntry.COLUMN_TIME + " TEXT NOT NULL, " +
                 AirAzureContract.AirAzureEntry.COLUMN_LONG + " TEXT NOT NULL, " +
                 AirAzureContract.AirAzureEntry.COLUMN_LAT + " TEXT NOT NULL " +
                 " );";

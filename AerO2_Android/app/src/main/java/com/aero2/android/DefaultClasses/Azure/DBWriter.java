@@ -1,12 +1,14 @@
 package com.aero2.android.DefaultClasses.Azure;
 
 import android.app.Activity;
-import android.os.AsyncTask;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.aero2.android.DefaultActivities.Data.AirAzureDbHelper;
 import com.aero2.android.DefaultClasses.DataTables.ResultDataTable;
 import com.aero2.android.DefaultClasses.DataTables.SampleDataTable;
-import com.aero2.android.DefaultClasses.SQLite.SQLiteAPI;
+import com.aero2.android.DefaultClasses.SQLite.ResultsSQLite;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceList;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
@@ -41,10 +43,9 @@ public class DBWriter {
      * return: No return value.
      */
 
-    public DBWriter(Activity activity, Class table) {
-        this(activity, table, DEFAULT_URL, DEFAULT_KEY);
+    public DBWriter(Context context, Class table) {
+        this(context, table, DEFAULT_URL, DEFAULT_KEY);
     }
-
 
     /**
      * Parametrized Constructor
@@ -54,11 +55,11 @@ public class DBWriter {
      * return: No return value.
      */
 
-    public DBWriter(Activity activity, Class table, String url, String key) {
+    public DBWriter(Context context, Class table, String url, String key) {
         try {
 
             // Create the Mobile Service Client instance, using the provided URL and key
-            mClient = new MobileServiceClient(url, key, activity);
+            mClient = new MobileServiceClient(url, key, context);
             Log.d("DBWriter", "URL Successful");
 
             // Get the Mobile Service Table instance to use
@@ -105,22 +106,49 @@ public class DBWriter {
     }
 
 
-    public void getItems(double currLat, double currLong, double horizontalInt,
-                         double verticalInt) throws ExecutionException {
-        //final longInterval =
+    public void getItems(double currLat, double currLong,double verticalInt,
+                         double horizontalInt, Context context) throws ExecutionException {
+
+
+        AirAzureDbHelper sqliteHelper = new AirAzureDbHelper(context);
+        SQLiteDatabase sqLiteDatabase = sqliteHelper.getWritableDatabase();
+        ResultsSQLite resultsSQLite = new ResultsSQLite(sqLiteDatabase);
+
+        resultsSQLite.emptySQL();
+
+        //Equivalent longitude & latitude of distance equal to 20m
+        final double longInterval = 0.000215901261691 ;
+        final double latInterval = 0.000179807875453;
+
+        //Compute corner points
+        double longRight = currLong + (horizontalInt/0.02)*longInterval;
+        Log.v("Value: "," "+longRight);
+        double longLeft = currLong - (horizontalInt/0.02)*longInterval;
+        Log.v("Value: "," "+longLeft);
+        double latTop = currLat + (verticalInt/0.02)*latInterval;
+        Log.v("Value: "," "+latTop);
+        double latBottom = currLat - (verticalInt/0.02)*latInterval;
+        Log.v("Value: "," "+latBottom);
 
         if (mClient == null) {
             return;
         }
 
 
-
         try {
             Log.v("DBWriter retrieve", "Starting.");
-            final MobileServiceList<ResultDataTable> result = rTable.top(1000).execute().get();
+            final MobileServiceList<ResultDataTable> result = rTable.where().field("lat").
+                    lt(latTop).and().field("lat").gt(latBottom).and().field("long").
+                    lt(longRight).and().field("long").gt(longLeft).top(1000).execute().get();
 
             Log.v("DBWriter retrieve","Data Captured.");
             for (ResultDataTable item:result) {
+                if(resultsSQLite.addResultValue(item)){
+                    Log.v("DBWriter retrieve","Insert success.");
+                }
+                else{
+                    Log.v("DBWriter retrieve","Insert failed.");
+                }
                 Log.v("Output:"," "+item.getLong());
             }
 

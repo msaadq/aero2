@@ -79,13 +79,6 @@ public class SmogRecordActivity extends AppCompatActivity {
         //Start saving data in Azure
         integrator.saveAzure();
 
-
-         // Debug Code
-        //azureHandler = new AzureHandler(this);
-        //azureHandler.retrieveSamples();
-        //
-
-
         //Ask user to adjust settings
         setSupportActionBar(toolbar);
         this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},

@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +35,8 @@ import android.view.View;
 import com.aero2.android.DefaultActivities.Data.AirAzureContract;
 import com.aero2.android.DefaultActivities.Data.AirAzureDbHelper;
 import com.aero2.android.DefaultActivities.Data.AirAzureDownloadService;
+import com.aero2.android.DefaultClasses.GPSTracker;
+import com.aero2.android.DefaultClasses.Integrator;
 import com.aero2.android.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -51,43 +54,32 @@ import java.util.List;
 /**
  * This shows how to draw polygons on a map.
  */
-public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCallback{
+public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     //************Variables related to Smog Map***************************************
 
     private static LatLng CURRENT_LAT_LONG;
+    private static final int MAXIMUM_SMOG_VALUE = 1024;
 
-    private static final int MAXIMUN_SMOG_VALUE=1024;
-
-    private static String LONG_LEFT_LIM;
-
-    private static String LONG_RIGHT_LIM;
-
-    private static String LAT_TOP_LIM;
-
-    private static String LAT_BOTTOM_LIM;
-
-    //************Variables related to Smog Map***************************************
-
+    private static final Double horizontalInt = 0.5;
+    private static final Double verticalInt = 0.5;
 
     //UI ELEMENTS
     private FloatingActionButton legendButton;
-
     private FloatingActionButton recordActivityButtom;
+    Double currLat, currLong;
 
     //Status check booleans
-    private boolean gps_enabled=false;
-
-    private boolean network_enabled=false;
-
+    private boolean gps_enabled = false;
+    private boolean network_enabled = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.smog_map);
-        legendButton=(FloatingActionButton) findViewById(R.id.legend);
-        recordActivityButtom=(FloatingActionButton) findViewById(R.id.record);
+        legendButton = (FloatingActionButton) findViewById(R.id.legend);
+        recordActivityButtom = (FloatingActionButton) findViewById(R.id.record);
 
         legendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,7 +94,7 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
                 });
                 builder.setTitle("LEGEND AERO2 MAP");
                 builder.setView(R.layout.legend_layout);
-// Create the AlertDialog
+                // Create the AlertDialog
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }
@@ -116,31 +108,53 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+
+
+        Integrator integrator = new Integrator(SmogMapActivity.this);
+        Double[] newLocation;
+
+        boolean valid;
+
+        //Wait until gps values are correct
+        do {
+            newLocation = integrator.getLocation();
+            currLat = newLocation[0];
+            currLong = newLocation[1];
+
+            if (currLat == null || currLong == null) {
+                valid = false;
+            }
+            else{
+                valid = true;
+            }
+
+        } while(!valid);
+
         Intent alarmIntent = new Intent(SmogMapActivity.this, AirAzureDownloadService.AlarmReceiver.class);
-        alarmIntent.putExtra(AirAzureDownloadService.LONGITUDE_LIMIT_LEFT, "0");
-        alarmIntent.putExtra(AirAzureDownloadService.LONGITUDE_LIMIT_RIGHT, "0");
-        alarmIntent.putExtra(AirAzureDownloadService.LATITUDE_LIMIT_TOP, "0");
-        alarmIntent.putExtra(AirAzureDownloadService.LATITUDE_LIMIT_BOTTOM, "0");
+        alarmIntent.putExtra(AirAzureDownloadService.CURRENT_LATITUDE, String.valueOf(33.735));
+        alarmIntent.putExtra(AirAzureDownloadService.CURRENT_LONGITUDE, String.valueOf(currLat));
+        alarmIntent.putExtra(AirAzureDownloadService.VERTICAL_INTERVAL, "4");
+        alarmIntent.putExtra(AirAzureDownloadService.HORIZONTAL_INTERVAL, "4");
         alarmIntent.setAction(AirAzureDownloadService.DOWNLOAD_AZURE_AIR_DATA);
         //Wrap in a pending intent which only fires once.
-        Log.v("OnCreate","Alarm Intent Created");
-        PendingIntent pi = PendingIntent.getBroadcast(SmogMapActivity.this, 0,alarmIntent,PendingIntent.FLAG_ONE_SHOT);//getBroadcast(context, 0, i, 0);
+        Log.v("OnCreate", "Alarm Intent Created");
+        PendingIntent pi = PendingIntent.getBroadcast(SmogMapActivity.this, 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);//getBroadcast(context, 0, i, 0);
 
-        AlarmManager am=(AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 
         Log.v("OnCreate", "AlarmManager Created");
         //Set the AlarmManager to wake up the system.
         am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10, pi);
 
 
-//          gps=new GPSTracker(getApplicationContext());
-            SupportMapFragment mapFragment =
+
+        //          gps=new GPSTracker(getApplicationContext());
+        SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-            mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(this);
         //getLoaderManager().initLoader(AZURE_LOADER, null, this);
 
     }
-
 
     //****************************************************************************************************
     //*******************  ALL MAP RELATED WORK IS DONE IN THIS FUNCTION  ********************************
@@ -153,7 +167,8 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
         map.setContentDescription("Google Map with polygons.");
 
         //MAP CAMERA
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(33.685570, 73.023332), 17));
+        //TODO: Ulti values of lat and long
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currLong, currLat), 17));
         map.getUiSettings().setZoomControlsEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
 
@@ -161,16 +176,42 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
         SimpleCursorLoader simpleCursorLoader=new SimpleCursorLoader(getApplicationContext()) {
             @Override
             public Cursor loadInBackground() {
+
+                //Equivalent longitude & latitude of distance equal to 20m
+                final double longInterval = 0.000215901261691 ;
+                final double latInterval = 0.000179807875453;
+
+                //Compute corner points
+                //TODO: Change the inverted values of lat and long
+                double longRight = currLat + (horizontalInt/0.02)*longInterval;
+                Log.v("Value: "," "+longRight);
+                double longLeft = currLat - (horizontalInt/0.02)*longInterval;
+                Log.v("Value: "," "+longLeft);
+                double latTop = currLong + (verticalInt/0.02)*latInterval;
+                Log.v("Value: "," "+latTop);
+                double latBottom = currLong - (verticalInt/0.02)*latInterval;
+                Log.v("Value: "," "+latBottom);
+
                 //All this work is done in the background thread
                 AirAzureDbHelper airAzureDbHelper=new AirAzureDbHelper(getApplicationContext());
                 SQLiteDatabase db=airAzureDbHelper.getReadableDatabase();
-                String[] projection=new String[]{
+
+                String[] columns=new String[]{
                         AirAzureContract.AirAzureEntry.COLUMN_AIR_INDEX,
                         AirAzureContract.AirAzureEntry.COLUMN_LAT,
                         AirAzureContract.AirAzureEntry.COLUMN_LONG
                 };
+
+                String[] selectionArgs = {String.valueOf(latTop),String.valueOf(latBottom),
+                        String.valueOf(longRight),String.valueOf(longLeft)};
+
+                String selection = AirAzureContract.AirAzureEntry.COLUMN_LAT + " < ? AND" +
+                        AirAzureContract.AirAzureEntry.COLUMN_LAT + " > ? AND" +
+                        AirAzureContract.AirAzureEntry.COLUMN_LONG + " < ? AND" +
+                        AirAzureContract.AirAzureEntry.COLUMN_LONG + " > ?";
+
                 Cursor mCursor;
-                mCursor=db.query(AirAzureContract.AirAzureEntry.TABLE_NAME,projection,null,null,null,null,null);
+                mCursor=db.query(AirAzureContract.AirAzureEntry.TABLE_NAME,columns,null,null,null,null,null);
                 return mCursor;
             }
         };

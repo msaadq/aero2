@@ -107,7 +107,7 @@ public class GPSTracker {
             }
 
         } catch (Exception e) {
-            Log.e("Exception", "Permission Denied");
+            Log.e("GPS Exception", "Permission Denied");
         }
 
         if (new_location != null) {

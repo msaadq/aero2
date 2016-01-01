@@ -7,16 +7,12 @@ import java.util.Date;
 import android.app.Activity;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.aero2.android.DefaultClasses.Azure.AzureHandler;
-import com.aero2.android.DefaultClasses.Azure.DBWriter;
-import com.aero2.android.DefaultClasses.DataTables.SampleDataTable;
 import com.aero2.android.DefaultClasses.Hardware.BTService;
 import com.aero2.android.DefaultClasses.Hardware.STMCommunicator;
-import com.aero2.android.DefaultClasses.SQLite.SQLiteAPI;
+import com.aero2.android.DefaultClasses.SQLite.SamplesSQLite;
 import com.aero2.android.DefaultClasses.SQLite.SQLiteAsyncTask;
-import com.aero2.android.R;
 
 /**
  *
@@ -51,7 +47,7 @@ public class Integrator {
     STMCommunicator sensor;
     GPSTracker gps;
     private SQLiteAsyncTask sqLiteAsyncTask;
-    public SQLiteAPI sqLiteAPI;
+    public SamplesSQLite samplesSqLite;
     private AzureHandler azureHandler;
 
     /**
@@ -74,12 +70,16 @@ public class Integrator {
         try {
             gps = new GPSTracker(activity);
             sensor = new STMCommunicator(activity);
-            sqLiteAPI = new SQLiteAPI(activity);
-            //sqLiteAPI.emptySQL();
+            samplesSqLite = new SamplesSQLite(activity);
+            //samplesSqLite.emptySQL();
 
         } catch (IOException e) {
             Log.d("Integrator ", "Initialization failed.");
         }
+    }
+
+    public Double[] getLocation(){
+        return gps.getGps();
     }
 
     /**
@@ -288,8 +288,8 @@ public class Integrator {
         value_count = 1;
 
         */
-        //Call SQLiteAPI
-        sqLiteAsyncTask = new SQLiteAsyncTask(activity,sqLiteAPI);
+        //Call SamplesSQLite
+        sqLiteAsyncTask = new SQLiteAsyncTask(activity, samplesSqLite);
         sqLiteAsyncTask.execute(integrators);
 
         //Reinitialize
@@ -306,7 +306,7 @@ public class Integrator {
     public void saveAzure(){
 
         azureHandler = new AzureHandler(activity);
-        azureHandler.postSamples(sqLiteAPI);
+        azureHandler.postSamples(samplesSqLite);
     }
 
     /**

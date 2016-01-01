@@ -21,7 +21,7 @@ import com.aero2.android.DefaultActivities.Data.AirDbHelper;
  * Created by Muddassir on 12/13/2015.
  */
 
-public class SQLiteAPI {
+public class SamplesSQLite {
 
     Context contextLocal;
     AirDbHelper mDbHelper;
@@ -35,7 +35,7 @@ public class SQLiteAPI {
      * return: None
      */
 
-    public SQLiteAPI(Context context){
+    public SamplesSQLite(Context context){
 
         contextLocal=context;
         mDbHelper = new AirDbHelper(contextLocal);
