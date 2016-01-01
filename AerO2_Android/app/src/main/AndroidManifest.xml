@@ -13,14 +13,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".DefaultActivities.MainActivity"
+            android:name=".DefaultActivities.SmogRecordActivity"
             android:label="@string/title_activity_test"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
         <activity
-            android:name=".DefaultActivities.SmogMap"
+            android:name=".DefaultActivities.SmogMapActivity"
             android:label="@string/polygon_demo_label"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>

@@ -25,7 +25,7 @@ import com.aero2.android.DefaultClasses.Integrator;
 
 import com.aero2.android.R;
 
-public class MainActivity extends AppCompatActivity {
+public class SmogRecordActivity extends AppCompatActivity {
 
     //Main Activity Variables
     private int m_interval = 1500;              // Time between each Integrator call

@@ -51,7 +51,7 @@ import java.util.List;
 /**
  * This shows how to draw polygons on a map.
  */
-public class SmogMap extends AppCompatActivity implements OnMapReadyCallback{
+public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     //************Variables related to Smog Map***************************************
 
@@ -94,7 +94,7 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback{
             public void onClick(View v) {
                 //Add code for showing legend dialog here
 
-                final AlertDialog.Builder builder = new AlertDialog.Builder(SmogMap.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(SmogMapActivity.this);
                 builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // User clicked OK button
@@ -111,12 +111,12 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback{
         recordActivityButtom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent recordActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent recordActivityIntent = new Intent(getApplicationContext(), SmogRecordActivity.class);
                 startActivity(recordActivityIntent);
             }
         });
 
-        Intent alarmIntent = new Intent(SmogMap.this, AirAzureDownloadService.AlarmReceiver.class);
+        Intent alarmIntent = new Intent(SmogMapActivity.this, AirAzureDownloadService.AlarmReceiver.class);
         alarmIntent.putExtra(AirAzureDownloadService.LONGITUDE_LIMIT_LEFT, "0");
         alarmIntent.putExtra(AirAzureDownloadService.LONGITUDE_LIMIT_RIGHT, "0");
         alarmIntent.putExtra(AirAzureDownloadService.LATITUDE_LIMIT_TOP, "0");
@@ -124,7 +124,7 @@ public class SmogMap extends AppCompatActivity implements OnMapReadyCallback{
         alarmIntent.setAction(AirAzureDownloadService.DOWNLOAD_AZURE_AIR_DATA);
         //Wrap in a pending intent which only fires once.
         Log.v("OnCreate","Alarm Intent Created");
-        PendingIntent pi = PendingIntent.getBroadcast(SmogMap.this, 0,alarmIntent,PendingIntent.FLAG_ONE_SHOT);//getBroadcast(context, 0, i, 0);
+        PendingIntent pi = PendingIntent.getBroadcast(SmogMapActivity.this, 0,alarmIntent,PendingIntent.FLAG_ONE_SHOT);//getBroadcast(context, 0, i, 0);
 
         AlarmManager am=(AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
 
