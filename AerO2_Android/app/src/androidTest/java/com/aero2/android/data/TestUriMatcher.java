@@ -20,10 +20,7 @@ import android.net.Uri;
 import android.test.AndroidTestCase;
 
 import com.aero2.android.DefaultActivities.Data.AirContract;
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 
 /*
     Uncomment this class when you are ready to test your UriMatcher.  Note that this class utilizes

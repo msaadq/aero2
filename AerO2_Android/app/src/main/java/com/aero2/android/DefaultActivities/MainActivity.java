@@ -1,16 +1,26 @@
 package com.aero2.android.DefaultActivities;
 
 import android.Manifest;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
+import com.aero2.android.DefaultClasses.Azure.AzureHandler;
+import com.aero2.android.DefaultClasses.Hardware.BTService;
 import com.aero2.android.DefaultClasses.Integrator;
 
 import com.aero2.android.R;
@@ -19,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Main Activity Variables
     private int m_interval = 1500;              // Time between each Integrator call
+    private static boolean sensorResponse;
 
     //UI Elements
     private TextView smog_text;
@@ -29,9 +40,12 @@ public class MainActivity extends AppCompatActivity {
     private ImageView location_image;
     private ImageView time_image;
     private Toolbar toolbar;
-    private Button gps_button;
-    private Button stop_button;
     private Handler m_handler;
+    private FloatingActionButton startSensor;
+    private FloatingActionButton stopSensor;
+    private Switch sensorSwitch;
+    private AzureHandler azureHandler;
+
 
     //Global Objects
     private Integrator integrator;
@@ -43,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Instantiate UI Objects
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        startSensor = (FloatingActionButton) findViewById(R.id.start_sensor);
+        stopSensor = (FloatingActionButton) findViewById(R.id.stop_sensor);
         smog_text = (TextView) findViewById(R.id.smog_text);
         location_text = (TextView) findViewById(R.id.location_text);
         time_text = (TextView) findViewById(R.id.time_text);
@@ -50,8 +66,7 @@ public class MainActivity extends AppCompatActivity {
         thank_you_text = (TextView) findViewById(R.id.thank_you_text);
         location_image = (ImageView) findViewById(R.id.location_image);
         time_image = (ImageView) findViewById(R.id.time_image);
-        gps_button = (Button) findViewById(R.id.gps_button);
-        stop_button = (Button) findViewById(R.id.stop_button);
+        sensorSwitch = (Switch) findViewById(R.id.switchButton);
 
         //Instantiate Objects
         m_handler = new Handler();
@@ -60,9 +75,17 @@ public class MainActivity extends AppCompatActivity {
         //Set visibility of ImageViews
         location_image.setVisibility(View.INVISIBLE);
         time_image.setVisibility(View.INVISIBLE);
+        stopSensor.setVisibility(View.INVISIBLE);
 
         //Start saving data in Azure
-        integrator.saveAzure();
+        //integrator.saveAzure();
+
+
+         // Debug Code
+        azureHandler = new AzureHandler(this);
+        azureHandler.retrieveSamples();
+        //
+
 
         //Ask user to adjust settings
         setSupportActionBar(toolbar);
@@ -70,9 +93,13 @@ public class MainActivity extends AppCompatActivity {
                 1);                         //Ask user for Manifest permission
 
 
-        //Start Integrator Handler
-        gps_button.setOnClickListener(new View.OnClickListener() {
+
+        //Start integrator handler
+        startSensor.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
+                stopSensor.setVisibility(View.VISIBLE);
+                startSensor.setVisibility(View.INVISIBLE);
 
                 //Set defaults
                 smog_text.setText("0");
@@ -87,10 +114,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        //Stop Integrator Handler & show count
-        stop_button.setOnClickListener(new View.OnClickListener() {
+        //Stop integrator handler and show count
+        stopSensor.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                stopSensor.setVisibility(View.INVISIBLE);
+                startSensor.setVisibility(View.VISIBLE);
 
                 //Stop Integrator Handler
                 m_handler.removeCallbacks(getIntegrator);
@@ -99,8 +127,37 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.v("MainActivity", "Stopped Integrator.");
             }
+
         });
+
+        sensorSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked) {
+
+                    if (BTService.getDeviceConnected()) {
+                        sensorResponse = integrator.sensorEnable();
+                    } else {
+                        sensorResponse = false;
+                        Log.v("sensorSwitch listener", "Device isn't connected yet.");
+                    }
+
+                sensorSwitch.setChecked(sensorResponse);
+
+
+
+                } else {
+
+                }
+            }
+        });
+        Log.v("hERE","HERE");
+
+
+
     }
+
 
     /**
      * Runnable Handler that calls Integrator class and
@@ -121,5 +178,21 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_test, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        return super.onOptionsItemSelected(item);
+
+
+    }
 
 }

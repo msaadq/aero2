@@ -70,11 +70,12 @@ public class Integrator {
         //corner = new int[4];
         counter = 0;
 
+
         try {
             gps = new GPSTracker(activity);
             sensor = new STMCommunicator(activity);
             sqLiteAPI = new SQLiteAPI(activity);
-
+            sqLiteAPI.emptySQL();
 
         } catch (IOException e) {
             Log.d("Integrator ", "Initialization failed.");
@@ -103,7 +104,10 @@ public class Integrator {
 
         try {
 
-            sensor.authenticate("username", "password");
+            if(value_count == 0) {
+                sensor.authenticate("username", "password");
+            }
+
             String smog = sensor.getSmogValue();
             Double[] newLocation = gps.getGps();
 
@@ -119,6 +123,16 @@ public class Integrator {
         }
 
         return integrated;
+    }
+
+    public boolean sensorEnable(){
+        try {
+            return sensor.enableSensors();
+        }
+        catch (IOException e){
+            Log.w("Integrator: ","Sensor Authentication Failed");
+            return false;
+        }
     }
 
 
@@ -253,6 +267,8 @@ public class Integrator {
         //Save just 1 row in SQL
         Double[][] temp = new Double[1][N];
 
+        /*
+
         //Save starting time & location
         temp[0][0] = integrators[0][0];
         temp[0][1] = integrators[0][1];
@@ -272,9 +288,10 @@ public class Integrator {
         //Set value count to 1
         value_count = 1;
 
+        */
         //Call SQLiteAPI
         sqLiteAsyncTask = new SQLiteAsyncTask(activity,sqLiteAPI);
-        sqLiteAsyncTask.execute(temp);
+        sqLiteAsyncTask.execute(integrators);
 
         //Reinitialize
         integrators = new Double [maxValueCount][N];;

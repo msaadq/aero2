@@ -16,6 +16,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main" />
+
     <ListView
         android:layout_marginTop="210dp"
         android:layout_width="match_parent"
@@ -24,9 +25,17 @@
         android:id="@+id/listview_all_air"
         android:background="#00ffffff"
         android:divider="#00ffffff"></ListView>
-    <android.support.design.widget.FloatingActionButton android:id="@+id/fab"
+
+    <android.support.design.widget.FloatingActionButton android:id="@+id/start_sensor"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end" android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
+        android:layout_gravity="bottom|center" android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/ic_media_play" />
+
+    <android.support.design.widget.FloatingActionButton android:id="@+id/stop_sensor"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center" android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/ic_media_pause" />
+
+
 
 </android.support.design.widget.CoordinatorLayout>

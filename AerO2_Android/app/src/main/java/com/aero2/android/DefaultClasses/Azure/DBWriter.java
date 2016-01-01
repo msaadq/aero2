@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.aero2.android.DefaultClasses.DataTables.ResultDataTable;
 import com.aero2.android.DefaultClasses.DataTables.SampleDataTable;
 import com.aero2.android.DefaultClasses.SQLite.SQLiteAPI;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
+import com.microsoft.windowsazure.mobileservices.MobileServiceList;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 
 import java.net.MalformedURLException;
@@ -27,7 +29,8 @@ public class DBWriter {
     public final static String DEFAULT_KEY = "WWnbNVGsdqRoniOxupcfwjOQaosAAl67";
 
     private MobileServiceClient mClient;  // Mobile Service Client reference
-    private MobileServiceTable<SampleDataTable> mTable;  // Mobile Service Table used to access data
+    private MobileServiceTable<SampleDataTable> sTable;  // Mobile Service Table used to access data
+    private MobileServiceTable<ResultDataTable> rTable;
 
 
     /**
@@ -56,11 +59,17 @@ public class DBWriter {
 
             // Create the Mobile Service Client instance, using the provided URL and key
             mClient = new MobileServiceClient(url, key, activity);
-            Log.d("App Status", "URL Successful");
+            Log.d("DBWriter", "URL Successful");
 
             // Get the Mobile Service Table instance to use
-            mTable = mClient.getTable(table);
-            Log.d("App Status", "Table get successful");
+            if (table == SampleDataTable.class) {
+                sTable = mClient.getTable(table);
+            }
+            else if (table == ResultDataTable.class){
+                rTable = mClient.getTable(table);
+            }
+
+            Log.d("DBWriter", "Table get successful");
 
         } catch (MalformedURLException e) {
             Log.d("Incorrect URL", "Error");
@@ -86,13 +95,33 @@ public class DBWriter {
 
         // Insert the new item
         try {
-            mTable.insert(mSampleDataTable);
+            sTable.insert(mSampleDataTable);
             Log.e("DBWriter", "Data Saved");
 
         } catch (final Exception e) {
             Log.e("Exception", "Data Cannot be saved");
         }
 
+    }
+
+
+    public void getItems() throws ExecutionException {
+        if (mClient == null) {
+            return;
+        }
+
+        try {
+            Log.v("DBWriter retrieve", "Starting.");
+            final MobileServiceList<ResultDataTable> result = rTable.where().field("time").eq("123456.123456").execute().get();
+            Log.v("DBWriter retrieve","Data Captured.");
+            for (ResultDataTable item:result){
+                Log.v("Output:",String.valueOf(item.getLat()));
+            }
+
+        }
+        catch (Exception e){
+            Log.v("DBWriter","Exception reading values.");
+        }
     }
 
 

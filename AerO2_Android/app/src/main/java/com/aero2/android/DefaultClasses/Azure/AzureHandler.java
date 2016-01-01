@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.aero2.android.DefaultClasses.DataTables.ResultDataTable;
 import com.aero2.android.DefaultClasses.DataTables.SampleDataTable;
 import com.aero2.android.DefaultClasses.SQLite.SQLiteAPI;
 
@@ -93,6 +94,28 @@ public class AzureHandler {
     private AsyncTask<Void, Void, Void> runAsyncTask(AsyncTask<Void, Void, Void> task) {
         return task.execute();
     }
+
+    public void retrieveSamples() {
+        //Initiate Azure for posting samples in SampleDataTable
+        dbWriter = new DBWriter(activity, ResultDataTable.class);
+
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    dbWriter.getItems();
+                }
+                catch (Exception e){
+                    Log.v("AzureHandler","Exception retrieving samples.");
+                }
+
+                return null;
+            }
+        };
+        runAsyncTask(task);
+    }
+
+
 
 }
 
