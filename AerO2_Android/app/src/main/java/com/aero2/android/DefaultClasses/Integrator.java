@@ -192,8 +192,7 @@ public class Integrator {
                 value_count++;
                 Log.v("Value Count", String.valueOf(value_count));
 
-                Toast toast = Toast.makeText(activity, R.string.update_message_6, Toast.LENGTH_SHORT);
-                toast.show();
+                Log.v("Integrator get value", "Success");
 
                 time_text.setText(time);
                 location_text.setText(String.format("%.2f", integrators[value_count - 1][1])
@@ -205,24 +204,18 @@ public class Integrator {
             }
 
             else{
-                Toast toast = Toast.makeText(activity, R.string.update_message_0,
-                        Toast.LENGTH_SHORT);
-                toast.show();
+                Log.e("Integrator","Location values are null");
             }
         }
 
         else if(!GPSTracker.getGPSStatus()){
-            Toast toast = Toast.makeText(activity, R.string.update_message_1,
-                    Toast.LENGTH_SHORT);
-            toast.show();
+            Log.e("Integrator","GPS is not connected");
         }
 
         else if(!BTService.getBluetoothAdapter()){
-            Log.v("BTAdapter status:","Disconnected");
+            Log.e("BTAdapter status:", "Disconnected");
             BTService.setDeviceConnected(false);
-            Toast toast = Toast.makeText(activity, R.string.update_message_2,
-                    Toast.LENGTH_SHORT);
-            toast.show();
+            Log.e("Integrator","Bluetooth is not connected");
         }
 
         else if (!BTService.getDeviceConnected()){
@@ -237,9 +230,7 @@ public class Integrator {
                 }
 
                 //BT has reinitialized; will connect again
-                Toast toast = Toast.makeText(activity, R.string.update_message_3,
-                        Toast.LENGTH_SHORT);
-                toast.show();
+                Log.w("Integrator","BT is trying to connect");
 
             }
             else{
@@ -247,9 +238,7 @@ public class Integrator {
                 counter ++;
 
                 //BT is in process of connecting
-                Toast toast = Toast.makeText(activity, R.string.update_message_4,
-                        Toast.LENGTH_SHORT);
-                toast.show();
+                Log.w("Integrator", "BT is trying to connect");
             }
         }
 

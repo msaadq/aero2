@@ -14,8 +14,6 @@ import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.aero2.android.DefaultActivities.MainActivity;
-
 
 /**
  * Determines the gps location after every 2 seconds and returns a 1-D array
@@ -122,6 +120,7 @@ public class GPSTracker {
         return locations;
     }
 
+
     /**
      * Creates a setting dialog to enable GPS
      * arg: None
@@ -169,7 +168,13 @@ public class GPSTracker {
     public static boolean getGPSStatus(){
 
         gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        Log.v("GPSTracker","GPS is on? "+String.valueOf(gpsEnabled));
+        Log.v("GPSTracker", "GPS is on? " + String.valueOf(gpsEnabled));
+        return gpsEnabled;
+    }
+
+    public static boolean getNetworkStatus(){
+        gpsEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        Log.v("Network","Network is on? "+String.valueOf(gpsEnabled));
         return gpsEnabled;
     }
 

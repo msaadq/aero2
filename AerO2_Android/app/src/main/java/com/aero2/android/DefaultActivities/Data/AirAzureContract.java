@@ -20,19 +20,16 @@ import android.provider.BaseColumns;
 /**
  * Defines table and column names for the work and hobbie database.
  */
-public class AirContract {
+public class AirAzureContract {
 
     //Inner Class that defines the contest of the Work DataBase
-    public static final class AirEntry implements BaseColumns {
+    public static final class AirAzureEntry implements BaseColumns {
 
         // Table name
-        public static final String TABLE_NAME = "air";
+        public static final String TABLE_NAME = "airazure";
 
         //smog value
-        public static final String COLUMN_SMOG_VALUE = "smog_value_of_air";
-
-        //air quality
-        public static final String COLUMN_NORMALIZED="normalized";
+        public static final String COLUMN_AIR_INDEX = "air_index";
 
         //time at which the value was taken
         public static final String COLUMN_TIME = "time_of_air";
@@ -42,9 +39,6 @@ public class AirContract {
 
         //Latitude at which the value was taken
         public static final String COLUMN_LAT = "lat_of_air";
-
-        //Altitude at which the value was taken
-        public static final String COLUMN_ALT = "alt_of_air";
 
 
     }
