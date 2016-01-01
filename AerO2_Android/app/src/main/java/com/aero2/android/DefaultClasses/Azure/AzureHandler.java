@@ -103,7 +103,7 @@ public class AzureHandler {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    dbWriter.getItems();
+                    //dbWriter.getItems();
                 }
                 catch (Exception e){
                     Log.v("AzureHandler","Exception retrieving samples.");

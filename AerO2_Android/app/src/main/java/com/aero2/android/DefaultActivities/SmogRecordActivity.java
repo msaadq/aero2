@@ -1,7 +1,6 @@
 package com.aero2.android.DefaultActivities;
 
 import android.Manifest;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -78,12 +77,12 @@ public class SmogRecordActivity extends AppCompatActivity {
         stopSensor.setVisibility(View.INVISIBLE);
 
         //Start saving data in Azure
-        //integrator.saveAzure();
+        integrator.saveAzure();
 
 
          // Debug Code
-        azureHandler = new AzureHandler(this);
-        azureHandler.retrieveSamples();
+        //azureHandler = new AzureHandler(this);
+        //azureHandler.retrieveSamples();
         //
 
 
@@ -105,7 +104,7 @@ public class SmogRecordActivity extends AppCompatActivity {
                 smog_text.setText("0");
                 location_text.setText("--,--");
                 time_text.setText("--:--:--");
-                count_text.setText("0");
+                count_text.setText("[0]");
 
                 location_image.setVisibility(View.VISIBLE);
                 time_image.setVisibility(View.VISIBLE);
@@ -148,6 +147,7 @@ public class SmogRecordActivity extends AppCompatActivity {
 
 
                 } else {
+                    integrator.sensorDisable();
 
                 }
             }

@@ -48,7 +48,7 @@ public class BTService {
      * return: No return value.
      */
 
-    public BTService(Activity activity, final String deviceName) {
+    public BTService(Activity activity, final String deviceName, final STMCommunicator sensor) {
         Log.v("Appstatus", "Entered the BTService Constructor");
 
         this.activity = activity;
@@ -70,10 +70,13 @@ public class BTService {
                 try {
                     bondDevice(deviceName);
                     Log.v("Appstatus", "BTService Constructor, bondDevice");
+                    Log.v("Appstatus", String.valueOf(getDeviceConnected()));
+                    sensor.authenticate("username","password");
                 } catch (IOException e) {
                     e.printStackTrace();
                     Log.e("Exception", "BTService Constructor, bondDevice");
                 }
+
                 return null;
             }
 

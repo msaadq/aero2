@@ -105,17 +105,23 @@ public class DBWriter {
     }
 
 
-    public void getItems() throws ExecutionException {
+    public void getItems(double currLat, double currLong, double horizontalInt,
+                         double verticalInt) throws ExecutionException {
+        //final longInterval =
+
         if (mClient == null) {
             return;
         }
 
+
+
         try {
             Log.v("DBWriter retrieve", "Starting.");
-            final MobileServiceList<ResultDataTable> result = rTable.where().field("time").eq("123456.123456").execute().get();
+            final MobileServiceList<ResultDataTable> result = rTable.top(1000).execute().get();
+
             Log.v("DBWriter retrieve","Data Captured.");
-            for (ResultDataTable item:result){
-                Log.v("Output:",String.valueOf(item.getLat()));
+            for (ResultDataTable item:result) {
+                Log.v("Output:"," "+item.getLong());
             }
 
         }

@@ -75,7 +75,7 @@ public class Integrator {
             gps = new GPSTracker(activity);
             sensor = new STMCommunicator(activity);
             sqLiteAPI = new SQLiteAPI(activity);
-            sqLiteAPI.emptySQL();
+            //sqLiteAPI.emptySQL();
 
         } catch (IOException e) {
             Log.d("Integrator ", "Initialization failed.");
@@ -106,6 +106,7 @@ public class Integrator {
 
             if(value_count == 0) {
                 sensor.authenticate("username", "password");
+                sensor.enableSensors();
             }
 
             String smog = sensor.getSmogValue();
@@ -130,8 +131,17 @@ public class Integrator {
             return sensor.enableSensors();
         }
         catch (IOException e){
-            Log.w("Integrator: ","Sensor Authentication Failed");
+            Log.w("Integrator: ", "Sensor Authentication Failed");
             return false;
+        }
+    }
+
+    public void sensorDisable(){
+        try {
+            sensor.disableSensors();
+        }
+        catch (IOException e){
+            Log.w("Integrator: ","Sensor Authentication Failed");
         }
     }
 

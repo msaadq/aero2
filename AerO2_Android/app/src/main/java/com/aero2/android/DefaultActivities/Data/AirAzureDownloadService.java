@@ -71,6 +71,7 @@ public class AirAzureDownloadService extends IntentService {
 
         //This code inserts random values in the localResults cache
         //Starts Here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        /*
         mDbHelper=new AirAzureDbHelper(getApplicationContext());
 
         db=mDbHelper.getWritableDatabase();
@@ -110,6 +111,7 @@ public class AirAzureDownloadService extends IntentService {
                 Log.v("RandomValue", "random smog value: " + random * 1000);
             }
         }
+        */
         //This code inserts random values in the localResults cache
         //Ends Here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }

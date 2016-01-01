@@ -69,7 +69,7 @@ public class STMCommunicator {
      */
 
     public STMCommunicator(Activity activity) throws IOException {
-        this.btService = new BTService(activity, BT_DEVICE_NAME);
+        this.btService = new BTService(activity, BT_DEVICE_NAME, this);
     }
 
     /**
@@ -103,38 +103,38 @@ public class STMCommunicator {
      */
 
     public void authenticate(String username, String password) throws IOException {
+        if (BTService.getBluetoothAdapter() && BTService.getDeviceConnected()) {
 
-        // Step 1 : Send the AUT: Instruction for initial identification and wait for approval
-        sendCommand(O_COM_AUT, "1\n");
+            // Step 1 : Send the AUT: Instruction for initial identification and wait for approval
+            sendCommand(O_COM_AUT, "1\n");
 
-        if(receiveCommand().equals(I_COM_AUT + ":1")) {
-            btAvailable = true;
-            Log.v("STMCommunicator","btAvailable is set to true, authenticate()");
+            if (receiveCommand().equals(I_COM_AUT + ":1")) {
+                btAvailable = true;
+                Log.v("STMCommunicator", "btAvailable is set to true, authenticate()");
+
+            }
+
+
+            // Step 2 : Send the Username and wait for approval
+            sendCommand(O_COM_USR, username + "\n");
+
+            if (receiveCommand().equals(I_COM_USR + ":1")) {
+                userCorrect = true;
+                Log.v("STMCommunicator", "username is set to true, authenticate()");
+            }
+
+            // Step 3 : Send the Password and wait for approval
+            sendCommand(O_COM_PAS, password + "\n");
+
+            if (receiveCommand().equals(I_COM_PAS + ":1")) {
+                passwordCorrect = true;
+                Log.v("STMCommunicator", "password is set to true, authenticate()");
+            }
+
+            authenticationStatus = btAvailable && userCorrect && passwordCorrect;
+            Log.v("Authenticated? ", String.valueOf(authenticationStatus));
 
         }
-
-
-        // Step 2 : Send the Username and wait for approval
-        sendCommand(O_COM_USR, username+"\n");
-
-        if(receiveCommand().equals(I_COM_USR + ":1")) {
-            userCorrect = true;
-            Log.v("STMCommunicator","username is set to true, authenticate()");
-        }
-
-        // Step 3 : Send the Password and wait for approval
-        sendCommand(O_COM_PAS, password+"\n");
-
-        if(receiveCommand().equals(I_COM_PAS + ":1")) {
-            passwordCorrect = true;
-            Log.v("STMCommunicator","password is set to true, authenticate()");
-        }
-
-        authenticationStatus = btAvailable && userCorrect && passwordCorrect;
-        Log.v("Authenticated? ", String.valueOf(authenticationStatus));
-
-        // Step 4 : Enable Smog Sensor amd Air Quality Sensor
-        enableSensors();
     }
 
 
@@ -226,26 +226,11 @@ public class STMCommunicator {
             temp = receiveCommand();
             Log.v("STMCommunicator", "Message Received in getSmogValue(): " + temp);
 
-            int len_smog = 4;
-
-            if(temp.substring(0,4).equals(I_COM_SSG)) {
-                for (int i=6;;i++){
-                    Log.v("Sal",temp.substring(i-1,i));
-                    if (temp.substring(i-1,i).equals(":")){break;}
-                    len_smog++;
-                }
-
-                len_smog++;
-
-                batteryLevel = temp.substring(len_smog+1,temp.length());
-                Log.v("Sal - Battery",batteryLevel);
-
-                return temp.substring(5, len_smog);
+            return temp.substring(5, temp.length());
             }
             return "0";
-        }
-        return "0";
     }
+
 
     /**
      * Returns the current Air Quality sensor value

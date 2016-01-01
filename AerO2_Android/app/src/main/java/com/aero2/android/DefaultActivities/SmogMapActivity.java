@@ -241,7 +241,7 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
                 cursor.moveToPosition(i);
                 double random = Double.valueOf(cursor.getString(0));
                 weightedLatLng[i] = new WeightedLatLng(new LatLng(Double.valueOf(cursor.getString(1)), Double.valueOf(cursor.getString(2))), random);
-                Log.v("RandomValue", "random smog value: " + random);
+                //Log.v("RandomValue", "random smog value: " + random);
                 list.add(weightedLatLng[i]);
 
             }
