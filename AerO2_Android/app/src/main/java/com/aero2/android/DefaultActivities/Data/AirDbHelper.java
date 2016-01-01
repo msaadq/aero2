@@ -40,11 +40,12 @@ public class AirDbHelper extends SQLiteOpenHelper {
         //has one _ID column and six other columns for various functions of the app
         final String SQL_CREATE_AIR_TABLE = "CREATE TABLE " + AirContract.AirEntry.TABLE_NAME + " (" +
                 com.aero2.android.DefaultActivities.Data.AirContract.AirEntry._ID + " INTEGER PRIMARY KEY," +
-                AirContract.AirEntry.COLUMN_SMOG_VALUE + " TEXT NOT NULL, " +
                 AirContract.AirEntry.COLUMN_TIME + " TEXT UNIQUE NOT NULL, " +
                 AirContract.AirEntry.COLUMN_LONG + " TEXT NOT NULL, " +
                 AirContract.AirEntry.COLUMN_LAT + " TEXT NOT NULL, " +
-                AirContract.AirEntry.COLUMN_ALT + " TEXT NOT NULL " +
+                AirContract.AirEntry.COLUMN_ALT + " TEXT NOT NULL, " +
+                AirContract.AirEntry.COLUMN_SMOG_VALUE + " TEXT NOT NULL, " +
+                AirContract.AirEntry.COLUMN_NORMALIZED+ " TEXT NOT NULL " +
                 " );";
 
 
