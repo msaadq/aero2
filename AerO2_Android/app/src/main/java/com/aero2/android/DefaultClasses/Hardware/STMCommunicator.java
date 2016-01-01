@@ -1,4 +1,4 @@
-package com.aero2.android.DefaultClasses;
+package com.aero2.android.DefaultClasses.Hardware;
 
 import android.app.Activity;
 import android.util.Log;
@@ -22,6 +22,7 @@ import java.io.IOException;
 public class STMCommunicator {
     public static final String BT_DEVICE_NAME = "HC-05"; // Default device name
     public static final int DEFAULT_I_COMMAND_SIZE = 20; // eg. "IPAS:1"
+    public static String batteryLevel;
 
     public int nSensors = 0; // No. of available sensors
 
@@ -144,22 +145,20 @@ public class STMCommunicator {
      * return: No return value.
      */
 
-    public void enableSensors() throws IOException {
+    public boolean enableSensors() throws IOException {
         sendCommand(O_COM_NSG, "1\n");
 
         if(receiveCommand().equals(I_COM_NSG + ":1")) {
             smogAvailable = true;
             nSensors++;
             Log.v("Smog sensor: ", "Authenticated");
+            return true;
         }
 
-        sendCommand(O_COM_NAQ, "1\n");
-
-        if(receiveCommand().equals(I_COM_NAQ + ":1")) {
-            airQualityAvailable = true;
-            nSensors++;
-            Log.v("Air quality sensor: ", "Authenticated");
+        else{
+            return false;
         }
+
     }
 
     /**
@@ -202,7 +201,7 @@ public class STMCommunicator {
         int[] sensorValues = new int[nSensors];
         int sensorValuesIndex = 0;
 
-        sensorValues[sensorValuesIndex++] = getSmogValue();
+        sensorValues[sensorValuesIndex++] = Integer.parseInt(getSmogValue());
 
         sensorValues[sensorValuesIndex++] = getAirQualityValue();
 
@@ -218,7 +217,8 @@ public class STMCommunicator {
      */
 
 
-    public int getSmogValue() throws IOException {
+    public String getSmogValue() throws IOException {
+        Log.v(String.valueOf(authenticationStatus),String.valueOf(smogAvailable));
         if(authenticationStatus && smogAvailable) {
 
             String temp;
@@ -226,13 +226,25 @@ public class STMCommunicator {
             temp = receiveCommand();
             Log.v("STMCommunicator", "Message Received in getSmogValue(): " + temp);
 
+            int len_smog = 4;
+
             if(temp.substring(0,4).equals(I_COM_SSG)) {
-                String smog = temp.substring(5, temp.length());
-                return Integer.parseInt(smog);
+                for (int i=6;;i++){
+                    Log.v("Sal",temp.substring(i-1,i));
+                    if (temp.substring(i-1,i).equals(":")){break;}
+                    len_smog++;
+                }
+
+                len_smog++;
+
+                batteryLevel = temp.substring(len_smog+1,temp.length());
+                Log.v("Sal - Battery",batteryLevel);
+
+                return temp.substring(5, len_smog);
             }
-            return 0;
+            return "0";
         }
-        return 0;
+        return "0";
     }
 
     /**

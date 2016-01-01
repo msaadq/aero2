@@ -1,10 +1,14 @@
-package com.aero2.android.DefaultClasses;
+package com.aero2.android.DefaultClasses.Azure;
 
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.aero2.android.DefaultClasses.DataTables.ResultDataTable;
+import com.aero2.android.DefaultClasses.DataTables.SampleDataTable;
+import com.aero2.android.DefaultClasses.SQLite.SQLiteAPI;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
+import com.microsoft.windowsazure.mobileservices.MobileServiceList;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
 
 import java.net.MalformedURLException;
@@ -25,7 +29,8 @@ public class DBWriter {
     public final static String DEFAULT_KEY = "WWnbNVGsdqRoniOxupcfwjOQaosAAl67";
 
     private MobileServiceClient mClient;  // Mobile Service Client reference
-    private MobileServiceTable<SampleDataTable> mTable;  // Mobile Service Table used to access data
+    private MobileServiceTable<SampleDataTable> sTable;  // Mobile Service Table used to access data
+    private MobileServiceTable<ResultDataTable> rTable;
 
 
     /**
@@ -36,9 +41,10 @@ public class DBWriter {
      * return: No return value.
      */
 
-    public DBWriter(Activity activity) {
-        this(activity, DEFAULT_URL, DEFAULT_KEY);
+    public DBWriter(Activity activity, Class table) {
+        this(activity, table, DEFAULT_URL, DEFAULT_KEY);
     }
+
 
     /**
      * Parametrized Constructor
@@ -48,20 +54,22 @@ public class DBWriter {
      * return: No return value.
      */
 
-    public DBWriter(Activity activity, String url, String key) {
+    public DBWriter(Activity activity, Class table, String url, String key) {
         try {
-
-            Log.d("App Status", "Entered Function");
 
             // Create the Mobile Service Client instance, using the provided URL and key
             mClient = new MobileServiceClient(url, key, activity);
-
-            Log.d("App Status", "URL Successful");
+            Log.d("DBWriter", "URL Successful");
 
             // Get the Mobile Service Table instance to use
-            mTable = mClient.getTable(SampleDataTable.class);
+            if (table == SampleDataTable.class) {
+                sTable = mClient.getTable(table);
+            }
+            else if (table == ResultDataTable.class){
+                rTable = mClient.getTable(table);
+            }
 
-            Log.d("App Status", "Table get successful");
+            Log.d("DBWriter", "Table get successful");
 
         } catch (MalformedURLException e) {
             Log.d("Incorrect URL", "Error");
@@ -73,54 +81,48 @@ public class DBWriter {
     /**
      * Adds a new Row to the database
      * arg: Double array
-     * exception: None
+     * exception: ExecutionException & InterruptedException
      * return: No return value.
      */
 
-    public void addItem(String id, double[] data) {
+    public void addItem(String id, Double[] data) throws ExecutionException, InterruptedException {
         if (mClient == null) {
             return;
         }
+
         // Create a new item
         final SampleDataTable mSampleDataTable = new SampleDataTable(id, data);
 
         // Insert the new item
-        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>(){
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    addItemInTable(mSampleDataTable);
-                    Log.v("DBWriter","Data Saved");
-                } catch (final Exception e) {
-                    Log.d("Exception", "Data Cannot be saved");
-                }
-                return null;
+        try {
+            sTable.insert(mSampleDataTable);
+            Log.e("DBWriter", "Data Saved");
+
+        } catch (final Exception e) {
+            Log.e("Exception", "Data Cannot be saved");
+        }
+
+    }
+
+
+    public void getItems() throws ExecutionException {
+        if (mClient == null) {
+            return;
+        }
+
+        try {
+            Log.v("DBWriter retrieve", "Starting.");
+            final MobileServiceList<ResultDataTable> result = rTable.where().field("time").eq("123456.123456").execute().get();
+            Log.v("DBWriter retrieve","Data Captured.");
+            for (ResultDataTable item:result){
+                Log.v("Output:",String.valueOf(item.getLat()));
             }
-        };
 
-        runAsyncTask(task);
+        }
+        catch (Exception e){
+            Log.v("DBWriter","Exception reading values.");
+        }
     }
 
-    /**
-     * Adds a compatible List SampleDataTable to the Database table
-     * arg: DBListItem
-     * exception: ExecutionException, InterruptedException
-     * return: No return value.
-     */
 
-    private SampleDataTable addItemInTable(SampleDataTable sampleDataTable) throws ExecutionException, InterruptedException {
-        SampleDataTable entity = mTable.insert(sampleDataTable).get();
-        return entity;
-    }
-
-    /**
-     * Executes the AsyncTask
-     * arg: AsyncTask
-     * exception: None
-     * return: No return value.
-     */
-
-    private AsyncTask<Void, Void, Void> runAsyncTask(AsyncTask<Void, Void, Void> task) {
-        return task.execute();
-    }
 }

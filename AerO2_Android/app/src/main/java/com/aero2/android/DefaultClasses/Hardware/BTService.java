@@ -1,4 +1,4 @@
-package com.aero2.android.DefaultClasses;
+package com.aero2.android.DefaultClasses.Hardware;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -26,11 +26,7 @@ import java.util.Set;
 public class BTService {
     static private OutputStream outputStream;
 
-    static public Boolean getDeviceConnected() {
-        return deviceConnected;
-    }
-
-    static private Boolean deviceConnected;
+    static private Boolean deviceConnected = false;
     static private InputStream inStream;
     static private Activity activity;
 
@@ -60,16 +56,15 @@ public class BTService {
         this.btDeviceName = deviceName;
         deviceConnected = false;
 
-        AsyncTask<Void, Void, Boolean> task = new AsyncTask<Void, Void, Boolean>(){
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>(){
             @Override
-            protected Boolean doInBackground(Void... params) {
+            protected Void doInBackground(Void... params) {
                 try {
                     setBluetoothDevice();
                     Log.v("Appstatus", "BTService Constructor, bluetoothDevice");
                 } catch (IOException e) {
                     e.printStackTrace();
                     Log.e("Exception", "BTService Constructor, bluetoothDevice");
-                    return false;
                 }
 
                 try {
@@ -78,20 +73,14 @@ public class BTService {
                 } catch (IOException e) {
                     e.printStackTrace();
                     Log.e("Exception", "BTService Constructor, bondDevice");
-                    return false;
                 }
-                return true;
+                return null;
             }
 
-            protected void onPostExecute(Boolean result) {
-                Log.v("Set","Setting deviceConntect true");
-                deviceConnected = true;
-            }
+
         };
 
         runAsyncTask(task);
-
-
     }
 
     /**
@@ -147,7 +136,9 @@ public class BTService {
             socket.connect();
             outputStream = socket.getOutputStream();
             inStream = socket.getInputStream();
-            Log.v("BTService","Input and Output Streams set");
+            Log.v("BTService", "Input and Output Streams set");
+            deviceConnected = true;
+            Log.v("BTService", "Setting deviceConnected True");
         }
         else {
             Log.e("On Screen Message", "No appropriate paired devices.");
@@ -166,7 +157,7 @@ public class BTService {
 
         outputStream = socket.getOutputStream();
         outputStream.write(message.getBytes());
-        Log.v("Appstatus","Mesage Written " + message);
+        Log.v("Appstatus", "Mesage Written " + message);
     }
 
     /**
@@ -214,7 +205,28 @@ public class BTService {
      * return: No return value.
      */
 
-    private AsyncTask<Void, Void, Boolean> runAsyncTask(AsyncTask<Void, Void, Boolean> task) {
+    private AsyncTask<Void, Void, Void> runAsyncTask(AsyncTask<Void, Void, Void> task) {
         return task.execute();
     }
+
+    /**
+     * Indicates if device is connected
+     * arg: None
+     * exception: None
+     * return: Boolean
+     */
+    static public Boolean getDeviceConnected() {
+        Log.v("BTService","Bluetooth is connected? "+String.valueOf(deviceConnected));
+        return deviceConnected;
+    }
+
+    static public void setDeviceConnected(Boolean status) {
+        deviceConnected = status;
+    }
+
+    static public Boolean getBluetoothAdapter(){
+        return bluetoothAdapter.isEnabled();
+    }
+
+
 }
