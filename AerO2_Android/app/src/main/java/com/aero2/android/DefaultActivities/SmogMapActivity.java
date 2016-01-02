@@ -171,7 +171,7 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currLong, currLat), 17));
         map.getUiSettings().setZoomControlsEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
-
+/*
         //Using the simple cursor loader class to query the cache on a background thread
         SimpleCursorLoader simpleCursorLoader=new SimpleCursorLoader(getApplicationContext()) {
             @Override
@@ -252,7 +252,8 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
                     .radius(10)
                     .build();
             map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-        }
+
+    }*/
 
         //ENDS HERE
         //******************************** Setting up the overlay on the Map using the cursor *************************************

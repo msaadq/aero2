@@ -7,6 +7,7 @@ import java.util.Date;
 import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
+import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -165,6 +166,12 @@ public class Integrator {
 
         if (GPSTracker.getGPSStatus() && BTService.getDeviceConnected()
                 && BTService.getBluetoothAdapter()) {
+
+            bluetoothStatus.setVisibility(View.INVISIBLE);
+            locationStatus.setVisibility(View.INVISIBLE);
+            sensorStatusText.setText("ON");
+            sensorSwitch.setChecked(false);
+
             new_integrator = integrateSmog();
 
             //Parse information
@@ -224,9 +231,13 @@ public class Integrator {
 
         else if(!GPSTracker.getGPSStatus()){
             Log.e("Integrator","GPS is not connected");
+            bluetoothStatus.setVisibility(View.INVISIBLE);
+            locationStatus.setVisibility(View.VISIBLE);
         }
 
         else if(!BTService.getBluetoothAdapter()){
+            bluetoothStatus.setVisibility(View.VISIBLE);
+            locationStatus.setVisibility(View.INVISIBLE);
             Log.e("BTAdapter status:", "Disconnected");
             BTService.setDeviceConnected(false);
             Log.e("Integrator","Bluetooth is not connected");
@@ -234,6 +245,8 @@ public class Integrator {
 
         else if (!BTService.getDeviceConnected()){
 
+            bluetoothStatus.setVisibility(View.INVISIBLE);
+            locationStatus.setVisibility(View.INVISIBLE);
             if (counter > maxCounter){
 
                 try {

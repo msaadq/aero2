@@ -74,6 +74,10 @@ public class SmogRecordActivity extends AppCompatActivity {
         m_handler = new Handler();
         integrator = new Integrator(this);
 
+        locationStatus.setVisibility(View.INVISIBLE);
+        bluetoothStatus.setVisibility(View.INVISIBLE);
+
+
         //Set visibility of ImageViews
         location_image.setVisibility(View.INVISIBLE);
         time_image.setVisibility(View.INVISIBLE);
@@ -145,7 +149,7 @@ public class SmogRecordActivity extends AppCompatActivity {
 
                 } else {
                     integrator.sensorDisable();
-                    sensorStatusText.setText("SENSOR OFF");
+                    sensorStatusText.setText("OFF");
 
                 }
             }
