@@ -5,7 +5,6 @@ Azure Connection Strings:
 		PRIMARY ACCESS KEY: ESYZUiWaGssQtGflJXeIk9E5w0xnLKs71lG/m0jkjXhv8F/QjFVWC8TLeAlt05ZOjHYrEX4OXP4AqlZIbuyhxg==
 		SECONDARY ACCESS KEY: XNIePQa4bRLg2gdOJ7hsPI4lWxZJmvtQ+0WkGxy3t16xypiLdpEE/GvTnSNbh1Fl+bx/NT1YsrL/MeGHzEtm9Q==
 	
-
 	Mobile Service:
 		URL: https://aero.azure-mobile.net/
 		Key: WWnbNVGsdqRoniOxupcfwjOQaosAAl67

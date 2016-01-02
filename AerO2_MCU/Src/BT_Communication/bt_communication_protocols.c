@@ -9,18 +9,16 @@ static const char* O_COM_AUT = "OAUT"; // Authenticate
 static const char* O_COM_USR = "OUSR"; // Set Username
 static const char* O_COM_PAS = "OPAS"; // Set Password
 static const char* O_COM_NSG = "ONSG"; // Enable / Disable Smog Sensor
-static const char* O_COM_NAQ = "ONAQ"; // Enable / Disable Air Quality Sensor
 static const char* O_COM_SSG = "OSSG"; // Request Smog Data
-static const char* O_COM_SAQ = "OSAQ"; // Request Air Quality Data
+static const char* O_COM_BAT = "OBAT"; // Request Battery Percentage
 
 // All the available In commands
 static char* I_COM_AUT = "IAUT"; // Authentication Status
 static char* I_COM_USR = "IUSR"; // Username Status
 static char* I_COM_PAS = "IPAS"; // Password Status
 static char* I_COM_NSG = "INSG"; // Smog Sensor Status
-static char* I_COM_NAQ = "INAQ"; // Air Quality Sensor Status
 static char* I_COM_SSG = "ISSG"; // Received Smog Data
-static char* I_COM_SAQ = "ISAQ"; // Received Air Quality Data
+static char* I_COM_BAT = "IBAT"; // Received Battery Percentage
 
 // Booleans representing program status
 bool communicationEnded = false;
@@ -33,7 +31,7 @@ bool airQualityAvailable = false;
 
 // Complete Received Command
 char * receivedString;
-char receivedParameters[20];
+char * receivedParameters;
 
 /**
  * Bluetooth Routine
@@ -45,53 +43,30 @@ char receivedParameters[20];
 
 void btRoutine(void) {
 	
-	sendString("Started");
-	
-	char receivedCommand[5];
-	int i;
+	sendString("Started BT Routine. Connect using 4 Letter Commands.");
 	
 	while(!communicationEnded) {
 		receivedString = readString();
 		
-		i = 0;
+		HAL_Delay(2);
 		
-		HAL_Delay(1);
-		
-		for(; receivedString[i] != '\0' && i < 4; i++) {
-			receivedCommand[i] = receivedString[i];
-		}
-		
-		if(i < 4) { break; }
-		else { i = 5; }
-		
-		for(; i < 25 && receivedString != '\0'; i++) {
-			receivedParameters[i - 5] = receivedString[i];
-		}
-		
-		if(strcmp(receivedCommand, O_COM_AUT) == 0) {
-			autRoutine();
+		receivedParameters = strtok(receivedString, ":"); 
+		receivedParameters = strtok(NULL, "\n");  
 			
-		} else if (strcmp(receivedCommand, O_COM_USR) == 0) {
-			userRoutine();
-			
-		} else if (strcmp(receivedCommand, O_COM_PAS) == 0) {
-			passRoutine();
-			
-		} else if (strcmp(receivedCommand, O_COM_NSG) == 0) {
-			smogEnable();
-			
-		} else if (strcmp(receivedCommand, O_COM_NAQ) == 0) {
-			airQualityEnable();
-
-		} else if (strcmp(receivedCommand, O_COM_SSG) == 0) {
-			reqSmogData();
-			
-		} else if (strcmp(receivedCommand, O_COM_SAQ) == 0) {
-			reqAirQualityData();
-			
+		if(compareCommand(receivedString, O_COM_AUT)) {
+			autRoutine();			
+		} else if (compareCommand(receivedString, O_COM_USR)) {
+			userRoutine();		
+		} else if (compareCommand(receivedString, O_COM_PAS)) {
+			passRoutine();		
+		} else if (compareCommand(receivedString, O_COM_NSG)) {
+			smogEnable();		
+		} else if (compareCommand(receivedString, O_COM_SSG)) {
+			reqSmogData();	
+		} else if (compareCommand(receivedString, O_COM_BAT)) {
+			reqBatteryStatus();	
 		} else {
-			sendCommand("IINV","COMMAND_REJECTED");
-			
+			sendCommand("IINV","COMMAND_REJECTED");		
 		}
 	}
 }
@@ -187,30 +162,12 @@ void smogEnable(void) {
 		smogAvailable = true;
 		sendCommand(I_COM_NSG, "1");
 		
+		enableSmogSensor();
 	} else {
 		smogAvailable = false;
 		sendCommand(I_COM_NSG, "0");
 		
-	}
-}
-
-/**
- * Air Quality Sensor Enabler / Disabler
- * Disables or enables the Air Quality Sensor
- * arg: None
- * exception: None
- * return: No return value
- */
-
-void airQualityEnable(void) {
-	if(authenticationStatus && receivedString[5] == '1') {
-		airQualityAvailable = true;
-		sendCommand(I_COM_NAQ, "1");
-		
-	} else {
-		airQualityAvailable = false;
-		sendCommand(I_COM_NAQ, "0");
-		
+		disableSmogSensor();
 	}
 }
 
@@ -233,6 +190,7 @@ void reqSmogData(void) {
 		iSmogData /= 1000;
 		
 		sprintf(smogData, "%d", iSmogData);
+		       
 		sendCommand(I_COM_SSG, smogData);
 		
 	} else {
@@ -242,30 +200,29 @@ void reqSmogData(void) {
 }
 
 /**
- * Request Air Quality Data
- * Deals with the smog data requests and sends values accordingly
+ * Request Battery Status
+ * Deals with the battery percentage status requests and sends data accordingly
  * arg: None
  * exception: None
  * return: No return value
  */
 
-void reqAirQualityData(void) {
-	if(airQualityAvailable) {
-		char airQualityData[3];
-		/*
-		int iAirQualityData = 0;
+void reqBatteryStatus(void) {
+	if(authenticationStatus) {
+		char batteryPercentage[3];
+		int iBatteryPercentage = 0;
 		
-		for(int i = 0; i < 100; i++) {
-			iAirQualityData += getAirQualitySensorValue();
+		for(int i = 0; i < 1000; i++) {
+			iBatteryPercentage += getBatteryPercentage();
 		}	
-		iAirQualityData /= 100;
+		iBatteryPercentage /= 1000;
 		
-		sprintf(airQualityData, "%d", iAirQualityData);
-		*/
-		sendCommand(I_COM_SAQ, airQualityData);
+		sprintf(batteryPercentage, "%d", iBatteryPercentage);
+		       
+		sendCommand(I_COM_BAT, batteryPercentage);
 		
 	} else {
-		sendCommand(I_COM_NAQ, "0");
+		sendCommand(I_COM_PAS, "0");
 		
 	}
 }
@@ -293,13 +250,38 @@ void sendCommand(char * command, char * parameters) {
  * return: Concatenated Strings with ":" between them
  */
 
-char * commandBuilder(char *s1, char *s2)
-{
+char * commandBuilder(char *s1, char *s2) {
     char *result = malloc(strlen(s1)+strlen(s2)+2);
     
     strcpy(result, s1);
-		strcat(result, ":");
+	strcat(result, ":");
     strcat(result, s2);
 	
     return result;
 }
+
+/**
+ * Compare Command
+ * Comapares String to contain the pre defined commands
+ * arg: 2 Strings
+ * exception: None
+ * return: bool
+ */
+
+bool compareCommand(char *receivedCommand, const char *sampleCommand) {
+    bool containsCommand = true;
+    
+    for(int i = 0; i < 4; i++) {
+			if(receivedCommand == '\0') {
+				containsCommand = false;
+				break;
+			}
+			
+			if(receivedCommand[i] != sampleCommand[i]) {
+				containsCommand = false;
+			}
+		}
+	
+    return containsCommand;
+}
+

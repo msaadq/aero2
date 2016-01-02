@@ -3,4 +3,14 @@
     <string name="title_activity_test">AerO2</string>
     <string name="action_settings">Settings</string>
     <string name="introduction_text">Welcome! Press \'Start\' as soon as you\'re ready.</string>
+    <string name="final_text">Thank you for contributing! Your values have been recorded.
+        Have a nice exercise!</string>
+    <string name="warm_up_message">Hold on, device is warming up!</string>
+    <string name="bt_gps_error_message">Oops, please try again or make sure your BT and GPS are turned on!</string>
+    <string name="polygon_demo_label">Smog Map</string>
+    <string name="Cancel">CANCEL</string>
+    <string name="open_location_settings">LOCATION SETTINGS</string>
+    <string name="open_bluetooth_settings">BLUETOOTH SETTINGS</string>
+    <string name="bluetooth_network_not_enabled">This application requires bluetooth to be turned on.</string>
+    <string name="gps_not_enabled">This applcation requires gps to be enabled. Please enable gps in the location settings.</string>
 </resources>

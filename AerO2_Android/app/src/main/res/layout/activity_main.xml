@@ -17,9 +17,41 @@
 
     <include layout="@layout/content_main" />
 
-    <android.support.design.widget.FloatingActionButton android:id="@+id/fab"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end" android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
+    <ListView
+        android:layout_marginTop="210dp"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:elevation="12dp"
+        android:id="@+id/listview_all_air"
+        android:background="#00ffffff"
+        android:divider="#00ffffff"></ListView>
+
+        <android.support.design.widget.FloatingActionButton android:id="@+id/start_sensor"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center" android:layout_margin="@dimen/fab_margin"
+            android:src="@android:drawable/ic_media_play" />
+
+        <android.support.design.widget.FloatingActionButton android:id="@+id/stop_sensor"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center" android:layout_margin="@dimen/fab_margin"
+            android:src="@android:drawable/ic_media_pause" />
+
+        <android.support.design.widget.FloatingActionButton android:id="@+id/bluetooth_status"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center" android:layout_margin="@dimen/fab_margin"
+            android:translationX="-70dp"
+            app:backgroundTint="#0000ff"
+            android:contextClickable="false"
+            android:tint="#ffffff"
+            android:src="@android:drawable/stat_sys_data_bluetooth" />
+
+        <android.support.design.widget.FloatingActionButton android:id="@+id/location_status"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center" android:layout_margin="@dimen/fab_margin"
+            android:translationX="70dp"
+            app:backgroundTint="#00bb00"
+            android:contextClickable="false"
+            android:tint="#ffffff"
+            android:src="@android:drawable/ic_menu_compass" />
 
 </android.support.design.widget.CoordinatorLayout>
