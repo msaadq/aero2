@@ -5,7 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Activity;
+import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.aero2.android.DefaultClasses.Azure.AzureHandler;
@@ -155,7 +157,9 @@ public class Integrator {
      */
 
     public void init (TextView smog_text, TextView location_text, TextView time_text,
-                      TextView count_text){
+                      TextView count_text, FloatingActionButton bluetoothStatus,
+                      FloatingActionButton locationStatus, TextView sensorStatusText,
+                      Switch sensorSwitch){
 
         Boolean valid = true;
 

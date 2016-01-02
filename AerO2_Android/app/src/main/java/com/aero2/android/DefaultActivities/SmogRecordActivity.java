@@ -35,15 +35,16 @@ public class SmogRecordActivity extends AppCompatActivity {
     private TextView location_text;
     private TextView time_text;
     private TextView count_text;
-    private TextView thank_you_text;
+    private TextView sensorStatusText;
     private ImageView location_image;
     private ImageView time_image;
     private Toolbar toolbar;
     private Handler m_handler;
     private FloatingActionButton startSensor;
     private FloatingActionButton stopSensor;
+    private FloatingActionButton bluetoothStatus;
+    private FloatingActionButton locationStatus;
     private Switch sensorSwitch;
-    private AzureHandler azureHandler;
 
 
     //Global Objects
@@ -58,11 +59,13 @@ public class SmogRecordActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         startSensor = (FloatingActionButton) findViewById(R.id.start_sensor);
         stopSensor = (FloatingActionButton) findViewById(R.id.stop_sensor);
+        bluetoothStatus = (FloatingActionButton) findViewById(R.id.bluetooth_status);
+        locationStatus = (FloatingActionButton) findViewById(R.id.location_status);
+        sensorStatusText = (TextView) findViewById(R.id.sensor_status_text);
         smog_text = (TextView) findViewById(R.id.smog_text);
         location_text = (TextView) findViewById(R.id.location_text);
         time_text = (TextView) findViewById(R.id.time_text);
         count_text = (TextView) findViewById(R.id.count_text);
-        thank_you_text = (TextView) findViewById(R.id.thank_you_text);
         location_image = (ImageView) findViewById(R.id.location_image);
         time_image = (ImageView) findViewById(R.id.time_image);
         sensorSwitch = (Switch) findViewById(R.id.switchButton);
@@ -83,7 +86,6 @@ public class SmogRecordActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 1);                         //Ask user for Manifest permission
-
 
 
         //Start integrator handler
@@ -114,7 +116,7 @@ public class SmogRecordActivity extends AppCompatActivity {
 
                 //Stop Integrator Handler
                 m_handler.removeCallbacks(getIntegrator);
-                thank_you_text.setText(getString(R.string.final_text));
+                //thank_you_text.setText(getString(R.string.final_text));
                 integrator.saveSQL();
 
                 Log.v("MainActivity", "Stopped Integrator.");
@@ -130,24 +132,24 @@ public class SmogRecordActivity extends AppCompatActivity {
 
                     if (BTService.getDeviceConnected()) {
                         sensorResponse = integrator.sensorEnable();
+                        sensorStatusText.setText("ON");
                     } else {
                         sensorResponse = false;
+                        sensorStatusText.setText("OFF");
+
                         Log.v("sensorSwitch listener", "Device isn't connected yet.");
                     }
 
-                sensorSwitch.setChecked(sensorResponse);
-
+                    sensorSwitch.setChecked(sensorResponse);
 
 
                 } else {
                     integrator.sensorDisable();
+                    sensorStatusText.setText("SENSOR OFF");
 
                 }
             }
         });
-        Log.v("hERE","HERE");
-
-
 
     }
 
@@ -164,7 +166,8 @@ public class SmogRecordActivity extends AppCompatActivity {
         @Override
         public void run() {
 
-            integrator.init(smog_text, location_text, time_text, count_text);
+            integrator.init(smog_text, location_text, time_text, count_text,
+                    bluetoothStatus,locationStatus,sensorStatusText,sensorSwitch);
 
             //Call again after delay of m_interval
             m_handler.postDelayed(getIntegrator,m_interval);

@@ -13,6 +13,15 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:textSize="22dp"
+            android:textColor="#ffffff"
+            android:text="OFF"
+            android:id="@+id/sensor_status_text"/>
+
         <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,12 +42,14 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
+            android:paddingTop="20dp"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:paddingLeft="25dp"
+                android:layout_marginLeft="25dp"
+
                 android:layout_height="wrap_content">
 
                 <ImageView
@@ -80,21 +91,22 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_weight=".9"
                 android:layout_height="wrap_content"
-                android:textSize="140dp"
+                android:textSize="150dp"
+                android:paddingLeft="20dp"
                 android:textAlignment="center"
                 android:id="@+id/smog_text" />
             <TextView
                 android:layout_width="0dp"
-                android:textStyle="italic"
                 android:layout_weight=".1"
                 android:layout_height="wrap_content"
-                android:textSize="17dp"
+                android:textSize="18dp"
                 android:textAlignment="center"
                 android:id="@+id/count_text" />
 
@@ -102,13 +114,7 @@
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:typeface="sans"
-        android:textStyle="italic"
-        android:textSize="17dp"
-        android:id="@+id/thank_you_text" />
+
 
 
 </LinearLayout>
