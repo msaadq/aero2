@@ -1,12 +1,7 @@
 ﻿import DataTraining as dt
-import Maps as map
 
-city_name = "Islamabad"
+data_train = dt.DataTraining()
 
-data_training = dt.DataTraining()
+#data_base.insert_multiple(data_base.PROP_TABLE_NAME, data_train._map_properties(data_train._save_all_properties("Islamabad")))
 
-all_coordinates = data_training._get_all_coordinates(map.get_corner_coordinates(city_name))
-
-
-for i in range(0, 100):
-    print data_training._calc_distance_on_unit_sphere(all_coordinates[i][0], all_coordinates[i][1], all_coordinates[i + 1][0], all_coordinates[i + 1][1])
+print data_train._map_properties(data_train._save_all_properties("Islamabad"))

@@ -15,7 +15,7 @@ class DataBaseLayer:
     # Default Columns for the tables
     SAMPLE_COLUMNS = "time, lat, long, alt, smog, normalized"
     RESULTS_COLUMNS = "time, lat, long, air_index"
-    PROP_COLUMNS = "time, lat, long, alt, r_index, i_index, sampled"
+    PROP_COLUMNS = "sampled, lat, long, r_index, i_index"
 
     # Threshold Values for Smog
     SMOG_MAX = 10000

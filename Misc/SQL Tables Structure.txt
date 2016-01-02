@@ -16,10 +16,8 @@
         
 3) PropertiesTable
     -Attributes:
-        0) time (number)
+        0) sampled (number)
         1) lat (number)
         2) long (number)
-        3) alt (number)
         3) r_index (number)
         4) i_index (number)
-        5) sampled (number)
