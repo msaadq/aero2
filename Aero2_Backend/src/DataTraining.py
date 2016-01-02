@@ -15,7 +15,9 @@ class DataTraining:
     DEFAULT_AIR_INDEX_INDEX = 3
     DEFAULT_R_INDEX_INDEX = 3
     DEFAULT_I_INDEX_INDEX = 4
-    DEFAULT_SAMPLED_INDEX = 5
+    DEFAULT_SAMPLED_INDEX = 0
+
+    maps = map.Maps()
 
     def __init__(self):
         pass
@@ -35,8 +37,7 @@ class DataTraining:
     '''
 
     def _save_all_properties(self, city_name):
-        return self._save_nodes_properties(
-            self._map_properties(self._get_all_coordinates(map.get_corner_points(city_name))))
+        return self._get_all_coordinates(self.maps.get_corner_coordinates(city_name))
 
     def _get_all_coordinates(self, corner_coordinates):
         nodes_coordinates = []
@@ -70,18 +71,14 @@ class DataTraining:
 
         return nodes_coordinates
 
-    @staticmethod
-    def _map_properties(nodes_coordinates, time_stamps):
+    def _map_properties(self, nodes_coordinates):
         output_table = []
 
         if nodes_coordinates == [[]]:
             return [[]]
 
-        i = 0
         for single_coordinates in nodes_coordinates:
-            output_table.append([single_coordinates, time_stamps[i], map.get_altitude(single_coordinates),
-                                map.get_road_index(single_coordinates), map.get_industry_index(single_coordinates)])
-            i += 1
+            output_table.append([0, single_coordinates[0], single_coordinates[1], self.maps.get_road_index(single_coordinates), self.maps.get_industry_index(single_coordinates)])
 
         return output_table
 
