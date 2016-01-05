@@ -1,6 +1,6 @@
 # AerO2
 
-''The project maps global regions that are ideal for athletes training and performance.''
+''Aer02 maps global regions that are ideal for athletes training and performance.''
 
 '''Description:'''
 The objective of Aer02 is to enhance the training and performance of athletes by suggesting regions around them that have ideal air content suited to their health needs. 
