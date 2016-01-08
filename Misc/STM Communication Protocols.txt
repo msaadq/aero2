@@ -1,0 +1,123 @@
+STM Communication Protocols with Mobile Application
+
+This software implements a very simple message queue framework of STM with Android Mobile Applications.  
+Applications include:
+
+	-Secured P2P communication over Bluetooth
+	-Authentication with the MCU directly from the Mobile Application
+	-Enabling and Disabling the sensors remotely
+	-Requesting the required Data and Receiving it in the desired format
+
+INSTALLATION
+------------
+
+	The user end API will not be made available for installation as it is only meant to be utilized by our application.
+
+USAGE
+-----
+
+	This extension is based on the idea of 3 Digit I/O commands appended after the Prefix which is either I or O depending on where the command is coming from. 'I' representing the Command by the MCU and 'O' being the commands from Application.
+
+	Following is the list of all the available commands along with their format:
+
+	'O' Commands:
+
+		-Availablility Enable / Disable
+		OAUT:1 / OAUT:0
+
+		-Set Username
+		OUSR:[Username (String)]
+
+		-Set Password
+		OPAS:[Password (String)]
+
+		-Enable / Disable Smog Sensor
+		ONSG:1 / ONSG:0
+
+		-Request Smog Sensor Data
+		OSSG:1
+
+		-Request Battery Percentage
+		OBAT:1
+
+
+	'I' Commands:
+
+		-Availablility Status
+		IAUT:[Enabled or Disabled (0 or 1)]
+
+		-Username Status
+		IUSR:[Authenticated or Disabled (0 or 1)]
+
+		-Password Status
+		IPAS:[Authenticated or Disabled (0 or 1)]
+
+		-Smog Sensor Status
+		INSG:[Enabled or Disabled (0 or 1)]
+
+		-Smog Sensor Data
+		ISSG:[Data Value]
+
+		-Battery Percentage
+		IBAT:[Percentage Value]
+
+
+Standard Operating Procedure (SOP) Examples
+-------------------------------------------
+
+	// Availablility
+
+	OAUT:1 -> IAUT:1
+	OAUT:0 -> IAUT:0
+
+
+	// Username Enter Correct AND IAUT:1
+
+	OUSR:saad -> IUSR:1
+
+
+	// Username Enter Incorrect OR IAUT:0
+
+	OUSR:hacker -> IUSR:0
+
+
+	// Password Enter Correct AND IUSR:1
+
+	OPAS:correct_password -> IPAS:1
+
+
+	// Password Enter Incorrect OR IUSR:0
+
+	OPAS:incorrect_password -> IPAS:0
+
+
+	// Request for Smog Sensor Enable AND IPAS:1
+
+	ONSG:1 -> INSG:1
+	ONSG:0 -> INSG:0
+
+
+	// Request for PPG Sensor Enable AND IPAS:0
+
+	ONSG:1 -> IPAS:0
+	ONSG:0 -> IPAS:0
+
+
+	// Request for PPG Sensor Data AND IPAS:1
+
+	OSSG:1 -> ISSG:334
+
+
+	// Request for PPG Sensor Data AND IPAS:0
+
+	OSSG:1 -> IPAS:0
+
+
+	// Request for Battery Percentage AND IPAS:1
+
+	OBAT:1 -> IBAT:98
+
+
+	// Request for PPG Sensor Data AND IPAS:0
+
+	OBAT:1 -> IPAS:0
