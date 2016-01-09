@@ -1,6 +1,7 @@
 Machine Learning Algorithm
 
 Routines:
+
 	-initialize:
 		-save_all_properties: city_name -> no_of_modifications
 			-get_corner_points: city_name -> Array[4][2] corners
