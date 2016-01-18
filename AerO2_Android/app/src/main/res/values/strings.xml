@@ -13,4 +13,11 @@
     <string name="open_bluetooth_settings">BLUETOOTH SETTINGS</string>
     <string name="bluetooth_network_not_enabled">This application requires bluetooth to be turned on.</string>
     <string name="gps_not_enabled">This applcation requires gps to be enabled. Please enable gps in the location settings.</string>
+
+    <string name="current_latitude_pref_key">com.android.aero2.CURRENT_LATITUDE</string>
+    <string name="current_longitutde_pref_key">com.android.aero2.CURRENT_LONGITUDE</string>
+
+    <string name="current_latitude">0</string>
+    <string name="current_longitude">0</string>
+
 </resources>

@@ -122,13 +122,13 @@ public class DBWriter {
 
         //Compute corner points
         double longRight = currLong + (horizontalInt/0.02)*longInterval;
-        Log.v("Value: "," "+longRight);
+        Log.v("Value: ","Logitude Right Limit "+longRight);
         double longLeft = currLong - (horizontalInt/0.02)*longInterval;
-        Log.v("Value: "," "+longLeft);
+        Log.v("Value: "," Longitude Left Limit"+longLeft);
         double latTop = currLat + (verticalInt/0.02)*latInterval;
-        Log.v("Value: "," "+latTop);
+        Log.v("Value: ","Latitude Top Limit "+latTop);
         double latBottom = currLat - (verticalInt/0.02)*latInterval;
-        Log.v("Value: "," "+latBottom);
+        Log.v("Value: ","Latitude Bottom Limit "+latBottom);
 
         if (mClient == null) {
             return;
@@ -144,7 +144,7 @@ public class DBWriter {
             Log.v("DBWriter retrieve","Data Captured.");
             for (ResultDataTable item:result) {
                 if(resultsSQLite.addResultValue(item)){
-                    Log.v("DBWriter retrieve","Insert success.");
+                    Log.v("DBWriter retrieve","Insert success."+item.getAirIndex()+" "+item.getLat()+" "+item.getLong());
                 }
                 else{
                     Log.v("DBWriter retrieve","Insert failed.");

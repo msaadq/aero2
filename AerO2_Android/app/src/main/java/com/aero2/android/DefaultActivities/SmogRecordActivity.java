@@ -54,7 +54,7 @@ public class SmogRecordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Log.v("Smog Record","Entered the Smog Record activity");
         //Instantiate UI Objects
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         startSensor = (FloatingActionButton) findViewById(R.id.start_sensor);
