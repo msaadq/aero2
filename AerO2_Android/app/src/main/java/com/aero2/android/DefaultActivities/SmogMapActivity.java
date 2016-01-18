@@ -16,18 +16,25 @@
 
 package com.aero2.android.DefaultActivities;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +45,9 @@ import com.aero2.android.DefaultActivities.Data.AirAzureDownloadService;
 import com.aero2.android.DefaultClasses.GPSTracker;
 import com.aero2.android.DefaultClasses.Integrator;
 import com.aero2.android.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -54,10 +64,13 @@ import java.util.List;
 /**
  * This shows how to draw polygons on a map.
  */
-public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     //************Variables related to Smog Map***************************************
 
+    GoogleMap googleMap;
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
     private static LatLng CURRENT_LAT_LONG;
     private static final int MAXIMUM_SMOG_VALUE = 1024;
 
@@ -78,6 +91,7 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.smog_map);
+        Log.v("Smog Map", "Entered the smog map activity");
         legendButton = (FloatingActionButton) findViewById(R.id.legend);
         recordActivityButtom = (FloatingActionButton) findViewById(R.id.record);
 
@@ -108,43 +122,18 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+        //START// New code that need to be verified if it works!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
+        //END// New code that need to be verified if it works!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-        Integrator integrator = new Integrator(SmogMapActivity.this);
-        Double[] newLocation;
-
-        boolean valid;
-
-        //Wait until gps values are correct
-        do {
-            newLocation = integrator.getLocation();
-            currLat = newLocation[0];
-            currLong = newLocation[1];
-
-            if (currLat == null || currLong == null) {
-                valid = false;
-            }
-            else{
-                valid = true;
-            }
-
-        } while(!valid);
-
-        Intent alarmIntent = new Intent(SmogMapActivity.this, AirAzureDownloadService.AlarmReceiver.class);
-        alarmIntent.putExtra(AirAzureDownloadService.CURRENT_LATITUDE, String.valueOf(33.735));
-        alarmIntent.putExtra(AirAzureDownloadService.CURRENT_LONGITUDE, String.valueOf(currLat));
-        alarmIntent.putExtra(AirAzureDownloadService.VERTICAL_INTERVAL, "4");
-        alarmIntent.putExtra(AirAzureDownloadService.HORIZONTAL_INTERVAL, "4");
-        alarmIntent.setAction(AirAzureDownloadService.DOWNLOAD_AZURE_AIR_DATA);
-        //Wrap in a pending intent which only fires once.
-        Log.v("OnCreate", "Alarm Intent Created");
-        PendingIntent pi = PendingIntent.getBroadcast(SmogMapActivity.this, 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);//getBroadcast(context, 0, i, 0);
-
-        AlarmManager am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-
-        Log.v("OnCreate", "AlarmManager Created");
-        //Set the AlarmManager to wake up the system.
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10, pi);
 
 
 
@@ -168,29 +157,17 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
 
         //MAP CAMERA
         //TODO: Ulti values of lat and long
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currLong, currLat), 17));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(72, 33), 17));
         map.getUiSettings().setZoomControlsEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
+        googleMap=map;
 /*
+ */
         //Using the simple cursor loader class to query the cache on a background thread
         SimpleCursorLoader simpleCursorLoader=new SimpleCursorLoader(getApplicationContext()) {
             @Override
             public Cursor loadInBackground() {
 
-                //Equivalent longitude & latitude of distance equal to 20m
-                final double longInterval = 0.000215901261691 ;
-                final double latInterval = 0.000179807875453;
-
-                //Compute corner points
-                //TODO: Change the inverted values of lat and long
-                double longRight = currLat + (horizontalInt/0.02)*longInterval;
-                Log.v("Value: "," "+longRight);
-                double longLeft = currLat - (horizontalInt/0.02)*longInterval;
-                Log.v("Value: "," "+longLeft);
-                double latTop = currLong + (verticalInt/0.02)*latInterval;
-                Log.v("Value: "," "+latTop);
-                double latBottom = currLong - (verticalInt/0.02)*latInterval;
-                Log.v("Value: "," "+latBottom);
 
                 //All this work is done in the background thread
                 AirAzureDbHelper airAzureDbHelper=new AirAzureDbHelper(getApplicationContext());
@@ -201,15 +178,6 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
                         AirAzureContract.AirAzureEntry.COLUMN_LAT,
                         AirAzureContract.AirAzureEntry.COLUMN_LONG
                 };
-
-                String[] selectionArgs = {String.valueOf(latTop),String.valueOf(latBottom),
-                        String.valueOf(longRight),String.valueOf(longLeft)};
-
-                String selection = AirAzureContract.AirAzureEntry.COLUMN_LAT + " < ? AND" +
-                        AirAzureContract.AirAzureEntry.COLUMN_LAT + " > ? AND" +
-                        AirAzureContract.AirAzureEntry.COLUMN_LONG + " < ? AND" +
-                        AirAzureContract.AirAzureEntry.COLUMN_LONG + " > ?";
-
                 Cursor mCursor;
                 mCursor=db.query(AirAzureContract.AirAzureEntry.TABLE_NAME,columns,null,null,null,null,null);
                 return mCursor;
@@ -253,11 +221,10 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
                     .build();
             map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
 
-    }*/
+    }
 
         //ENDS HERE
         //******************************** Setting up the overlay on the Map using the cursor *************************************
-
 
 
         //add a marker at the place the user is standing.
@@ -272,22 +239,87 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     //Gets WeightedLatLong list (weighted with air index values) for the heatmap
-    public List<WeightedLatLng> getListForHeatMap(Cursor cursor){
+    public List<WeightedLatLng> getListForHeatMap(Cursor cursor) {
         List<WeightedLatLng> list = new ArrayList<WeightedLatLng>();
-        WeightedLatLng[] weightedLatLng=new WeightedLatLng[cursor.getCount()];
-        Log.v("CusorLength:"," cursor length is "+cursor.getCount());
-        if(cursor.moveToFirst()) {
+        WeightedLatLng[] weightedLatLng = new WeightedLatLng[cursor.getCount()];
+        Log.v("CusorLength:", " cursor length is " + cursor.getCount());
+        if (cursor.moveToFirst()) {
 
             for (int i = 0; i < cursor.getCount(); i++) {
 
                 cursor.moveToPosition(i);
-                double random = Double.valueOf(cursor.getString(0));
-                weightedLatLng[i] = new WeightedLatLng(new LatLng(Double.valueOf(cursor.getString(1)), Double.valueOf(cursor.getString(2))), random);
+                weightedLatLng[i] = new WeightedLatLng(new LatLng(Double.valueOf(cursor.getString(1)),
+                        Double.valueOf(cursor.getString(2))),
+                        Double.valueOf(cursor.getString(0)));
                 //Log.v("RandomValue", "random smog value: " + random);
+                Log.v("Cursor",cursor.getString(0)+" "+cursor.getString(1)+" "+cursor.getString(2));
                 list.add(weightedLatLng[i]);
 
             }
         }
         return list;
+    }
+
+
+    @Override
+    protected void onStart() {
+        Log.v("onStart","Entered the onStart Function of the Smog Map Activity");
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.v("onConnected","Entered the onConnected function");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        while(mLastLocation==null) {
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+        }
+        currLat=mLastLocation.getLatitude();
+        currLong=mLastLocation.getLongitude();
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currLat,currLong),17));
+        Intent alarmIntent = new Intent(SmogMapActivity.this, AirAzureDownloadService.AlarmReceiver.class);
+        alarmIntent.putExtra(AirAzureDownloadService.CURRENT_LATITUDE, String.valueOf(currLat));
+        alarmIntent.putExtra(AirAzureDownloadService.CURRENT_LONGITUDE, String.valueOf(currLong));
+        alarmIntent.putExtra(AirAzureDownloadService.VERTICAL_INTERVAL, "4");
+        alarmIntent.putExtra(AirAzureDownloadService.HORIZONTAL_INTERVAL, "4");
+        alarmIntent.setAction(AirAzureDownloadService.DOWNLOAD_AZURE_AIR_DATA);
+        //Wrap in a pending intent which only fires once.
+        Log.v("OnCreate", "Alarm Intent Created");
+        PendingIntent pi = PendingIntent.getBroadcast(SmogMapActivity.this, 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);//getBroadcast(context, 0, i, 0);
+
+        AlarmManager am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+
+        Log.v("OnCreate", "AlarmManager Created");
+        //Set the AlarmManager to wake up the system.
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10, pi);
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 }

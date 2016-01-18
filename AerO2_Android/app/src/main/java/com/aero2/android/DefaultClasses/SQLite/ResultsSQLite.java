@@ -36,8 +36,8 @@ public class ResultsSQLite {
         ContentValues values=new ContentValues();
 
         values.put(AirAzureContract.AirAzureEntry.COLUMN_TIME,String.valueOf(result.getTime()));
-        values.put(AirAzureContract.AirAzureEntry.COLUMN_LONG,String.valueOf(result.getLat()));
-        values.put(AirAzureContract.AirAzureEntry.COLUMN_LAT, String.valueOf(result.getLong()));
+        values.put(AirAzureContract.AirAzureEntry.COLUMN_LONG,String.valueOf(result.getLong()));
+        values.put(AirAzureContract.AirAzureEntry.COLUMN_LAT, String.valueOf(result.getLat()));
         values.put(AirAzureContract.AirAzureEntry.COLUMN_AIR_INDEX, String.valueOf(result.getAirIndex()));
 
         long newRowId = db.insert(AirAzureContract.AirAzureEntry.TABLE_NAME, null, values);
