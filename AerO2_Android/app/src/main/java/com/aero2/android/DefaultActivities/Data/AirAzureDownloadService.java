@@ -5,9 +5,11 @@ import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.aero2.android.DefaultActivities.SmogMapActivity;
 import com.aero2.android.DefaultClasses.Azure.AzureHandler;
 
 
