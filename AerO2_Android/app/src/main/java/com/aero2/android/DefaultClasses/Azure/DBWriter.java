@@ -2,10 +2,13 @@ package com.aero2.android.DefaultClasses.Azure;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.aero2.android.DefaultActivities.Data.AirAzureDbHelper;
+import com.aero2.android.DefaultActivities.SmogMapActivity;
 import com.aero2.android.DefaultClasses.DataTables.ResultDataTable;
 import com.aero2.android.DefaultClasses.DataTables.SampleDataTable;
 import com.aero2.android.DefaultClasses.SQLite.ResultsSQLite;
@@ -141,7 +144,7 @@ public class DBWriter {
                     lt(latTop).and().field("lat").gt(latBottom).and().field("long").
                     lt(longRight).and().field("long").gt(longLeft).top(1000).execute().get();
 
-            Log.v("DBWriter retrieve","Data Captured.");
+            Log.v("DBWriter retrieve", "Data Captured.");
             for (ResultDataTable item:result) {
                 if(resultsSQLite.addResultValue(item)){
                     Log.v("DBWriter retrieve","Insert success."+item.getAirIndex()+" "+item.getLat()+" "+item.getLong());
@@ -151,6 +154,19 @@ public class DBWriter {
                 }
                 Log.v("Output:"," "+item.getLong());
             }
+            sqLiteDatabase.close();
+
+            /*
+               Once the service is completed set the SERVICE_COMPLETED variable in cache
+               to be true so that the activity can be refershed with the new data.
+             */
+            SharedPreferences serviceStatus=context.getSharedPreferences("SERVICE_COMPLETED",Context.MODE_WORLD_WRITEABLE);
+            SharedPreferences.Editor serviceStatusEdit=serviceStatus.edit();
+            serviceStatusEdit.putBoolean("SERVICE_COMPLETED", true);
+            serviceStatusEdit.commit();
+
+            //log that the service has completed
+            Log.v("Azure Download Servie", "Service Completed");
 
         }
         catch (Exception e){
