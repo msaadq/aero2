@@ -1,32 +1,23 @@
 package com.aero2.android.DefaultActivities.Data;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.aero2.android.DefaultActivities.SmogMapActivity;
 import com.aero2.android.DefaultClasses.Azure.AzureHandler;
+import com.aero2.android.R;
 
 
 public class AirAzureDownloadService extends IntentService {
-
-    public static final String DOWNLOAD_AZURE_AIR_DATA =
-            "com.aero2.android.DefaultActivities.Data.download.AZUREAIRDATA";
-    public static final String UPDATE_LOCAL_CACHE =
-            "com.aero2.android.DefaultActivities.Data.update.LOCALCACHE";
-    public static final String CURRENT_LATITUDE =
-            "com.aero2.android.DefaultActivities.Data.latitude.CURRENT";
-    public static final String CURRENT_LONGITUDE =
-            "com.aero2.android.DefaultActivities.Data.longitude.CURRENT";
-    public static final String VERTICAL_INTERVAL =
-            "com.aero2.android.DefaultActivities.Data.vertical.INTERVAL";
-    public static final String HORIZONTAL_INTERVAL =
-            "com.aero2.android.DefaultActivities.Data.horizontal.INTERVAL";
 
     public AirAzureDownloadService() {
         super("AirAzureDownloadService");
@@ -38,23 +29,40 @@ public class AirAzureDownloadService extends IntentService {
         if (intent != null) {
 
                 Log.v("HandleIntent","About to handle Action Download");
-                final String currLat = intent.getStringExtra(CURRENT_LATITUDE);
-                final String currLong = intent.getStringExtra(CURRENT_LONGITUDE);
-                final String verticalInt=intent.getStringExtra(VERTICAL_INTERVAL);
-                final String horizontalInt=intent.getStringExtra(HORIZONTAL_INTERVAL);
-                handleActionDownloadAzureAirData(currLat, currLong, verticalInt, horizontalInt);
+
+                handleActionDownloadAzureAirData();
         }
     }
 
-    private void handleActionDownloadAzureAirData(String currLat, String currLong,
-            String verticalInt, String horizontalInt) {
+    private void handleActionDownloadAzureAirData() {
+        NotificationCompat.Builder mBuilder =
+                (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Data AerO2")
+                        .setContentText("Starting Smog Data Download");
+        Intent resultIntent = new Intent(this, SmogMapActivity.class);
+
+        PendingIntent resultPendingIntent =
+                PendingIntent.getActivity(
+                        this,
+                        0,
+                        resultIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        int mNotificationId = 235;
+        NotificationManager mNotifyMgr =
+                (NotificationManager) this.getSystemService(this.NOTIFICATION_SERVICE);
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
 
         AzureHandler azureHandler;
-
+        SharedPreferences latSharedPref = getApplicationContext().getSharedPreferences("LatitudeAerO2", Context.MODE_PRIVATE);
+        SharedPreferences longSharedPref = getApplicationContext().getSharedPreferences("LongitudeAerO2", Context.MODE_PRIVATE);
+        double currLat = Double.valueOf(latSharedPref.getString("LatitudeAerO2", "33"));
+        double currLong = Double.valueOf(longSharedPref.getString("LongitudeAerO2", "72"));
         //Retrieves results from azure and saves in local storage
         azureHandler = new AzureHandler(this);
-        azureHandler.retrieveSamples(Double.valueOf(currLat),Double.valueOf(currLong),
-                Integer.parseInt(verticalInt),Integer.parseInt(horizontalInt), this);
+        azureHandler.retrieveSamples(currLat,currLong, 8, 8, this);
 
      }
 
@@ -64,15 +72,6 @@ public class AirAzureDownloadService extends IntentService {
         public void onReceive(Context context, Intent intent) {
             Log.v("AlarmReciever","Enter the AlarmReciever on Recieve Function");
             Intent sendIntent = new Intent(context, AirAzureDownloadService.class);
-            sendIntent.putExtra(AirAzureDownloadService.CURRENT_LATITUDE,
-                    intent.getStringExtra(AirAzureDownloadService.CURRENT_LATITUDE));
-            sendIntent.putExtra(AirAzureDownloadService.CURRENT_LONGITUDE,
-                    intent.getStringExtra(AirAzureDownloadService.CURRENT_LONGITUDE));
-            sendIntent.putExtra(AirAzureDownloadService.VERTICAL_INTERVAL,
-                    intent.getStringExtra(AirAzureDownloadService.VERTICAL_INTERVAL));
-            sendIntent.putExtra(AirAzureDownloadService.HORIZONTAL_INTERVAL,
-                    intent.getStringExtra(AirAzureDownloadService.HORIZONTAL_INTERVAL));
-
             sendIntent.setAction(intent.getAction());
             context.startService(sendIntent);
         }

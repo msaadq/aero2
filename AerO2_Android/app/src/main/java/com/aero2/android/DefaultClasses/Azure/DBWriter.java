@@ -1,10 +1,13 @@
 package com.aero2.android.DefaultClasses.Azure;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.aero2.android.DefaultActivities.Data.AirAzureDbHelper;
@@ -12,6 +15,7 @@ import com.aero2.android.DefaultActivities.SmogMapActivity;
 import com.aero2.android.DefaultClasses.DataTables.ResultDataTable;
 import com.aero2.android.DefaultClasses.DataTables.SampleDataTable;
 import com.aero2.android.DefaultClasses.SQLite.ResultsSQLite;
+import com.aero2.android.R;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceList;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
@@ -145,8 +149,51 @@ public class DBWriter {
                     lt(longRight).and().field("long").gt(longLeft).top(1000).execute().get();
 
             Log.v("DBWriter retrieve", "Data Captured.");
+            int i=1;
+            String dots="";
             for (ResultDataTable item:result) {
                 if(resultsSQLite.addResultValue(item)){
+                    if(i<10) {
+                        dots = " ";
+                        i++;
+                    }else if(i<20){
+                        dots=" . ";
+                        i++;
+                    }else if(i<30){
+                        dots=" . . ";
+                        i++;
+                    }else if(i<40){
+                        dots=" . . . ";
+                        i++;
+                    }else if(i<50){
+                        dots=" . . . . ";
+                        i++;
+                    }else if(i<60) {
+                        dots=" . . . . . ";
+                        i++;
+                    }else{
+                            i=1;
+                    }
+
+                    NotificationCompat.Builder mBuilder =
+                            (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                                    .setSmallIcon(R.mipmap.ic_launcher)
+                                    .setContentTitle("Data AerO2")
+                                    .setContentText("Downloading Smog Data" + dots);
+                    Intent resultIntent = new Intent(context, SmogMapActivity.class);
+
+                    PendingIntent resultPendingIntent =
+                            PendingIntent.getActivity(
+                                    context,
+                                    0,
+                                    resultIntent,
+                                    PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+                    mBuilder.setContentIntent(resultPendingIntent);
+                    int mNotificationId = 235;
+                    NotificationManager mNotifyMgr =
+                            (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                    mNotifyMgr.notify(mNotificationId, mBuilder.build());
                     Log.v("DBWriter retrieve","Insert success."+item.getAirIndex()+" "+item.getLat()+" "+item.getLong());
                 }
                 else{
