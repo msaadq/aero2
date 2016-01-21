@@ -34,23 +34,30 @@ class Maps:
 
         print(web_link)
 
-        index = 0
+        #index = 0
 
         source = urllib2.urlopen(web_link)
         tree = bs(source)
 
-        lat_results = tree.findAll('lat')
-        long_results = tree.findAll('lng')
+        results = tree.findAll('name')
+        results_text = [i.getText() for i in results]
 
-        for i in range(0, len(lat_results)):
-            index += self._calc_distance_on_unit_sphere(float(lat_results[i].getText()),
-                                                        float(long_results[i].getText()), float(origin[0]), float(origin[1]))
+ 
+        #lat_results = tree.findAll('lat')
+        #long_results = tree.findAll('lng')
 
-        index /= (float(len(lat_results)) * 100)
+        #for i in range(0, len(lat_results)):
+        #    index += self._calc_distance_on_unit_sphere(float(lat_results[i].getText()),
+        #                                                float(long_results[i].getText()), float(origin[0]), float(origin[1]))
+        
+        #index = len(lat_results)
+        
+        #if (index != 0):                                                
+        #    index /= (float(len(lat_results)) * 100)
 
-        print index
+        #return index
 
-        return index
+        return len(results_text)
 
     # Helper Function
     def calDuration(self, key, origin, destination, departure_time='now', traffic_model='best_guess'):
@@ -64,7 +71,7 @@ class Maps:
         web_link += '&origins=' + origin[0] + ',' + origin[1] + '&destinations=' + destination[0] + ','
         web_link += destination[1]
         # web_link += '&departure_time='+departure_time+'&traffic_model='+traffic_model
-
+        
         source = urllib2.urlopen(web_link)
         tree = bs(source)
         result = tree.findAll('distance')
@@ -101,41 +108,54 @@ class Maps:
         d2 = self.calDuration(key, origin, destination2)
         d3 = self.calDuration(key, origin, destination3)
         d4 = self.calDuration(key, origin, destination4)
-
-        print (d1 + d2 + d3 + d4) / 4
+        
         return str((d1 + d2 + d3 + d4) / 4)
 
     # Callable Function
-    def calData(self, key, origin, delta=0.5, increment=0.02):
+    def calData(self, key, origin, latInterval = 0.000179807875453, longInterval = 0.000215901261691):
         '''
-        Calculates traffic and industry information starting from
-        origin and up to delta.
+        KEYWORDS:
+        Area: Is the space consisting of points within latIntevral 
+        & longInterval
+        Corner: Is a point located at distance latIntveral or 
+        longInterval from origin
+        General Contractor: Is the length of General Contractors within
+        the area
+        Traffics: Is an estimate of traffic density at corner points 
+        
+        FUNCTION:
+        Calculates the number of general contractors and averaged traffic
+        density in a given area.
+        
+        INPUTS:
+        Key: Google API Key
+        Origin: Latitude and longitude stored in a list
+        latInterval: Equivalent latitude distance of a node in degrees
+        longInterval: Equivalent longitude distance of a node in degrees
+        
+        RETURNS:
+        General Contractors: int
+        Traffic: float 
         '''
 
-        origins1 = [(str(float(origin[0]) + i), origin[1]) for i in np.linspace(0, delta, delta / increment)]
-        origins2 = [(str(float(origin[0]) - i), origin[1]) for i in np.linspace(0, delta, delta / increment)]
-        origins3 = [(origin[0], str(float(origin[1]) + i)) for i in np.linspace(0, delta, delta / increment)]
-        origins4 = [(origin[0], str(float(origin[1]) + i)) for i in np.linspace(0, delta, delta / increment)]
+        corner1 = [(str(float(origin[0]) + latInterval), origin[1])]
+        corner2 = [(str(float(origin[0]) - latInterval), origin[1])]
+        corner3 = [(origin[0], str(float(origin[1]) + longInterval))] 
+        corner4 = [(origin[0], str(float(origin[1]) - longInterval))] 
+        corners = corner1 + corner2 + corner3 + corner4
 
-        origins = origins1 + origins2 + origins3 + origins4
-
-        general_contractors = [len(self.find_place(key, i, 'general_contractor')) for i in origins]
-        traffics = [self.call_traffic(key, i) for i in origins]
-
-        print general_contractors, traffics
+        general_contractors = self.find_place(key, origin, 'general_contractor')
+        
+        #Calculate traffic at all corners
+        traffics = [float(self.call_traffic(key, i)) for i in corners]
+        #Average traffic density
+        traffic = sum(traffics)/len(traffics)
+        print traffic
+        
+        return general_contractors, traffic
 
         # TO DO: Add timestamp here
-
-        df = pd.DataFrame({
-            'coordinates': origins,
-            'industries': general_contractors,
-            'traffic': traffics
-        })
-
-        df.to_csv('Data\data.csv')
-
-        return df
-
+        
     '''
     These functions need to be defined here
     '''
