@@ -19,6 +19,7 @@ package com.aero2.android.DefaultActivities;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -36,6 +37,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -61,6 +63,7 @@ import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.google.maps.android.heatmaps.WeightedLatLng;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -72,6 +75,9 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
     //************Variables related to Smog Map***************************************
 
     public GoogleMap googleMap;
+    public double mapLat;
+    public double mapLong;
+    public float mapZoom;
 
     //**********Variables related to date*********************************************
     GoogleApiClient mGoogleApiClient;
@@ -159,13 +165,15 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
         map.setContentDescription("Google Map with polygons.");
 
         //Retrieving the last known location from cache
-        SharedPreferences latSharedPref = getApplicationContext().getSharedPreferences("LatitudeAerO2", Context.MODE_PRIVATE);
-        SharedPreferences longSharedPref = getApplicationContext().getSharedPreferences("LongitudeAerO2", Context.MODE_PRIVATE);
-        currLat = Double.valueOf(latSharedPref.getString("LatitudeAerO2", "33"));
-        currLong = Double.valueOf(longSharedPref.getString("LongitudeAerO2", "72"));
+        SharedPreferences latSharedPref = getApplicationContext().getSharedPreferences("MapLatitudeAerO2", Context.MODE_PRIVATE);
+        SharedPreferences longSharedPref = getApplicationContext().getSharedPreferences("MapLongitudeAerO2", Context.MODE_PRIVATE);
+        SharedPreferences zoomPref = getApplicationContext().getSharedPreferences("MapZoomAerO2", Context.MODE_PRIVATE);
+        currLat = Double.valueOf(latSharedPref.getString("MapLatitudeAerO2", "33"));
+        currLong = Double.valueOf(longSharedPref.getString("MapLongitudeAerO2", "72"));
+        float zoom=Float.valueOf(zoomPref.getString("MapZoomAerO2","16"));
         googleMap = map;
         //Moving camera to last known location
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currLat, currLong), 16));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currLat, currLong), zoom));
         map.getUiSettings().setZoomControlsEnabled(true);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -305,12 +313,43 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        //Saving Current Map State
+        SharedPreferences latMapSharedPref = getApplicationContext().getSharedPreferences("MapLatitudeAerO2", Context.MODE_PRIVATE);
+        SharedPreferences longMapSharedPref = getApplicationContext().getSharedPreferences("MapLongitudeAerO2", Context.MODE_PRIVATE);
+        SharedPreferences zoomPref = getApplicationContext().getSharedPreferences("MapZoomAerO2", Context.MODE_PRIVATE);
+        SharedPreferences.Editor latMapEdit = latMapSharedPref.edit();
+        SharedPreferences.Editor longMapEdit = longMapSharedPref.edit();
+        SharedPreferences.Editor zoomPrefEdit=zoomPref.edit();
+        latMapEdit.putString("MapLatitudeAerO2", String.valueOf(mapLat));
+        latMapEdit.commit();
+        longMapEdit.putString("MapLongitudeAerO2", String.valueOf(mapLong));
+        longMapEdit.commit();
+        zoomPrefEdit.putString("MapZoomAerO2", String.valueOf(mapZoom));
+        zoomPrefEdit.commit();
+
+        //Saving Current Location data
+        SharedPreferences latSharedPref = getApplicationContext().getSharedPreferences("LatitudeAerO2", Context.MODE_PRIVATE);
+        SharedPreferences longSharedPref = getApplicationContext().getSharedPreferences("LongitudeAerO2", Context.MODE_PRIVATE);
+        SharedPreferences.Editor latEdit = latSharedPref.edit();
+        latEdit.putString("LatitudeAerO2", String.valueOf(currLat));
+        latEdit.commit();
+        SharedPreferences.Editor longEdit = longSharedPref.edit();
+        longEdit.putString("LongitudeAerO2", String.valueOf(currLong));
+        longEdit.commit();
+        Log.v(LOG_TAG,"Save Current map state");
+    }
+
+
+    @Override
     public void onConnected(Bundle bundle) {
         Log.v(LOG_TAG, "Entered the onConnected method");
         mLocationRequest = LocationRequest.create();
-        mLocationRequest.setInterval(5000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(7000);
+        mLocationRequest.setFastestInterval(7000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -357,30 +396,29 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
         currLat = location.getLatitude();
         currLong = location.getLongitude();
 
+        mapLat=googleMap.getCameraPosition().target.latitude;
+        mapLong=googleMap.getCameraPosition().target.longitude;
+        mapZoom=googleMap.getCameraPosition().zoom;
         /*
            storing the latest accurate know location in cache so that if location
            services are uavailable the last known location can be used.
         */
-        SharedPreferences latSharedPref = getApplicationContext().getSharedPreferences("LatitudeAerO2", Context.MODE_PRIVATE);
-        SharedPreferences longSharedPref = getApplicationContext().getSharedPreferences("LongitudeAerO2", Context.MODE_PRIVATE);
-        SharedPreferences.Editor latEdit = latSharedPref.edit();
-        latEdit.putString("LatitudeAerO2", String.valueOf(currLat));
-        latEdit.commit();
-        SharedPreferences.Editor longEdit = longSharedPref.edit();
-        longEdit.putString("LongitudeAerO2", String.valueOf(currLong));
-        longEdit.commit();
 
         Log.v(LOG_TAG, " " + currLat + " " + currLong);
 
         //if the Alarm hasn't been called once since the install of the app
         if (ALARM_NOT_CALLED) {
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currLat,currLong)));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currLat, currLong), 16));
             Intent alarmIntent = new Intent(SmogMapActivity.this, AirAzureDownloadService.AlarmReceiver.class);
-            alarmIntent.putExtra(AirAzureDownloadService.CURRENT_LATITUDE, String.valueOf(currLat));
-            alarmIntent.putExtra(AirAzureDownloadService.CURRENT_LONGITUDE, String.valueOf(currLong));
-            alarmIntent.putExtra(AirAzureDownloadService.VERTICAL_INTERVAL, "8");
-            alarmIntent.putExtra(AirAzureDownloadService.HORIZONTAL_INTERVAL, "8");
-            alarmIntent.setAction(AirAzureDownloadService.DOWNLOAD_AZURE_AIR_DATA);
+
+            SharedPreferences latSharedPref = getApplicationContext().getSharedPreferences("LatitudeAerO2", Context.MODE_PRIVATE);
+            SharedPreferences longSharedPref = getApplicationContext().getSharedPreferences("LongitudeAerO2", Context.MODE_PRIVATE);
+            SharedPreferences.Editor latEdit = latSharedPref.edit();
+            latEdit.putString("LatitudeAerO2", String.valueOf(currLat));
+            latEdit.commit();
+            SharedPreferences.Editor longEdit = longSharedPref.edit();
+            longEdit.putString("LongitudeAerO2", String.valueOf(currLong));
+            longEdit.commit();
             //Wrap in a pending intent which only fires once.
             Log.v("OnCreate", "Alarm Intent Created");
             PendingIntent pi = PendingIntent.getBroadcast(SmogMapActivity.this, 0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);//getBroadcast(context, 0, i, 0);
@@ -388,8 +426,20 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
             AlarmManager am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 
             Log.v("OnCreate", "AlarmManager Created");
-            //Set the AlarmManager to wake up the system.
-            am.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10000, AlarmManager.INTERVAL_DAY, pi);
+            //Set the AlarmManager to wake up the system every day at 6 a.m.
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.set(Calendar.HOUR_OF_DAY, 6);
+            long currentTime=System.currentTimeMillis();
+            long sixAM=calendar.getTimeInMillis();
+            long oneMin=60*1000;
+
+            am.setInexactRepeating(AlarmManager.RTC_WAKEUP, sixAM, AlarmManager.INTERVAL_DAY, pi);
+            if(((currentTime+oneMin)<sixAM)||(currentTime>sixAM)) {
+                Log.v(LOG_TAG,"First time download and time is not 6 a.m.");
+                Intent firstTimeDownloadIntent = new Intent(getApplicationContext(), AirAzureDownloadService.class);
+                startService(firstTimeDownloadIntent);
+            }
             SharedPreferences alarmPref = getApplicationContext().getSharedPreferences("ALARM_NOT_CALLED", Context.MODE_PRIVATE);
             SharedPreferences.Editor alarmPrefEditor = alarmPref.edit();
             alarmPrefEditor.putBoolean("ALARM_NOT_CALLED", false);
@@ -403,12 +453,47 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
 
         // has the service been completed ??
         if(SERVICE_COMPLRETED){
+            NotificationCompat.Builder mBuilder =
+                    (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setContentTitle("Data AerO2")
+                            .setContentText("Smog Data Download Complete");
+            Intent resultIntent = new Intent(this, SmogMapActivity.class);
+
+            PendingIntent resultPendingIntent =
+                    PendingIntent.getActivity(
+                            this,
+                            0,
+                            resultIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+            int mNotificationId = 235;
+            NotificationManager mNotifyMgr =
+                    (NotificationManager) this.getSystemService(this.NOTIFICATION_SERVICE);
+            mNotifyMgr.notify(mNotificationId, mBuilder.build());
             SharedPreferences.Editor serviceStatusEdit=serviceStatus.edit();
-            serviceStatusEdit.putBoolean("SERVICE_COMPLETED",false);
+            serviceStatusEdit.putBoolean("SERVICE_COMPLETED", false);
             serviceStatusEdit.commit();
 
-            //if the smog data download service has just completed restart the activity so that the refreshed map can be viewed
-            Intent intent=new Intent(getApplicationContext(),SmogMapActivity.class);
+            Toast.makeText(getApplicationContext(),"Smog data downloaded",Toast.LENGTH_SHORT).show();
+            SharedPreferences latSharedPref = getApplicationContext().getSharedPreferences("MapLatitudeAerO2", Context.MODE_PRIVATE);
+            SharedPreferences longSharedPref = getApplicationContext().getSharedPreferences("MapLongitudeAerO2", Context.MODE_PRIVATE);
+            SharedPreferences zoomPref = getApplicationContext().getSharedPreferences("MapZoomAerO2", Context.MODE_PRIVATE);
+            SharedPreferences.Editor latEdit = latSharedPref.edit();
+            SharedPreferences.Editor longEdit = longSharedPref.edit();
+            SharedPreferences.Editor zoomPrefEdit=zoomPref.edit();
+            latEdit.putString("MapLatitudeAerO2", String.valueOf(mapLat));
+            latEdit.commit();
+            longEdit.putString("MapLongitudeAerO2", String.valueOf(mapLong));
+            longEdit.commit();
+            zoomPrefEdit.putString("MapZoomAerO2", String.valueOf(mapZoom));
+            zoomPrefEdit.commit();
+            Intent intent = getIntent();
+            overridePendingTransition(0, 0);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            finish();
+            overridePendingTransition(0, 0);
             startActivity(intent);
         }
     }
@@ -429,7 +514,11 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
                     }
 
                     //once the permission to access fine location is granted restart the activity so that we can get the user's location
-                    Intent intent=new Intent(getApplicationContext(),SmogMapActivity.class);
+                    Intent intent = getIntent();
+                    overridePendingTransition(0, 0);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    finish();
+                    overridePendingTransition(0, 0);
                     startActivity(intent);
 
                 } else {
