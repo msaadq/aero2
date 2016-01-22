@@ -30,11 +30,38 @@ public class AirAzureDownloadService extends IntentService {
 
                 Log.v("HandleIntent","About to handle Action Download");
 
+                //making the alarm not called false as if we have reached this scope the alarm has been called.
+                SharedPreferences alarmPref = getApplicationContext().getSharedPreferences("ALARM_NOT_CALLED", Context.MODE_PRIVATE);
+                SharedPreferences.Editor alarmPrefEditor = alarmPref.edit();
+                alarmPrefEditor.putBoolean("ALARM_NOT_CALLED", false);
+                alarmPrefEditor.commit();
+
+                //handling download of smog data
                 handleActionDownloadAzureAirData();
         }
     }
 
     private void handleActionDownloadAzureAirData() {
+
+        //notifying the user of the download.
+        notifyUserOfDownload();
+
+        //Setting up classes for fetching data form azure cloud service
+        AzureHandler azureHandler;
+
+        //retrieving the latest known location from cache
+        SharedPreferences latSharedPref = getApplicationContext().getSharedPreferences("LatitudeAerO2", Context.MODE_PRIVATE);
+        SharedPreferences longSharedPref = getApplicationContext().getSharedPreferences("LongitudeAerO2", Context.MODE_PRIVATE);
+        double currLat = Double.valueOf(latSharedPref.getString("LatitudeAerO2", "33"));
+        double currLong = Double.valueOf(longSharedPref.getString("LongitudeAerO2", "72"));
+
+        //Retrieves results from azure and saves in local storage
+        azureHandler = new AzureHandler(this);
+        azureHandler.retrieveSamples(currLat,currLong, 8, 8, this);
+
+     }
+
+    public void notifyUserOfDownload(){
         NotificationCompat.Builder mBuilder =
                 (NotificationCompat.Builder) new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
@@ -54,17 +81,7 @@ public class AirAzureDownloadService extends IntentService {
         NotificationManager mNotifyMgr =
                 (NotificationManager) this.getSystemService(this.NOTIFICATION_SERVICE);
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
-
-        AzureHandler azureHandler;
-        SharedPreferences latSharedPref = getApplicationContext().getSharedPreferences("LatitudeAerO2", Context.MODE_PRIVATE);
-        SharedPreferences longSharedPref = getApplicationContext().getSharedPreferences("LongitudeAerO2", Context.MODE_PRIVATE);
-        double currLat = Double.valueOf(latSharedPref.getString("LatitudeAerO2", "33"));
-        double currLong = Double.valueOf(longSharedPref.getString("LongitudeAerO2", "72"));
-        //Retrieves results from azure and saves in local storage
-        azureHandler = new AzureHandler(this);
-        azureHandler.retrieveSamples(currLat,currLong, 8, 8, this);
-
-     }
+    }
 
     public static class AlarmReceiver extends BroadcastReceiver {
 
