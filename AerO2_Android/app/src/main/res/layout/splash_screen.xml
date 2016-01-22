@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="#ffffff"
+        android:id="@+id/splash_screen">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_launcher"
+            android:layout_gravity="center"
+            android:paddingBottom="50dp"
+            android:minHeight="200dp"
+            android:minWidth="100dp"
+            android:id="@+id/splash_icon"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AerO2"
+            android:layout_gravity="center"
+            android:paddingTop="50dp"
+            android:gravity="center"
+            android:textSize="30dp"
+            android:textColor="#00bfbc"
+            android:textStyle="bold"
+            android:typeface="normal"
+            android:id="@+id/splash_text"/>
+</LinearLayout>

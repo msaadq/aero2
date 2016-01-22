@@ -16,7 +16,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/map_layout">
 
     <fragment
         android:id="@+id/map"
@@ -25,6 +26,19 @@
         android:layout_height="match_parent"
         >
     </fragment>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/loading_tv"
+        android:gravity="center"
+        android:text="Loading smog data"
+        android:textColor="#00beed"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="30dp"
+        android:layout_above="@+id/progressBar"
+        android:layout_centerHorizontal="true" />
     <android.support.design.widget.FloatingActionButton android:id="@+id/legend"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
@@ -42,6 +56,16 @@
         android:contextClickable="false"
         android:tint="#ff0000"
         android:alpha="0.7" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:progressTintMode="add"
+        android:foregroundTintMode="screen" />
 
 
 </RelativeLayout>
