@@ -4,11 +4,24 @@ import pandas as pd
 
 data_base = dl.DataBaseLayer()
 map = maps.Maps()
-origin = []
 
 data = data_base.select_data("aero2.SampleDataTable")
-print data[0]
-origin.append(data[0][2])
-origin.append(data[0][1])
+origins = [[data[i][2], data[i][1]] for i in range(1,len(data))]
 
-df = map.calData(map.DEFAULT_GOOGLE_KEY_1,origin)
+info = [map.calData('AIzaSyCsVhDS_38NedVI7ZF37MOpkp7MbVxDDj8',origin) for origin in origins]
+industries = [info[i][0] for i in range(0,len(info))]
+traffic = [info[i][1] for i in range(0,len(info))]
+
+print industries
+print traffic 
+print info
+
+df = pd.DataFrame({
+    'coordinates': origins,
+    'industries': industries,
+    'traffic': traffic,
+    'smog':[data[i][4] for i in range(1,len(data))],
+    'time':[data[i][5] for i in range(1,len(data))]
+})
+
+df.to_csv('..\Data\data.csv')

@@ -13,6 +13,7 @@ class Maps:
     INDUSTRY_TYPE = 'chemicals'
     table_name = 'smogTable'
     partition_key = 'smogValues'
+    count = 0
 
     def __init__(self):
         pass
@@ -60,7 +61,7 @@ class Maps:
         return len(results_text)
 
     # Helper Function
-    def calDuration(self, key, origin, destination, departure_time='now', traffic_model='best_guess'):
+    def calTraffic(self, key, origin, destination, departure_time='now', traffic_model='best_guess'):
         """
         Calls Google Distance API and returns the duration/km.
         departure_time is number of seconds in int from December, 1970.
@@ -92,25 +93,6 @@ class Maps:
 
         return duration / distance
 
-    # Helper Function
-    def call_traffic(self, key, origin, increment=0.01):
-        '''
-        Estimates traffic by averaging duration over 4 different
-        directions from origin.
-        '''
-
-        destination1 = [str(float(origin[0]) + increment), origin[1]]
-        destination2 = [str(float(origin[0]) - increment), origin[1]]
-        destination3 = [origin[0], str(float(origin[1]) + increment)]
-        destination4 = [origin[0], str(float(origin[1]) - increment)]
-
-        d1 = self.calDuration(key, origin, destination1)
-        d2 = self.calDuration(key, origin, destination2)
-        d3 = self.calDuration(key, origin, destination3)
-        d4 = self.calDuration(key, origin, destination4)
-        
-        return str((d1 + d2 + d3 + d4) / 4)
-
     # Callable Function
     def calData(self, key, origin, latInterval = 0.000179807875453, longInterval = 0.000215901261691):
         '''
@@ -137,22 +119,31 @@ class Maps:
         General Contractors: int
         Traffic: float 
         '''
-
+       
         corner1 = [(str(float(origin[0]) + latInterval), origin[1])]
         corner2 = [(str(float(origin[0]) - latInterval), origin[1])]
         corner3 = [(origin[0], str(float(origin[1]) + longInterval))] 
         corner4 = [(origin[0], str(float(origin[1]) - longInterval))] 
         corners = corner1 + corner2 + corner3 + corner4
-
-        general_contractors = self.find_place(key, origin, 'general_contractor')
         
-        #Calculate traffic at all corners
-        traffics = [float(self.call_traffic(key, i)) for i in corners]
-        #Average traffic density
-        traffic = sum(traffics)/len(traffics)
-        print traffic
+        try:
+            general_contractors = self.find_place(key, origin, 'general_contractor')
+            
+            #Calculate traffic at all corners
+            traffics = [float(self.calTraffic(key, origin, i)) for i in corners]
+            #Average traffic density
+            traffic = sum(traffics)/len(traffics)
+        
+        except Exception as e:
+            general_contractors = 0
+            traffic = 0
+            print "Faced a problem with this link"
+        
+        Maps.count += 1
+        print Maps.count
         
         return general_contractors, traffic
+        
 
         # TO DO: Add timestamp here
         
@@ -168,7 +159,7 @@ class Maps:
 
         try:
             location = geo_locator.geocode(city_name)
-        except:
+        except Exception as e:
             return [[]]
 
         center_lat = round(location.latitude, 2)
@@ -185,11 +176,13 @@ class Maps:
         pass
 
     def get_road_index(self, node_coordinates):
-        return self.call_traffic('AIzaSyDRhcSUYbhG25wWSKRmvau1GuoXCnnjN8c', node_coordinates)
-
+        #return self.calTraffic('AIzaSyDRhcSUYbhG25wWSKRmvau1GuoXCnnjN8c', node_coordinates)
+        pass
+        
     def get_industry_index(self, node_coordinates):
-        return self.find_place(self.DEFAULT_GOOGLE_KEY_1, node_coordinates, self.INDUSTRY_TYPE)
-
+        #return self.find_place(self.DEFAULT_GOOGLE_KEY_1, node_coordinates, self.INDUSTRY_TYPE)
+        pass
+        
     def _calc_distance_on_unit_sphere(self, lat1, long1, lat2, long2):
 
         earth_radius = 6373.0
