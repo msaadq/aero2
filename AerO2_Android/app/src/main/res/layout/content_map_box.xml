@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.aero2.android.MapBoxActivity"
+    tools:showIn="@layout/activity_map_box">
+
+    <com.mapbox.mapboxsdk.views.MapView
+        android:id="@+id/mapboxMapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        mapbox:access_token="pk.eyJ1IjoibXVkZGFzc2lyMjM1IiwiYSI6ImNpanIwdTIzMjA2MjZ2YWx4MWFyODBrbHoifQ.9wJJ6vuiL6GnVyvOGaGrNA"
+        />
+    <android.support.design.widget.FloatingActionButton android:id="@+id/myLocation"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/fab_margin"
+        android:layout_marginLeft="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/record"
+        android:src="@drawable/go_to_my_location"
+        android:tint="#00af55"
+        app:backgroundTint="#ffffff"
+        android:adjustViewBounds="false"
+        android:elevation="2dp"
+        android:focusable="false"
+        android:cropToPadding="false" />
+
+    <android.support.design.widget.FloatingActionButton android:id="@+id/record"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/presence_online"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        app:backgroundTint="#48a8db"
+        android:contextClickable="false"
+        android:tint="#ff0055"
+        android:elevation="2dp" />
+</RelativeLayout>
