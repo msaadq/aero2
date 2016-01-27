@@ -63,6 +63,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -98,7 +99,7 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
     Double currLat, currLong;
 
     //UI ELEMENTS
-    private FloatingActionButton legendButton;
+    private FloatingActionButton currentLocationButton;
     private FloatingActionButton recordActivityButtom;
 
     //Status check booleans
@@ -122,29 +123,7 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
         showMapHideLoadingScreen();
 
         Log.v("Smog Map", "Entered the smog map activity");
-        legendButton = (FloatingActionButton) findViewById(R.id.legend);
         recordActivityButtom = (FloatingActionButton) findViewById(R.id.record);
-
-        legendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Add code for showing legend dialog here
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(SmogMapActivity.this);
-                builder.setPositiveButton("GOT IT", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User clicked OK button
-                    }
-                });
-                builder.setTitle("LEGEND AERO2 MAP");
-                builder.setView(R.layout.legend_layout);
-                // Create the AlertDialog
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
-
-
         recordActivityButtom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -220,11 +199,12 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
         // Override the default content description on the view, for accessibility mode.
         // Ideally this string would be localised.
         map.setContentDescription("Google Map with polygons.");
+        map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        map.getUiSettings().setTiltGesturesEnabled(false);
         googleMap = map;
         //Moving camera to last known location
         restorePreviousMapState();
 
-        map.getUiSettings().setZoomControlsEnabled(true);
 
         //if the user hasn't granted location permissions to the app
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -249,8 +229,15 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
             return;
         }
         map.setMyLocationEnabled(true);
-        map.getUiSettings().setMyLocationButtonEnabled(true);
-
+        map.getUiSettings().setMyLocationButtonEnabled(false);
+        currentLocationButton = (FloatingActionButton) findViewById(R.id.myLocation);
+        currentLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Add code for showing legend dialog here
+                moveCameraToMyLocation();
+            }
+        });
         //add heat map to the instance of google map
         addHeatMap(map);
 
@@ -432,6 +419,13 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
 
 
     }
+
+    //move map camera to the uers's current positon
+    private void moveCameraToMyLocation() {
+        LatLng latLng = new LatLng(googleMap.getMyLocation().getLatitude(), googleMap.getMyLocation().getLongitude());
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 16);
+        googleMap.animateCamera(cameraUpdate);
+    }
     //END// *******************  ALL MAP RELATED FUCTIONS  ********************************
 
 
@@ -528,7 +522,7 @@ public class SmogMapActivity extends AppCompatActivity implements OnMapReadyCall
     public void showLoadingScreen(){
         View mapFragment=(View) findViewById(R.id.map);
         mapFragment.setVisibility(View.GONE);
-        View button1=(View) findViewById(R.id.legend);
+        View button1=(View) findViewById(R.id.myLocation);
         View button2=(View) findViewById(R.id.record);
         View progressBar=(View) findViewById(R.id.progressBar);
         View loadingTV=(View) findViewById(R.id.loading_tv);

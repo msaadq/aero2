@@ -19,5 +19,6 @@
 
     <string name="current_latitude">0</string>
     <string name="current_longitude">0</string>
+    <string name="title_activity_map_box">MapBoxActivity</string>
 
 </resources>
