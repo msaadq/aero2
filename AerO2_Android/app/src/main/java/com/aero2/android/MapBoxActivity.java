@@ -5,7 +5,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +19,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.text.Html;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -26,7 +32,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.text.DecimalFormat;
 
+import com.aero2.android.DefaultClasses.Integrator;
+import com.aero2.android.DefaultClasses.MagicTextView;
 import com.aero2.android.DefaultClasses.SystemBarTintManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -37,13 +46,17 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.playlog.internal.LogEvent;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.views.MapView;
+
+import javax.crypto.Cipher;
 
 public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
@@ -82,6 +95,7 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
     private boolean permissionJustGranted;
     public TextView locationTextView;
     public boolean inRecordMode=false;
+    public MagicTextView smogTextView;
 
 
     @Override
@@ -89,7 +103,7 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_box);
         bindViews();
-        setOnClickListeners();
+
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addApi(Places.GEO_DATA_API)
@@ -101,6 +115,9 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
                 .build();
         mapView = (MapView) findViewById(R.id.mapboxMapView);
         mapView.setStyleUrl("mapbox://styles/muddassir235/cijqzvhxo00568zkqbk87dftn");
+
+        Log.v(LOG_TAG,getDisplayWidth(getApplicationContext())+" "+getDisplayHieght(getApplicationContext()));
+        mapView.setTiltEnabled(false);
         CoordinatorLayout coordinatorLayout=(CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         // Set the padding to match the Status Bar height
         coordinatorLayout.setPadding(0, -getStatusBarHeight(), 0, 0);
@@ -122,6 +139,7 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
         ploaceMarkerOnSelectedPlace();
         animateInAndOutOfFullScreen(250);
         ifMarkerHadBeenClickedDisableFullscreenAnimation();
+        setOnClickListeners();
 
     }
 
@@ -164,6 +182,7 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
             @Override
             public void onMapClick(@NonNull LatLng point) {
                 Log.v(LOG_TAG, "Entered the on clickListener of the map");
+                Log.v(LOG_TAG, " " + mapView.getMetersPerPixelAtLatitude(33));
                 if (locationButtonVisible && fullscreenInAndOutEnabled) {
                     final int amountToMoveLocationButtonDown = 0;
                     final int amountToMoveLocationButtonRight = 300;
@@ -388,6 +407,7 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
         CardView recordingCard=(CardView) findViewById(R.id.recordingSmogCard);
         recordingCard.setVisibility(View.INVISIBLE);
         locationTextView=(TextView) findViewById(R.id.locationTextView);
+        smogTextView=(MagicTextView) findViewById(R.id.smog_value_tv);
     }
 
     public void setOnClickListeners() {
@@ -395,12 +415,15 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
             @Override
             public void onClick(View v) {
                 moveCameraToMyLocation();
+                goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#52B5FF")));
             }
         });
         startRecordingSmog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 enterRecordMode();
+                mapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+                mapView.setAllGesturesEnabled(false);
                 startRecordingSmog.setVisibility(View.INVISIBLE);
                 stopRecordingSmog.setVisibility(View.VISIBLE);
             }
@@ -410,9 +433,34 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
             public void onClick(View v) {
                 exitRecordMode();
                 stopRecordingSmog.setVisibility(View.INVISIBLE);
+                mapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
+                mapView.setAllGesturesEnabled(true);
+                mapView.setTiltEnabled(false);
                 startRecordingSmog.setVisibility(View.VISIBLE);
             }
         });
+        mapView.setOnScrollListener(new MapView.OnScrollListener() {
+            @Override
+            public void onScroll() {
+                if (isTheMarkerOutside(getApplicationContext(), mapView.getLatLng(), mapView.getMyLocation().getLatitude(), mapView.getMyLocation().getLongitude(), mapView)) {
+                    goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#1AA130")));
+                } else {
+                    goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#52B5FF")));
+                }
+            }
+        });
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(isTheMarkerOutside(getApplicationContext(),mapView.getLatLng(),mapView.getMyLocation().getLatitude(),mapView.getMyLocation().getLongitude(),mapView)){
+                    goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#1AA130")));
+                }else{
+                    goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#52B5FF")));
+                }
+            }
+        }, 3000);
+
 
     }
 
@@ -636,7 +684,18 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
 
     @Override
     public void onLocationChanged(Location location) {
-        locationTextView.setText(location.getLatitude()+" "+location.getLongitude()+" "+location.getAltitude());
+        Double value=Math.random()*1000;
+        smogTextView.setText(String.valueOf(value.intValue()));
+        smogTextView.setTextColor(getColorFromSmogValue(1000, value));
+        Typeface myTypeface = Typeface.createFromAsset(getAssets(), "fonts/market.ttf");
+        smogTextView.setTypeface(myTypeface);
+        DecimalFormat decimalFormat=new DecimalFormat("#.###");
+        String lati=decimalFormat.format(location.getLatitude());
+        String longi=decimalFormat.format(location.getLongitude());
+        String latitude = "<b>" + "lat: " + "</b> " + lati;
+        String longitude = "<b>" + "lon: " + "</b> " + longi;
+
+        locationTextView.setText(Html.fromHtml(latitude+"&nbsp &nbsp &nbsp &nbsp;"+longitude));
     }
 
     @Override
@@ -942,5 +1001,71 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
             result = getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+    public int getColorFromSmogValue(double max, double value){
+        int red;
+        if(value>(max/2)){
+            red=255;
+        }else{
+            red= (int) ((value/(max/2))*255);
+        }
+        int green;
+        if(value<(max/2)){
+            green=255;
+        }else {
+            green = (int) (255 - (((value-(max/2)) / (max/2)) * 255));
+        }
+        int blue=20;
+        return Color.argb(255,red,green,blue);
+    }
+
+    int getDisplayWidth(Context context){
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return metrics.widthPixels;
+    }
+
+    int getDisplayHieght(Context context){
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return metrics.heightPixels;
+    }
+
+    Double distanceFromLatLongDiff(Double lat1,Double long1,Double lat2,Double long2){
+        double latMid, m_per_deg_lat, m_per_deg_lon, deltaLat, deltaLon,dist_m;
+
+        latMid = (lat1+lat2 )/2;  // or just use Lat1 for slightly less accurate estimate
+
+
+        m_per_deg_lat = 111132.954 - 559.822 * Math.cos( 2.0 * latMid ) + 1.175 * Math.cos( 4.0 * latMid);
+        m_per_deg_lon = (3.14159265359/180 ) * 6367449 * Math.cos ( latMid );
+
+        deltaLat = Math.abs(lat1 - lat2);
+        deltaLon = Math.abs(long1 - long2);
+
+        return Math.sqrt (  Math.pow( deltaLat * m_per_deg_lat,2) + Math.pow( deltaLon * m_per_deg_lon , 2) );
+    }
+
+    boolean isTheMarkerOutside(Context context,LatLng latLng1,Double lat2,Double long2,MapView mapView){
+        Double xDistance=Math.abs(distanceFromLatLongDiff(0.0,latLng1.getLongitude(),0.0,long2));
+        Double yDistance=Math.abs(distanceFromLatLongDiff(latLng1.getLatitude(), 0.0, lat2, 0.0));
+        Double distance=Math.abs(Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2)));
+        Double bearingAngleInRad=Math.abs(mapView.getBearing()*3.14159265359)/180;
+        Double totalAngle=bearingAngleInRad+Math.abs(Math.atan(yDistance / xDistance));
+        Double x=distance*Math.abs(Math.cos(totalAngle));
+        Double y=distance*Math.abs(Math.sin(totalAngle));
+        final double longInterval = 0.000215901261691 ;
+        final double latInterval = 0.000179807875453;
+        double latLngRatio=latInterval/longInterval;
+        Double metersPerPixelY=mapView.getMetersPerPixelAtLatitude(latLng1.getLatitude());
+        Double metersPerPixelX=metersPerPixelY/latLngRatio;
+        Double xPixels=x*(1/(metersPerPixelX+0.25*metersPerPixelX));
+        Double yPixels=y*(1/(metersPerPixelY+0.15*metersPerPixelY));
+        Log.v(LOG_TAG," "+mapView.getBearing());
+        if(xPixels>(getDisplayWidth(context)/2)||(yPixels>(getDisplayHieght(context)/2))){
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

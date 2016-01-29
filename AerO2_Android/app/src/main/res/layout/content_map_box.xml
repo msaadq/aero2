@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    xmlns:qwerjk="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -32,7 +33,7 @@
         android:tint="#00af55"
         app:backgroundTint="#ffffff"
         android:adjustViewBounds="false"
-        android:elevation="2dp"
+        app:elevation="1dp"
         android:focusable="false"
         android:cropToPadding="false" />
 
@@ -42,25 +43,25 @@
         android:src="@android:drawable/presence_online"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        app:backgroundTint="#48a8db"
+        app:backgroundTint="#FFEEAD"
         android:contextClickable="false"
-        android:tint="#ff0022"
-        android:elevation="2dp" />
+        android:tint="#EE4035"
+        app:elevation="1dp" />
     <android.support.design.widget.FloatingActionButton android:id="@+id/stopRecording"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/stop_recording_icon"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        app:backgroundTint="#48a8db"
+        app:backgroundTint="#FFEEAD"
         android:contextClickable="false"
-        android:tint="#ff0022"
-        android:elevation="2dp" />
+        android:tint="#EE4035"
+        app:elevation="1dp" />
     <android.support.v7.widget.CardView
         android:id="@+id/searchCardView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:elevation="100dp"
+        card_view:cardElevation="1dp"
         card_view:cardBackgroundColor="#ddffffff"
         card_view:cardCornerRadius="4dp"
         android:layout_marginTop="7dp"
@@ -81,8 +82,8 @@
         android:id="@+id/recordingSmogCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="0dp"
-        card_view:cardBackgroundColor="#ddffffff"
+        card_view:cardElevation="1dp"
+        card_view:cardBackgroundColor="#ddFFEEAD"
         card_view:cardCornerRadius="4dp"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="9dp"
@@ -100,7 +101,7 @@
             android:gravity="center"
             android:layout_gravity="bottom"
             android:padding="10dp"
-            android:textColor="#00af55" />
+            android:textColor="#000000" />
         <com.aero2.android.DefaultClasses.CustomDigitalClock
             android:id="@+id/fragment_clock_digital"
             android:layout_width="wrap_content"
@@ -109,8 +110,19 @@
             android:textSize="17dp"
             android:layout_gravity="end"
             android:padding="10dp"
-            android:textColor="#48a8db"
+            android:textColor="#000000"
             android:layout_centerHorizontal="true"/>
+        <com.aero2.android.DefaultClasses.MagicTextView
+
+            android:textSize="50sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            qwerjk:strokeColor="#FF000000"
+            qwerjk:strokeJoinStyle="miter"
+            qwerjk:strokeWidth="0.3dp"
+            android:layout_gravity="center"
+            android:text="Hey"
+            android:id="@+id/smog_value_tv" />
     </android.support.v7.widget.CardView>
 
 
