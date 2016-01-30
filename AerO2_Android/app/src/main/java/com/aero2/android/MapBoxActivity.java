@@ -1,6 +1,7 @@
 package com.aero2.android;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,23 +17,31 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.List;
 
 import com.aero2.android.DefaultClasses.Integrator;
 import com.aero2.android.DefaultClasses.MagicTextView;
@@ -58,7 +67,7 @@ import com.mapbox.mapboxsdk.views.MapView;
 
 import javax.crypto.Cipher;
 
-public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
+public class MapBoxActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
 
     private GoogleApiClient mGoogleApiClient;
@@ -96,6 +105,10 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
     public TextView locationTextView;
     public boolean inRecordMode=false;
     public MagicTextView smogTextView;
+    public ImageButton openDrawer;
+    public final int RESULTS_MAP_ID=1;
+    public final int SAMPLES_MAP_ID=2;
+    public int mapID;
 
 
     @Override
@@ -115,7 +128,7 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
                 .build();
         mapView = (MapView) findViewById(R.id.mapboxMapView);
         mapView.setStyleUrl("mapbox://styles/muddassir235/cijqzvhxo00568zkqbk87dftn");
-
+        mapID=RESULTS_MAP_ID;
         Log.v(LOG_TAG,getDisplayWidth(getApplicationContext())+" "+getDisplayHieght(getApplicationContext()));
         mapView.setTiltEnabled(false);
         CoordinatorLayout coordinatorLayout=(CoordinatorLayout) findViewById(R.id.coordinatorLayout);
@@ -131,7 +144,11 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
         tintManager.setStatusBarTintEnabled(true);
         // enable navigation bar tint
         tintManager.setNavigationBarTintEnabled(true);
-        tintManager.setTintColor(Color.parseColor("#220000FF"));
+        tintManager.setStatusBarAlpha(0.2f);
+        tintManager.setNavigationBarAlpha(0.2f);
+        tintManager.setTintAlpha(0.2f);
+        tintManager.setStatusBarTintResource(R.drawable.selected);
+        tintManager.setTintColor(Color.parseColor("#39ADCC"));
         checkForLocationPermission();
         mapView.setMyLocationEnabled(true);
         mapView.onCreate(savedInstanceState);
@@ -140,6 +157,9 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
         animateInAndOutOfFullScreen(250);
         ifMarkerHadBeenClickedDisableFullscreenAnimation();
         setOnClickListeners();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
     }
 
@@ -153,7 +173,10 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
                 // TODO: Get info about the selected place.
                 Log.i(LOG_TAG, "Place: " + place.getName());
                 LatLng mapboxLatLng = new LatLng(place.getLatLng().latitude, place.getLatLng().longitude);
-                moveCameraToSearchedLocation(mapboxLatLng);
+                Log.v(LOG_TAG, " " + place.getPlaceTypes());
+                Float zoom=getZoomLevelFromPlace(place);
+                Log.v(LOG_TAG," "+zoom);
+                moveCameraToSearchedLocation(mapboxLatLng, zoom);
                 mapView.addMarker(new MarkerOptions().position(mapboxLatLng).title((String) place.getName()).snippet((String) place.getAddress()));
 
             }
@@ -408,14 +431,23 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
         recordingCard.setVisibility(View.INVISIBLE);
         locationTextView=(TextView) findViewById(R.id.locationTextView);
         smogTextView=(MagicTextView) findViewById(R.id.smog_value_tv);
+        openDrawer=(ImageButton) findViewById(R.id.open_drawer);
     }
 
     public void setOnClickListeners() {
+        openDrawer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawerLayout);
+                drawer.openDrawer(GravityCompat.START);
+
+            }
+        });
         goToCurretntLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 moveCameraToMyLocation();
-                goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#52B5FF")));
+                goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#39ADCC")));
             }
         });
         startRecordingSmog.setOnClickListener(new View.OnClickListener() {
@@ -442,10 +474,16 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
         mapView.setOnScrollListener(new MapView.OnScrollListener() {
             @Override
             public void onScroll() {
-                if (isTheMarkerOutside(getApplicationContext(), mapView.getLatLng(), mapView.getMyLocation().getLatitude(), mapView.getMyLocation().getLongitude(), mapView)) {
-                    goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#1AA130")));
-                } else {
-                    goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#52B5FF")));
+                Location location = mapView.getMyLocation();
+                if (location != null) {
+                    Double latit = location.getLatitude();
+                    Double longitude = location.getLongitude();
+
+                    if (isTheMarkerOutside(getApplicationContext(), mapView.getLatLng(), latit, longitude, mapView)) {
+                        goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#779977")));
+                    } else {
+                        goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#39ADCC")));
+                    }
                 }
             }
         });
@@ -453,10 +491,16 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(isTheMarkerOutside(getApplicationContext(),mapView.getLatLng(),mapView.getMyLocation().getLatitude(),mapView.getMyLocation().getLongitude(),mapView)){
-                    goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#1AA130")));
-                }else{
-                    goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#52B5FF")));
+                Location location = mapView.getMyLocation();
+                if (location != null) {
+                    Double latit = location.getLatitude();
+                    Double longitude = location.getLongitude();
+
+                    if (isTheMarkerOutside(getApplicationContext(), mapView.getLatLng(), latit, longitude, mapView)) {
+                        goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#779977")));
+                    } else {
+                        goToCurretntLocation.setImageTintList(ColorStateList.valueOf(Color.parseColor("#39ADCC")));
+                    }
                 }
             }
         }, 3000);
@@ -474,8 +518,8 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     //move map camera to the uers's current positon
-    private void moveCameraToSearchedLocation(LatLng latLng) {
-        CameraPosition cameraPosition=new CameraPosition(latLng,10,0,0);
+    private void moveCameraToSearchedLocation(LatLng latLng,Float zoom) {
+        CameraPosition cameraPosition=new CameraPosition(latLng,zoom,0,0);
         CameraUpdateFactory cameraUpdateFactory=new CameraUpdateFactory();
         CameraUpdate cameraUpdate=cameraUpdateFactory.newCameraPosition(cameraPosition);
         mapView.animateCamera(cameraUpdate, 2000, null);
@@ -1002,6 +1046,7 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
         }
         return result;
     }
+
     public int getColorFromSmogValue(double max, double value){
         int red;
         if(value>(max/2)){
@@ -1016,7 +1061,7 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
             green = (int) (255 - (((value-(max/2)) / (max/2)) * 255));
         }
         int blue=20;
-        return Color.argb(255,red,green,blue);
+        return Color.argb(150,red,green,blue);
     }
 
     int getDisplayWidth(Context context){
@@ -1067,5 +1112,82 @@ public class MapBoxActivity extends AppCompatActivity implements GoogleApiClient
         {
             return false;
         }
+    }
+
+    Float getZoomLevelFromPlace(Place place){
+        Float zoom=-1f;
+        List<Integer> typeList=place.getPlaceTypes();
+        for(int i=0;i<typeList.size();i++){
+            if(zoom==-1f) {
+               if(typeList.get(i) == 1005){
+                   zoom=3f;
+               }else if(typeList.get(i)==1001){
+                   zoom=4.1f;
+               }else if(typeList.get(i)==1009){
+                   zoom=9f;
+               }else if(typeList.get(i)==34||typeList.get(i)==1023){
+                   zoom=12f;
+               }else if(typeList.get(i)==1020) {
+                   zoom = 13f;
+               }else if(typeList.get(i)==1011){
+                   zoom=14f;
+               }else if(typeList.get(i)==1013){
+                   return 15f;
+               }
+            }else{
+                if(typeList.get(i) == 1005){
+                    if(3f>zoom) {
+                        zoom = 3f;
+                    }
+                }else if(typeList.get(i)==1001){
+                    if(4.1f>zoom) {
+                        zoom = 4.1f;
+                    }
+                }else if(typeList.get(i)==1009){
+                    if(9f>zoom) {
+                        zoom = 9f;
+                    }
+                }else if(typeList.get(i)==34||typeList.get(i)==1023){
+                    if(12f>zoom) {
+                        zoom = 12f;
+                    }
+                }else if(typeList.get(i)==1020) {
+                    if(13f>zoom) {
+                        zoom = 13f;
+                    }
+                }else if(typeList.get(i)==1011){
+                    if(14f>zoom) {
+                        zoom = 14f;
+                    }
+                }else if(typeList.get(i)==1013){
+                    return 15f;
+                }
+            }
+        }
+        if(zoom!=-1f) {
+            return zoom;
+        }else{
+            return 17f;
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.result_map ){
+            if(mapID!=RESULTS_MAP_ID){
+                mapView.setStyleUrl("mapbox://styles/muddassir235/cijqzvhxo00568zkqbk87dftn");
+                mapID=RESULTS_MAP_ID;
+            }
+
+        } else if (id == R.id.sample_map) {
+            if(mapID!=SAMPLES_MAP_ID){
+                mapView.setStyleUrl("mapbox://styles/muddassir235/cijvht0ak00gb94kq6nseust5");
+                mapID=SAMPLES_MAP_ID;
+            }
+        }
+        return true;
     }
 }
