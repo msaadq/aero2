@@ -54,10 +54,14 @@ import com.aero2.android.DefaultClasses.MagicTextView;
 import com.aero2.android.DefaultClasses.SystemBarTintManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceLikelihood;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -122,6 +126,9 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
     boolean recordServiceCompleted;
     boolean firstTimeShowingSmogValue=true;
     boolean recordingServiceIsGoingOn=false;
+
+    long startTimeOfRecording;
+    long endTimeOfRecording;
 
 
     //Start//----------------------- ACTIVITY LIFECYCLE ------------------------------------------------------
@@ -258,6 +265,7 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
                 moveCameraToMyLocation();
                 recordService = new RecordService();
                 recordService.shouldContinue = true;
+                startTimeOfRecording=System.currentTimeMillis();
                 recordService.startRecording(getApplicationContext());
                 recordingServiceIsGoingOn = true;
                 startRecordingSmog.setVisibility(View.INVISIBLE);
@@ -292,18 +300,21 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
             public void onClick(View v) {
                 exitRecordMode();
                 recordService.shouldContinue=false;
+                endTimeOfRecording=System.currentTimeMillis();
+                long timeTakenForRecording=endTimeOfRecording-startTimeOfRecording;
                 int mNotificationId = 235;
                 NotificationManager mNotifyMgr =
                         (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 mNotifyMgr.cancel(mNotificationId);
+
 
                 checkForLocationPermission();
                 mapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
                 mapView.setAllGesturesEnabled(true);
                 mapView.setTiltEnabled(false);
 
-                firstTimeShowingSmogValue=true;
-                recordingServiceIsGoingOn=false;
+                firstTimeShowingSmogValue = true;
+                recordingServiceIsGoingOn = false;
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -315,8 +326,30 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
                         smogTextView.setText(" ___ ");
                     }
                 }, 1000);
-                Intent recordingCompleteActivityIntent=new Intent(getApplicationContext(),RecordingCompleteActivity.class);
-                startActivity(recordingCompleteActivityIntent);
+                final Intent recordingCompleteActivityIntent=new Intent(getApplicationContext(),RecordingCompleteActivity.class);
+                recordingCompleteActivityIntent.putExtra("TimeConsumed", timeTakenForRecording);
+
+                PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
+                        .getCurrentPlace(mGoogleApiClient, null);
+                result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+                    @Override
+                    public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                        float maxLikeliHood=0;
+                        CharSequence nameOfPlace="Place Undetectable";
+                        for (PlaceLikelihood placeLikelihood : likelyPlaces) {
+                            Log.i(LOG_TAG, String.format("Place '%s' has likelihood: %g",
+                                    placeLikelihood.getPlace().getName(),
+                                    placeLikelihood.getLikelihood()));
+                            if(placeLikelihood.getLikelihood()>maxLikeliHood){
+                                nameOfPlace=placeLikelihood.getPlace().getName();
+                            }
+                        }
+                        recordingCompleteActivityIntent.putExtra("NameOfPlace",nameOfPlace);
+                        startActivity(recordingCompleteActivityIntent);
+                        likelyPlaces.release();
+                    }
+                });
+
             }
         });
         mapView.setOnScrollListener(new MapView.OnScrollListener() {
@@ -444,6 +477,7 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
             public void onMapClick(@NonNull LatLng point) {
                 Log.v(LOG_TAG, "Entered the on clickListener of the map");
                 Log.v(LOG_TAG, " " + mapView.getMetersPerPixelAtLatitude(33));
+                Log.v(LOG_TAG," lat long : "+mapView.getLatLng().getLatitude()+" "+mapView.getLatLng().getLongitude());
                 if (locationButtonVisible && fullscreenInAndOutEnabled) {
                     final int amountToMoveLocationButtonDown = 0;
                     final int amountToMoveLocationButtonRight = 300;
@@ -1061,6 +1095,8 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
         // The directory is now empty so delete it
         return dir.delete();
     }
+
+
     //END//------------------------- DATA -----------------------------------------------------------
 
 
