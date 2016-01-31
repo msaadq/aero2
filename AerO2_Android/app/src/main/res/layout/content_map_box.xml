@@ -21,6 +21,12 @@
         mapbox:access_token="pk.eyJ1IjoibXVkZGFzc2lyMjM1IiwiYSI6ImNpanIwdTIzMjA2MjZ2YWx4MWFyODBrbHoifQ.9wJJ6vuiL6GnVyvOGaGrNA"
         />
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/waterScreen"
+        android:background="#FCFFE8" />
+
 
     <android.support.design.widget.FloatingActionButton android:id="@+id/myLocation"
         android:layout_width="wrap_content" android:layout_height="wrap_content"

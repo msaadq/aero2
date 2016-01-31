@@ -23,6 +23,9 @@ public class ResultsSQLite {
 
     }
 
+    public void closeDB(){
+        db.close();
+    }
 
     /**
      * Add a new value into local storage.
