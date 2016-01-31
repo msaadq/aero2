@@ -14,19 +14,14 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".DefaultActivities.SmogRecordActivity"
             android:label="@string/title_activity_test"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-
-
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".DefaultActivities.SmogMapActivity"
             android:label="@string/polygon_demo_label"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
-        </activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <service
             android:name=".DefaultActivities.Data.AirAzureDownloadService"
@@ -46,9 +41,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAhAq85IxiyyKcNLacUvFRvJ8gVDcyboU8"/>
+            android:value="AIzaSyAhAq85IxiyyKcNLacUvFRvJ8gVDcyboU8" />
+
+        <service
+            android:name=".DefaultActivities.Data.RecordService"
+            android:exported="false" />
+
+        <activity
+            android:name=".DefaultActivities.RecordingCompleteActivity"
+            android:label="@string/title_activity_recording_complete"
+            android:parentActivityName=".MapBoxActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.aero2.android.MapBoxActivity" />
+        </activity>
     </application>
 
 </manifest>

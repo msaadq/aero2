@@ -2,10 +2,15 @@ package com.aero2.android;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.IntentService;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Location;
@@ -27,13 +32,23 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.aero2.android.DefaultActivities.Data.AirAzureContract;
+import com.aero2.android.DefaultActivities.Data.AirAzureDbHelper;
+import com.aero2.android.DefaultActivities.Data.AirAzureDownloadService;
+import com.aero2.android.DefaultActivities.Data.RecordService;
+import com.aero2.android.DefaultActivities.RecordingCompleteActivity;
+import com.aero2.android.DefaultActivities.SimpleCursorLoader;
 import com.aero2.android.DefaultClasses.AerOUtilities;
 import com.aero2.android.DefaultClasses.MagicTextView;
 import com.aero2.android.DefaultClasses.SystemBarTintManager;
@@ -48,6 +63,8 @@ import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.PolygonOptions;
+import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -99,8 +116,12 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
     public TextView locationTextView;
     public MagicTextView smogTextView;
     public ImageButton openDrawer;
+    public ImageView waterScreen;
 
-
+    RecordService recordService;
+    boolean recordServiceCompleted;
+    boolean firstTimeShowingSmogValue=true;
+    boolean recordingServiceIsGoingOn=false;
 
 
     //Start//----------------------- ACTIVITY LIFECYCLE ------------------------------------------------------
@@ -169,6 +190,7 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
                 .addApi(LocationServices.API)
                 .enableAutoManage(this, this)
                 .build();
+        startUpScreen();
         setupMapForStart(savedInstanceState);
         setupStatusBar();
         ploaceMarkerOnSelectedPlace();
@@ -206,6 +228,7 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
         locationTextView=(TextView) findViewById(R.id.locationTextView);
         smogTextView=(MagicTextView) findViewById(R.id.smog_value_tv);
         openDrawer=(ImageButton) findViewById(R.id.open_drawer);
+        waterScreen=(ImageView) findViewById(R.id.waterScreen);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
@@ -230,23 +253,70 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
             @Override
             public void onClick(View v) {
                 enterRecordMode();
+                fadeInWaterScreen();
                 checkForLocationPermission();
-                mapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-                mapView.setAllGesturesEnabled(false);
+                moveCameraToMyLocation();
+                recordService = new RecordService();
+                recordService.shouldContinue = true;
+                recordService.startRecording(getApplicationContext());
+                recordingServiceIsGoingOn = true;
                 startRecordingSmog.setVisibility(View.INVISIBLE);
                 stopRecordingSmog.setVisibility(View.VISIBLE);
+                final Handler handler1 = new Handler();
+                handler1.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        checkForLocationPermission();
+                        mapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+                        final Handler handler2 = new Handler();
+                        handler2.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                fadeOutWaterScreen();
+
+                            }
+                        }, 2000);
+
+                        mapView.setAllGesturesEnabled(false);
+                        mapView.setStyleUrl("mapbox://styles/muddassir235/cik2moulv019bbpm3hlr90t6c");
+
+
+                    }
+                }, 1000);
             }
         });
         stopRecordingSmog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 exitRecordMode();
-                stopRecordingSmog.setVisibility(View.INVISIBLE);
+                recordService.shouldContinue=false;
+                int mNotificationId = 235;
+                NotificationManager mNotifyMgr =
+                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                mNotifyMgr.cancel(mNotificationId);
+
                 checkForLocationPermission();
                 mapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
                 mapView.setAllGesturesEnabled(true);
                 mapView.setTiltEnabled(false);
-                startRecordingSmog.setVisibility(View.VISIBLE);
+
+                firstTimeShowingSmogValue=true;
+                recordingServiceIsGoingOn=false;
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        stopRecordingSmog.setVisibility(View.INVISIBLE);
+                        startRecordingSmog.setVisibility(View.VISIBLE);
+                        mapView.setStyleUrl("mapbox://styles/muddassir235/cijqzvhxo00568zkqbk87dftn");
+                        smogTextView.setTextColor(Color.parseColor("#9939ADCC"));
+                        smogTextView.setText(" ___ ");
+                    }
+                }, 1000);
+                Intent recordingCompleteActivityIntent=new Intent(getApplicationContext(),RecordingCompleteActivity.class);
+                startActivity(recordingCompleteActivityIntent);
             }
         });
         mapView.setOnScrollListener(new MapView.OnScrollListener() {
@@ -330,9 +400,8 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
     //END//------------------------- VIEWS  -----------------------------------------------------------
 
 
-
     //START//------------------------- ANIMATION -----------------------------------------------------------
-    public void ploaceMarkerOnSelectedPlace(){
+    public void ploaceMarkerOnSelectedPlace() {
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
@@ -869,6 +938,31 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
         inRecordMode=false;
         fullscreenInAndOutEnabled =true;
     }
+
+    public void fadeInWaterScreen(){
+        AlphaAnimation animation = new AlphaAnimation(0f, 1.0f);
+        animation.setFillAfter(true);
+        animation.setDuration(900);
+        waterScreen.startAnimation(animation);
+    }
+
+    public void startUpScreen(){
+        waterScreen.setVisibility(View.VISIBLE);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                fadeOutWaterScreen();
+            }
+        }, 5000);
+    }
+
+    public void fadeOutWaterScreen(){
+        AlphaAnimation animation = new AlphaAnimation(1.0f, 0f);
+        animation.setFillAfter(true);
+        animation.setDuration(1000);
+        waterScreen.startAnimation(animation);
+    }
     //END//------------------------- ANIMATION -----------------------------------------------------------
 
 
@@ -990,11 +1084,25 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
 
     @Override
     public void onLocationChanged(Location location) {
-        Double value=Math.random()*1000;
-        smogTextView.setText(String.valueOf(value.intValue()));
-        smogTextView.setTextColor(AerOUtilities.getColorFromSmogValue(1000, value));
-        Typeface myTypeface = Typeface.createFromAsset(getAssets(), "fonts/market.ttf");
-        smogTextView.setTypeface(myTypeface);
+        SharedPreferences latSharedPref = getApplicationContext().getSharedPreferences("CurrentSmogValue", Context.MODE_PRIVATE);
+        String value=latSharedPref.getString("CurrentSmogValue",String.valueOf(-1));
+        if(!firstTimeShowingSmogValue&&recordingServiceIsGoingOn) {
+            smogTextView.setText(value);
+            smogTextView.setTextColor(AerOUtilities.getColorFromSmogValue(1000, Double.valueOf(value)));
+            Typeface myTypeface = Typeface.createFromAsset(getAssets(), "fonts/market.ttf");
+            smogTextView.setTypeface(myTypeface);
+        }else if(recordingServiceIsGoingOn){
+            smogTextView.setText(" ___ ");
+            smogTextView.setTextColor(Color.parseColor("#9939ADCC"));
+            Typeface myTypeface = Typeface.createFromAsset(getAssets(), "fonts/market.ttf");
+            smogTextView.setTypeface(myTypeface);
+            firstTimeShowingSmogValue=false;
+        }else{
+            smogTextView.setText(" ___ ");
+            smogTextView.setTextColor(Color.parseColor("#9939ADCC"));
+            Typeface myTypeface = Typeface.createFromAsset(getAssets(), "fonts/market.ttf");
+            smogTextView.setTypeface(myTypeface);
+        }
         DecimalFormat decimalFormat=new DecimalFormat("#.###");
         String lati=decimalFormat.format(location.getLatitude());
         String longi=decimalFormat.format(location.getLongitude());
@@ -1002,6 +1110,7 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
         String longitude = "<b>" + "lon: " + "</b> " + longi;
 
         locationTextView.setText(Html.fromHtml(latitude + "&nbsp &nbsp &nbsp &nbsp;" + longitude));
+
     }
 
     //request current location from the google play locations api
@@ -1009,7 +1118,7 @@ public class MapBoxActivity extends AppCompatActivity implements NavigationView.
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setInterval(2000);
         mLocationRequest.setFastestInterval(2000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         checkForLocationPermission();
 
