@@ -9,6 +9,8 @@ class GeoJson:
 
     '''
     Empty Constructor
+
+    @params: self
     '''
 
     def __init__(self):
