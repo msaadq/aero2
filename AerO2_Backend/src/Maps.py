@@ -9,63 +9,76 @@ class Maps:
     the Properties Table
     """
 
-    DEFAULT_GOOGLE_API_KEY = "AIzaSyAxC9UsA68-zYS6aSsjCG5Mi8WDYP3Dxd4"
-    INDUSTRY_DISTANCE_THRESHOLD = '1000'
-    INDUSTRY_TYPE = 'establishment'
+    GOOGLE_API_KEY = "AIzaSyB_th_xYmO9cXL74QGG0bb34D5vp15UxVc"
+    DEFAULT_ROAD_DISTANCE_THRESHOLD = 500
+    DEFAULT_INDUSTRY_DISTANCE_THRESHOLD = 1000
+    DEFAULT_INDUSTRY_TYPE = 'establishment'
+
+    INDUSTRY_KEYWORDS = ['industry', 'factory', 'manufacturing', 'chemical', 'refinery', 'bank', 'limited']
+
+    _google_maps = None
+    _google_places = None
+
+    _is_connected = False
 
     table_name = 'smogTable'
     partition_key = 'smogValues'
     count = 0
 
     def __init__(self):
-        pass
+        try:
+            self._google_maps = gmaps.Client(key=self.GOOGLE_API_KEY)
+            self._google_places = GooglePlaces(self.GOOGLE_API_KEY)
+            self._is_connected = True
+        except:
+            self._is_connected = False
 
     # Helper Function
-    def find_place(self, key, origin, p_type, radius=INDUSTRY_DISTANCE_THRESHOLD):
+    def get_industry_index(self, coordinates):
         """
         Calls Google Place API and returns the nearest place within
         the radius provided by user.
         Supported ptypes: https://developers.google.com/places/supported_types
 
-        :param key:
-        :param origin:
-        :param p_type:
-        :param radius:
+        :param coordinates:
 
-        :return no. of places:
+        :return industry_index:
         """
 
-        web_link = "https://maps.googleapis.com/maps/api/place/nearbysearch/xml?key=" + key
-        web_link += '&location=' + origin[0] + ',' + origin[1] + '&radius=' + radius + '&type=' + p_type
+        distances = []
+        intensities = []
+        index = 0.0
 
-        print(web_link)
+        nearby_industry_query = self._google_places.nearby_search(
+            lat_lng={'lat': coordinates[0], 'lng': coordinates[1]},
+            radius=self.DEFAULT_INDUSTRY_DISTANCE_THRESHOLD, types=[types.TYPE_ESTABLISHMENT])
 
-        # index = 0
+        for place in nearby_industry_query.places:
+            # Returned places from a query are place summaries.
+            lat = float(place.geo_location["lat"])
+            lng = float(place.geo_location["lng"])
+            name = str(place.name).lower()
+            distance = self.calc_distance_on_unit_sphere(coordinates[0], coordinates[1], lat, lng)
 
-        source = urllib2.urlopen(web_link)
-        tree = bs(source)
+            if distance > 20:
+                distances.append(self.calc_distance_on_unit_sphere(coordinates[0], coordinates[1], lat, lng))
+            else:
+                distances.append(1)
 
-        results = tree.findAll('name')
-        results_text = [i.getText() for i in results]
+            if any(substring in name for substring in self.INDUSTRY_KEYWORDS):
+                intensities.append(100.0)
+            else:
+                intensities.append(1.0)
 
-        # lat_results = tree.findAll('lat')
-        # long_results = tree.findAll('lng')
+        for x in range(0, len(distances)):
+            index += 10 * (intensities[x] / distances[x])
 
-        # for i in range(0, len(lat_results)):
-        #    index += self._calc_distance_on_unit_sphere(float(lat_results[i].getText()),
-        #                                                float(long_results[i].getText()), float(origin[0]), float(origin[1]))
+        return index
 
-        # index = len(lat_results)
+    def get_nearest_roads(self, coordinates):
+        pass
 
-        # if (index != 0):
-        #    index /= (float(len(lat_results)) * 100)
-
-        # return index
-
-        return len(results_text)
-
-    @staticmethod
-    def cal_traffic(key, origin, destination, departure_time='now', traffic_model='best_guess'):
+    def cal_traffic(self, key, origin, destination, departure_time='now', traffic_model='best_guess'):
         """
         Calls Google Distance API and returns the duration/km.
         departure_time is number of seconds in int from December, 1970.
@@ -143,19 +156,17 @@ class Maps:
 
         return general_contractors, traffic
 
-
-        # TO DO: Add timestamp here
-
     def get_corner_coordinates(self, city_name):
         """
         These functions need to be defined here
 
         :param city_name: (String)
+
+        :return corner_coordinates: (double[][])
         """
 
         try:
-            geocoder = gmaps.Client(key=self._DEFAULT_GOOGLE_API_KEY)
-            geocode_result = geocoder.geocode(city_name)
+            geocode_result = self._google_maps.geocode(city_name)
 
         except Exception as e:
             return [[]]
@@ -170,17 +181,12 @@ class Maps:
 
         return corner_coordinates
 
-
     def get_road_index(self, node_coordinates):
         # return self.calTraffic('AIzaSyDRhcSUYbhG25wWSKRmvau1GuoXCnnjN8c', node_coordinates)
         return 0
 
-    def get_industry_index(self, node_coordinates):
-        # return self.find_place(self.DEFAULT_GOOGLE_KEY_1, node_coordinates, self.INDUSTRY_TYPE)
-        return 0
-
     def get_altitude(self, node_coordinates):
-        return 0
+        return self._google_maps.elevation((node_coordinates[0], node_coordinates[1]))[0]['elevation']
 
     @staticmethod
     def calc_distance_on_unit_sphere(lat1, long1, lat2, long2):
