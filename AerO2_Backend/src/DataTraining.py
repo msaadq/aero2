@@ -56,15 +56,17 @@ class DataTraining:
         n_saved = 0
 
         all_coordinates = self._get_all_coordinates(self._maps.get_corner_coordinates(city_name))
-        all_coordinates = all_coordinates[:120]
-        print all_coordinates
 
-        t_len = len(all_coordinates)
+        # Debug Code
+        print "Total nodes for this city: " + str(len(all_coordinates))
+        all_coordinates = all_coordinates[:30]
+        #
 
         for coordinates in all_coordinates:
             final_table.append([0, coordinates[0], coordinates[1], self._maps.get_altitude(coordinates), 0,
                                 self._maps.get_road_index(coordinates), self._maps.get_industry_index(coordinates)])
 
+        t_len = len(all_coordinates)
         for i in range(0, t_len, 1000):
             if (t_len - i) > 1000:
                 max_index = 1000
@@ -110,8 +112,8 @@ class DataTraining:
 
         long_interval = (x2 - x1) / (self._maps.calc_distance_on_unit_sphere(y1, x1, y1, x2) / 20.0)
         lat_interval = (y2 - y1) / (self._maps.calc_distance_on_unit_sphere(y1, x1, y2, x1) / 20.0)
-        latitude = y2
 
+        latitude = y2
         while latitude > y1:
             longitude = x1
 

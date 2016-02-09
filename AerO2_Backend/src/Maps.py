@@ -1,6 +1,6 @@
 import googlemaps as gmaps
-
-import math
+from googleplaces import GooglePlaces, types, lang as gplaces
+import math as m
 
 
 class Maps:
@@ -9,10 +9,10 @@ class Maps:
     the Properties Table
     """
 
-    _DEFAULT_GOOGLE_API_KEY = "AIzaSyAxC9UsA68-zYS6aSsjCG5Mi8WDYP3Dxd4"
-
+    DEFAULT_GOOGLE_API_KEY = "AIzaSyAxC9UsA68-zYS6aSsjCG5Mi8WDYP3Dxd4"
     INDUSTRY_DISTANCE_THRESHOLD = '1000'
-    INDUSTRY_TYPE = 'chemicals'
+    INDUSTRY_TYPE = 'establishment'
+
     table_name = 'smogTable'
     partition_key = 'smogValues'
     count = 0
@@ -155,31 +155,21 @@ class Maps:
 
         try:
             geocoder = gmaps.Client(key=self._DEFAULT_GOOGLE_API_KEY)
-            geocode_result = geocoder.geocode('Islamabad')
+            geocode_result = geocoder.geocode(city_name)
 
-            location = geocode_result[0]['geometry']['location']
-            bounds = geocode_result[0]['geometry']['bounds']
-
-            north_east = [bounds['northeast']['lat'], bounds['northeast']['lng']]
-            south_west = [bounds['southwest']['lat'], bounds['southwest']['lng']]
         except Exception as e:
             return [[]]
-        
+
+        bounds = geocode_result[0]['geometry']['bounds']
         north_east = [bounds['northeast']['lat'], bounds['northeast']['lng']]
         south_west = [bounds['southwest']['lat'], bounds['southwest']['lng']]
 
-        center_lat = round(location['lat'], 3)
-        center_long = round(location['lng'], 3)
-
-        y1, y2, x1, x2 = round(center_lat + 0.05, 2), round(center_lat - 0.08, 2), round(center_long - 0.08, 2), round(
-            center_long + 0.07, 2)
+        y1, y2, x1, x2 = north_east[0], south_west[0], south_west[1], north_east[1]
 
         corner_coordinates = [[y1, x1], [y1, x2], [y2, x2], [y2, x1]]
 
         return corner_coordinates
 
-    def get_nearest_roads(self, node_coordinates):
-        pass
 
     def get_road_index(self, node_coordinates):
         # return self.calTraffic('AIzaSyDRhcSUYbhG25wWSKRmvau1GuoXCnnjN8c', node_coordinates)
@@ -196,7 +186,7 @@ class Maps:
     def calc_distance_on_unit_sphere(lat1, long1, lat2, long2):
 
         earth_radius = 6373000
-        degrees_to_radians = math.pi / 180.0
+        degrees_to_radians = m.pi / 180.0
 
         phi1 = (90.0 - lat1) * degrees_to_radians
         phi2 = (90.0 - lat2) * degrees_to_radians
@@ -204,7 +194,7 @@ class Maps:
         theta1 = long1 * degrees_to_radians
         theta2 = long2 * degrees_to_radians
 
-        cos = (math.sin(phi1) * math.sin(phi2) * math.cos(theta1 - theta2) + math.cos(phi1) * math.cos(phi2))
-        arc = math.acos(cos)
+        cos = (m.sin(phi1) * m.sin(phi2) * m.cos(theta1 - theta2) + m.cos(phi1) * m.cos(phi2))
+        arc = m.acos(cos)
 
         return arc * earth_radius
