@@ -58,15 +58,12 @@ class AzureSQLHandler:
 
         output_table = []
 
-        select_string = " SELECT " + select_params
-        from_string = " FROM " + table_name
+        select_string = " SELECT " + select_params + " FROM " + table_name
 
-        if not where_params:
-            self._cursor.execute(select_string + from_string)
-        else:
-            print("we have where_params = " + where_params)
-            where_string = " WHERE " + where_params
-            self._cursor.execute(select_string + from_string + where_string)
+        if where_params:
+            select_string += " WHERE " + where_params
+
+        self._cursor.execute(select_string)
 
         for row in self._cursor:
             output_table.append(row)
@@ -78,21 +75,39 @@ class AzureSQLHandler:
         Builds the SQL command from the string parameters and Inserts the row into the DB
 
         :param table_name: Table Name (String)
-        :param column_names: Column Names separated by ', ' (String)
-        :param values: Values separated by ', ' (String)
+        :param column_names: (Column Names separated by ', ') (String)
+        :param values: (Values separated by ', ') (String)
 
         :return Int:
         """
 
-        insert_string = " INSERT INTO " + table_name + column_names
-        value_string = " VALUES " + values
+        insert_string = " INSERT INTO " + table_name + " " + column_names + " VALUES " + values
 
-        rowcount = self._cursor.execute(insert_string + value_string).rowcount
+        rowcount = self._cursor.execute(insert_string).rowcount
         self._connection.commit()
 
-        if rowcount > 0:
-            return 1
-        return 0
+        return rowcount
+
+    def update_data(self, table_name, set_params, where_params=None):
+        """
+        Builds the SQL command from the string parameters and updates the row into the DB
+
+        :param table_name: Table Name (String)
+        :param set_params: <Column Names> = <Values> separated by ', ' (String)
+        :param where_params: Parameters for WHERE (String)
+
+        :return Int:
+        """
+
+        update_string = " UPDATE " + table_name + " SET " + set_params
+
+        if where_params:
+            update_string += " WHERE " + where_params
+
+        rowcount = self._cursor.execute(update_string).rowcount
+        self._connection.commit()
+
+        return rowcount
 
     def delete_data(self, table_name, where_params):
         """

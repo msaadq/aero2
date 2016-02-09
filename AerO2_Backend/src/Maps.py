@@ -1,7 +1,6 @@
+import googlemaps as gmaps
+
 import math
-from bs4 import BeautifulSoup as bs
-import urllib2
-from geopy.geocoders import Nominatim
 
 
 class Maps:
@@ -10,8 +9,8 @@ class Maps:
     the Properties Table
     """
 
-    DEFAULT_GOOGLE_KEY_1 = 'AIzaSyDRhcSUYbhG25wWSKRmvau1GuoXCnnjN8c'
-    DEFAULT_GOOGLE_KEY_2 = 'AIzaSyDKQ-7d3pejj3BxgdGusj3djD4ppwWtn2s'
+    _DEFAULT_GOOGLE_API_KEY = "AIzaSyAxC9UsA68-zYS6aSsjCG5Mi8WDYP3Dxd4"
+
     INDUSTRY_DISTANCE_THRESHOLD = '1000'
     INDUSTRY_TYPE = 'chemicals'
     table_name = 'smogTable'
@@ -41,7 +40,7 @@ class Maps:
 
         print(web_link)
 
-        #index = 0
+        # index = 0
 
         source = urllib2.urlopen(web_link)
         tree = bs(source)
@@ -49,19 +48,19 @@ class Maps:
         results = tree.findAll('name')
         results_text = [i.getText() for i in results]
 
-        #lat_results = tree.findAll('lat')
-        #long_results = tree.findAll('lng')
+        # lat_results = tree.findAll('lat')
+        # long_results = tree.findAll('lng')
 
-        #for i in range(0, len(lat_results)):
+        # for i in range(0, len(lat_results)):
         #    index += self._calc_distance_on_unit_sphere(float(lat_results[i].getText()),
         #                                                float(long_results[i].getText()), float(origin[0]), float(origin[1]))
 
-        #index = len(lat_results)
+        # index = len(lat_results)
 
-        #if (index != 0):
+        # if (index != 0):
         #    index /= (float(len(lat_results)) * 100)
 
-        #return index
+        # return index
 
         return len(results_text)
 
@@ -105,7 +104,7 @@ class Maps:
         return duration / distance
 
     # Callable Function
-    def cal_data(self, key, origin, latInterval = 0.000179807875453, longInterval = 0.000215901261691):
+    def cal_data(self, key, origin, latInterval=0.000179807875453, longInterval=0.000215901261691):
         """
         Calculates the number of general contractors and averaged traffic
         density in a given area.
@@ -129,10 +128,10 @@ class Maps:
         try:
             general_contractors = self.find_place(key, origin, 'general_contractor')
 
-            #Calculate traffic at all corners
+            # Calculate traffic at all corners
             traffics = [float(self.cal_traffic(key, origin, i)) for i in corners]
-            #Average traffic density
-            traffic = sum(traffics)/len(traffics)
+            # Average traffic density
+            traffic = sum(traffics) / len(traffics)
 
         except Exception as e:
             general_contractors = 0
@@ -147,23 +146,30 @@ class Maps:
 
         # TO DO: Add timestamp here
 
-    @staticmethod
-    def get_corner_coordinates(city_name):
+    def get_corner_coordinates(self, city_name):
         """
         These functions need to be defined here
 
         :param city_name: (String)
         """
 
-        geo_locator = Nominatim()
-
         try:
-            location = geo_locator.geocode(city_name)
+            geocoder = gmaps.Client(key=self._DEFAULT_GOOGLE_API_KEY)
+            geocode_result = geocoder.geocode('Islamabad')
+
+            location = geocode_result[0]['geometry']['location']
+            bounds = geocode_result[0]['geometry']['bounds']
+
+            north_east = [bounds['northeast']['lat'], bounds['northeast']['lng']]
+            south_west = [bounds['southwest']['lat'], bounds['southwest']['lng']]
         except Exception as e:
             return [[]]
+        
+        north_east = [bounds['northeast']['lat'], bounds['northeast']['lng']]
+        south_west = [bounds['southwest']['lat'], bounds['southwest']['lng']]
 
-        center_lat = round(location.latitude, 2)
-        center_long = round(location.longitude, 2)
+        center_lat = round(location['lat'], 3)
+        center_long = round(location['lng'], 3)
 
         y1, y2, x1, x2 = round(center_lat + 0.05, 2), round(center_lat - 0.08, 2), round(center_long - 0.08, 2), round(
             center_long + 0.07, 2)
@@ -176,16 +182,20 @@ class Maps:
         pass
 
     def get_road_index(self, node_coordinates):
-        #return self.calTraffic('AIzaSyDRhcSUYbhG25wWSKRmvau1GuoXCnnjN8c', node_coordinates)
-        pass
+        # return self.calTraffic('AIzaSyDRhcSUYbhG25wWSKRmvau1GuoXCnnjN8c', node_coordinates)
+        return 0
 
     def get_industry_index(self, node_coordinates):
-        #return self.find_place(self.DEFAULT_GOOGLE_KEY_1, node_coordinates, self.INDUSTRY_TYPE)
-        pass
+        # return self.find_place(self.DEFAULT_GOOGLE_KEY_1, node_coordinates, self.INDUSTRY_TYPE)
+        return 0
 
-    def _calc_distance_on_unit_sphere(self, lat1, long1, lat2, long2):
+    def get_altitude(self, node_coordinates):
+        return 0
 
-        earth_radius = 6373.0
+    @staticmethod
+    def calc_distance_on_unit_sphere(lat1, long1, lat2, long2):
+
+        earth_radius = 6373000
         degrees_to_radians = math.pi / 180.0
 
         phi1 = (90.0 - lat1) * degrees_to_radians

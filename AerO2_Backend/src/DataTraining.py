@@ -1,6 +1,6 @@
-import Maps as map
+import Maps as mp
 import DataBaseLayer as dbl
-import math
+
 
 class DataTraining:
     """
@@ -11,18 +11,10 @@ class DataTraining:
 
     VERIFICATION_THRESHOLD = 0.8
 
-    DEFAULT_TIME_INDEX = 0
-    DEFAULT_LAT_INDEX = 1
-    DEFAULT_LONG_INDEX = 2
-    DEFAULT_ALT_INDEX = 3
-    DEFAULT_SMOG_INDEX = 4
-    DEFAULT_NORMALIZED_INDEX = 5
-    DEFAULT_AIR_INDEX_INDEX = 3
-    DEFAULT_R_INDEX_INDEX = 3
-    DEFAULT_I_INDEX_INDEX = 4
-    DEFAULT_SAMPLED_INDEX = 0
+    _city_name = None
 
-    maps = map.Maps()
+    _maps = mp.Maps()
+    _data_base = dbl.DataBaseLayer()
 
     def __init__(self):
         """
@@ -33,53 +25,91 @@ class DataTraining:
 
     def initialize(self, city_name):
         """
-        Populates the Properties Table with data for a particular city. The recorded attributes are:
-        0) sampled (number)
-        1) lat (number)
-        2) long (number)
-        3) r_index (number)
-        4) i_index (number)
+        Deletes any previous entries for a city and populates fresh data in the Properties Table with data for a
+        particular city.
 
         :param city_name: City name (String)
 
         :return no_of_modifications: (Int)
         """
 
+        self._city_name = city_name
+        self._delete_city_data(city_name)
+
         return self._save_all_properties(city_name)
-
-    def update_database(self):
-        if self._normalize_all() > 0:
-            if self._train_system() > self.VERIFICATION_THRESHOLD:
-                return self._update_results()
-
-        return -1
 
     '''
     Functions inside initialize
     '''
 
     def _save_all_properties(self, city_name):
-        return self._get_all_coordinates(self.maps.get_corner_coordinates(city_name))
+        """
+        Populates properties data in the Properties Table with data for a
+        particular city after appending all the values.
+
+        :param city_name: City name (String)
+
+        :return no_of_modifications: (Int)
+        """
+
+        final_table = []
+        n_saved = 0
+
+        all_coordinates = self._get_all_coordinates(self._maps.get_corner_coordinates(city_name))
+        all_coordinates = all_coordinates[:120]
+        print all_coordinates
+
+        t_len = len(all_coordinates)
+
+        for coordinates in all_coordinates:
+            final_table.append([0, coordinates[0], coordinates[1], self._maps.get_altitude(coordinates), 0,
+                                self._maps.get_road_index(coordinates), self._maps.get_industry_index(coordinates)])
+
+        for i in range(0, t_len, 1000):
+            if (t_len - i) > 1000:
+                max_index = 1000
+            else:
+                max_index = t_len - i
+
+            n_saved += self._data_base.insert_multiple(self._data_base.PROP_TABLE_NAME, final_table[i:i + max_index],
+                                                       self._city_name)
+
+        return n_saved
+
+    def _delete_city_data(self, city_name):
+        """
+        Deletes all associated data of a city in the Properties Table
+
+        :param city_name:
+
+        :return: no_of_deletions:
+        """
+
+        return self._data_base.delete_data(self._data_base.PROP_TABLE_NAME,
+                                           self._data_base.key_value_string_gen('city', city_name))
 
     def _get_all_coordinates(self, corner_coordinates):
-        nodes_coordinates = []
+        """
+        Calculates all the node coordinates of a city, separated by 20m using its corner coordinates
 
+        :param corner_coordinates:
+
+        :return: all_coordinates:
+        """
+
+        nodes_coordinates = []
         if corner_coordinates == [[]]:
             return [[]]
 
         y1, y2, x1, x2 = corner_coordinates[0][0], corner_coordinates[2][0], corner_coordinates[0][1], \
                          corner_coordinates[2][1]
-
         if x1 > x2:
             x1, x2 = x2, x1
         if y1 > y2:
             y1, y2 = y2, y1
 
-        long_interval = (x2 - x1) / (self._calc_distance_on_unit_sphere(y1, x1, y1, x2) / 20.0)
-        lat_interval = (y2 - y1) / (self._calc_distance_on_unit_sphere(y1, x1, y2, x1) / 20.0)
-
-        print self._calc_distance_on_unit_sphere(y2, x1, y2, x1 + long_interval)
-
+        long_interval = (x2 - x1) / (self._maps.calc_distance_on_unit_sphere(y1, x1, y1, x2) / 20.0)
+        lat_interval = (y2 - y1) / (self._maps.calc_distance_on_unit_sphere(y1, x1, y2, x1) / 20.0)
         latitude = y2
 
         while latitude > y1:
@@ -93,24 +123,16 @@ class DataTraining:
 
         return nodes_coordinates
 
-    def _map_properties(self, nodes_coordinates):
-        output_table = []
+    '''
+    Update Function
+    '''
 
-        if nodes_coordinates == [[]]:
-            return [[]]
+    def update_database(self):
+        if self._normalize_all() > 0:
+            if self._train_system() > self.VERIFICATION_THRESHOLD:
+                return self._update_results()
 
-        for single_coordinates in nodes_coordinates:
-            output_table.append(
-                [0, single_coordinates[0], single_coordinates[1], self.maps.get_road_index(single_coordinates),
-                 self.maps.get_industry_index(single_coordinates)])
-
-        return output_table
-
-    def _save_nodes_properties(self, nodes_properties_table):
-        if nodes_properties_table == [[]]:
-            return 0
-
-        return self._database.insert_multiple(self._database.PROP_TABLE_NAME, nodes_properties_table)
+        return -1
 
     '''
     Functions inside update_database
@@ -171,19 +193,3 @@ class DataTraining:
     def _calc_distance_from_long(self, long_min, long_max, ref_lat):
         return self._calc_distance_on_unit_sphere(ref_lat, long_min, ref_lat, long_max)
 
-    @staticmethod
-    def _calc_distance_on_unit_sphere(lat1, long1, lat2, long2):
-
-        earth_radius = 6373000
-        degrees_to_radians = math.pi / 180.0
-
-        phi1 = (90.0 - lat1) * degrees_to_radians
-        phi2 = (90.0 - lat2) * degrees_to_radians
-
-        theta1 = long1 * degrees_to_radians
-        theta2 = long2 * degrees_to_radians
-
-        cos = (math.sin(phi1) * math.sin(phi2) * math.cos(theta1 - theta2) + math.cos(phi1) * math.cos(phi2))
-        arc = math.acos(cos)
-
-        return arc * earth_radius
