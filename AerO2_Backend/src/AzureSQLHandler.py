@@ -4,8 +4,8 @@ import pyodbc as dbc
 Azure SQL Database Handler uses SQL login credentials to connect and Interact with the Azure SQL DB
 '''
 
-class AzureSQLHandler:
 
+class AzureSQLHandler:
     DEFAULT_SQL_SERVER = "kezq6jecop"
     DEFAULT_USERNAME = "aero2"
     DEFAULT_PASSWORD = "h1pa33w0rD"
@@ -25,6 +25,7 @@ class AzureSQLHandler:
 	@params: self, Server Name (String), User Name (String), Password (String), Database Name (String)
 	@return: None
 	'''
+
     def __init__(self, server_name=DEFAULT_SQL_SERVER, username=DEFAULT_USERNAME, password=DEFAULT_PASSWORD,
                  database=DEFAULT_DATABASE_NAME):
         self._sql_server = server_name
@@ -35,9 +36,9 @@ class AzureSQLHandler:
         server_url = self._sql_server + ".database.windows.net,1433"
 
         self._connection = dbc.connect("DRIVER={SQL Server};SERVER=" + server_url,
-                                    user=self._username + "@" + self._sql_server,
-                                    password=self._password,
-                                    database=self._database_name)
+                                       user=self._username + "@" + self._sql_server,
+                                       password=self._password,
+                                       database=self._database_name)
         self._cursor = self._connection.cursor()
 
     '''
@@ -46,6 +47,7 @@ class AzureSQLHandler:
     @params: self, Parameters for SELECT (String), Table Name (String), Parameters for WHERE (String)
 	@return: Table (String[][])
     '''
+
     def select_data(self, table_name, select_params, where_params=None):
         output_table = []
 
@@ -70,6 +72,7 @@ class AzureSQLHandler:
     @params: self, Table Name (String), Column Names separated by ', ' (String), Values separated by ', ' (String)
 	@return: Int
     '''
+
     def insert_data(self, table_name, column_names, values):
         insert_string = " INSERT INTO " + table_name + column_names
         value_string = " VALUES " + values
@@ -87,6 +90,7 @@ class AzureSQLHandler:
     @params: self, Table Name (String), Parameters for WHERE (String)
 	@return: List (String[])
     '''
+
     def delete_data(self, table_name, where_params):
         delete_string = " DELETE FROM " + table_name
         where_string = " WHERE " + where_params
@@ -102,5 +106,6 @@ class AzureSQLHandler:
     @params: self
 	@return: None
     '''
+
     def close_connection(self):
         self._connection.close()

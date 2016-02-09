@@ -4,8 +4,8 @@
 Database Layer allows functions for accessing the SQL Database at a higher abstraction level and easy-access
 '''
 
-class DataBaseLayer:
 
+class DataBaseLayer:
     # Default Table names
     SAMPLE_TABLE_NAME = "aero2.SampleDataTable"
     RESULTS_TABLE_NAME = "aero2.ResultDataTable"
@@ -28,6 +28,7 @@ class DataBaseLayer:
     @params: self
     @return: None
     '''
+
     def __init__(self):
         self._sql_handler = sql.AzureSQLHandler()
 
@@ -37,6 +38,7 @@ class DataBaseLayer:
     @params: self, Table Name (String), Where String (String)
 	@return: Table (String[])
     '''
+
     def select_data(self, table_name, where_params=None):
         if not where_params:
             where_params = ""
@@ -48,13 +50,16 @@ class DataBaseLayer:
 
         if table_name == self.SAMPLE_TABLE_NAME:
             for row in rows_table:
-                data_table.append([str(row.time), str(row.lat), str(row.long), str(row.alt), str(row.smog), str(row.normalized)])
+                data_table.append(
+                    [str(row.time), str(row.lat), str(row.long), str(row.alt), str(row.smog), str(row.normalized)])
         elif table_name == self.RESULTS_TABLE_NAME:
             for row in rows_table:
                 data_table.append([str(row.time), str(row.lat), str(row.long), str(row.air_index)])
         elif table_name == self.PROP_TABLE_NAME:
             for row in rows_table:
-                data_table.append([str(row.time), str(row.lat), str(row.long), str(row.alt), str(row.r_index), str(row.i_index), str(row.sampled)])
+                data_table.append(
+                    [str(row.time), str(row.lat), str(row.long), str(row.alt), str(row.r_index), str(row.i_index),
+                     str(row.sampled)])
 
         return data_table
 
@@ -64,13 +69,14 @@ class DataBaseLayer:
     @params: self, Table Name (String), List of Data Values (String[])
 	@return: Int
     '''
+
     def insert_row(self, table_name, data_list):
         if table_name == self.SAMPLE_TABLE_NAME:
             columns_list = self.SAMPLE_COLUMNS
         elif table_name == self.RESULTS_TABLE_NAME:
             columns_list = self.RESULTS_COLUMNS
         elif table_name == self.PROP_TABLE_NAME:
-            columns_list = self.PROP_COLUMNS      
+            columns_list = self.PROP_COLUMNS
 
         columns_string = "(" + columns_list + ")"
         values_string = "(" + ",".join(data_list) + ")"
@@ -86,6 +92,7 @@ class DataBaseLayer:
     @params: self, Table Name (String), Table of Data Values (String[][])
 	@return: Int
     '''
+
     def insert_multiple(self, table_name, data_table):
         i = 0
         for data_list in data_table:
@@ -99,6 +106,7 @@ class DataBaseLayer:
     @params: self, Table Name (String), where_params
 	@return: Int
     '''
+
     def delete_data(self, table_name, where_params):
         return self._sql_handler.delete_data(table_name, where_params)
 
@@ -108,10 +116,10 @@ class DataBaseLayer:
     @params: self, key name, value
 	@return: String
     '''
+
     @staticmethod
     def key_value_string_gen(key, value):
         return key + " = " + str(float(value))
-
 
     '''
     where_param string generator for key range
@@ -119,6 +127,7 @@ class DataBaseLayer:
     @params: self, key name, Max value, Min value
 	@return: String
     '''
+
     @staticmethod
     def key_range_string_gen(key, min_value, max_value):
         return " " + key + " BETWEEN " + str(float(min_value)) + " AND " + str(
@@ -130,12 +139,13 @@ class DataBaseLayer:
     @params: self, Lat position, long position, X Y range
 	@return: String
     '''
+
     @staticmethod
     def nearby_string_gen(latitude_position, longitude_position, x_y_range):
         return "lat <= " + str(float(latitude_position + x_y_range)) + " AND  lat >= " + str(
-                float(latitude_position - x_y_range)) + " AND  long <= " + str(
-                float(longitude_position + x_y_range)) + " AND  lat >= " + str(
-                float(longitude_position - x_y_range))
+            float(latitude_position - x_y_range)) + " AND  long <= " + str(
+            float(longitude_position + x_y_range)) + " AND  lat >= " + str(
+            float(longitude_position - x_y_range))
 
     '''
     where_param string generator for different times
@@ -143,6 +153,7 @@ class DataBaseLayer:
     @params: self, date, start_time, end_time
 	@return: String
     '''
+
     @staticmethod
     def when_string_gen(date, start_time=None, end_time=None):
         if not start_time or not end_time:
@@ -156,6 +167,7 @@ class DataBaseLayer:
     @params: self, List of Data Values (String[])
 	@return: Int
     '''
+
     def _validate_data_values(self, data_list):
         if len(data_list[0]) != 13 or data_list[0][6] != '.':
             return False
@@ -182,5 +194,6 @@ class DataBaseLayer:
     @params: self
 	@return: None
     '''
+
     def close_connection(self):
         self._sql_handler.close_connection()

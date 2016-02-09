@@ -78,7 +78,9 @@ class DataTraining:
             return [[]]
 
         for single_coordinates in nodes_coordinates:
-            output_table.append([0, single_coordinates[0], single_coordinates[1], self.maps.get_road_index(single_coordinates), self.maps.get_industry_index(single_coordinates)])
+            output_table.append(
+                [0, single_coordinates[0], single_coordinates[1], self.maps.get_road_index(single_coordinates),
+                 self.maps.get_industry_index(single_coordinates)])
 
         return output_table
 
@@ -147,7 +149,8 @@ class DataTraining:
     def _calc_distance_from_long(self, long_min, long_max, ref_lat):
         return self._calc_distance_on_unit_sphere(ref_lat, long_min, ref_lat, long_max)
 
-    def _calc_distance_on_unit_sphere(self, lat1, long1, lat2, long2):
+    @staticmethod
+    def _calc_distance_on_unit_sphere(lat1, long1, lat2, long2):
 
         earth_radius = 6373000
         degrees_to_radians = math.pi / 180.0
