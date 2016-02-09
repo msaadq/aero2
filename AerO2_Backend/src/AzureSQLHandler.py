@@ -1,11 +1,11 @@
-import pyodbc as dbc
-
-'''
-Azure SQL Database Handler uses SQL login credentials to connect and Interact with the Azure SQL DB
-'''
+import pyodbc
 
 
 class AzureSQLHandler:
+    """
+    Azure SQL Database Handler uses SQL login credentials to connect and Interact with the Azure SQL DB
+    """
+
     DEFAULT_SQL_SERVER = "kezq6jecop"
     DEFAULT_USERNAME = "aero2"
     DEFAULT_PASSWORD = "h1pa33w0rD"
@@ -18,16 +18,20 @@ class AzureSQLHandler:
     _connection = None
     _cursor = None
 
-    '''
-	Connects to the Azure SQL server with either the default parameters or user-defined parameters
-	and sets the cursor
-    
-	@params: self, Server Name (String), User Name (String), Password (String), Database Name (String)
-	@return: None
-	'''
-
     def __init__(self, server_name=DEFAULT_SQL_SERVER, username=DEFAULT_USERNAME, password=DEFAULT_PASSWORD,
                  database=DEFAULT_DATABASE_NAME):
+        """
+        Connects to the Azure SQL server with either the default parameters or user-defined parameters
+        and sets the cursor
+
+        :param server_name: Server name (String)
+        :param username: User name (String)
+        :param password: Password (String)
+        :param database: Database name (String)
+
+        :return None
+        """
+
         self._sql_server = server_name
         self._username = username
         self._password = password
@@ -35,20 +39,23 @@ class AzureSQLHandler:
 
         server_url = self._sql_server + ".database.windows.net,1433"
 
-        self._connection = dbc.connect("DRIVER={SQL Server};SERVER=" + server_url,
-                                       user=self._username + "@" + self._sql_server,
-                                       password=self._password,
-                                       database=self._database_name)
+        self._connection = pyodbc.connect("DRIVER={SQL Server};SERVER=" + server_url,
+                                          user=self._username + "@" + self._sql_server,
+                                          password=self._password,
+                                          database=self._database_name)
         self._cursor = self._connection.cursor()
 
-    '''
-    Builds the SQL command from the string parameters, makes a SQL query and updates the cursor
-    
-    @params: self, Parameters for SELECT (String), Table Name (String), Parameters for WHERE (String)
-	@return: Table (String[][])
-    '''
-
     def select_data(self, table_name, select_params, where_params=None):
+        """
+        Builds the SQL command from the string parameters, makes a SQL query and updates the cursor
+
+        :param table_name: Table Name (String)
+        :param select_params: Parameters for SELECT (String)
+        :param where_params: Parameters for WHERE (String)
+
+        :return Table (String[][]):
+        """
+
         output_table = []
 
         select_string = " SELECT " + select_params
@@ -66,14 +73,17 @@ class AzureSQLHandler:
 
         return output_table
 
-    '''
-    Builds the SQL command from the string parameters and Inserts the row into the DB
-    
-    @params: self, Table Name (String), Column Names separated by ', ' (String), Values separated by ', ' (String)
-	@return: Int
-    '''
-
     def insert_data(self, table_name, column_names, values):
+        """
+        Builds the SQL command from the string parameters and Inserts the row into the DB
+
+        :param table_name: Table Name (String)
+        :param column_names: Column Names separated by ', ' (String)
+        :param values: Values separated by ', ' (String)
+
+        :return Int:
+        """
+
         insert_string = " INSERT INTO " + table_name + column_names
         value_string = " VALUES " + values
 
@@ -84,14 +94,16 @@ class AzureSQLHandler:
             return 1
         return 0
 
-    '''
-    Builds the SQL command from the string parameters and Deletes the row(s)
-    
-    @params: self, Table Name (String), Parameters for WHERE (String)
-	@return: List (String[])
-    '''
-
     def delete_data(self, table_name, where_params):
+        """
+        Builds the SQL command from the string parameters and Deletes the row(s)
+
+        :param table_name: Table Name (String)
+        :param where_params: Parameters for WHERE (String)
+
+        :return List (String[])
+        """
+
         delete_string = " DELETE FROM " + table_name
         where_string = " WHERE " + where_params
 
@@ -100,12 +112,11 @@ class AzureSQLHandler:
 
         return rowcount
 
-    '''
-    Closes the SQL connection
-    
-    @params: self
-	@return: None
-    '''
-
     def close_connection(self):
+        """
+        Closes the SQL connection
+
+        :return None
+        """
+
         self._connection.close()

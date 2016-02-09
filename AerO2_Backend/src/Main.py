@@ -1,7 +1,5 @@
-﻿import DataTraining as dt
+﻿import DataBaseLayer as dbl
 
-data_train = dt.DataTraining()
+data_base = dbl.DataBaseLayer()
 
-#data_base.insert_multiple(data_base.PROP_TABLE_NAME, data_train._map_properties(data_train._save_all_properties("Islamabad")))
-
-print "Hello World"
+print data_base.select_data(data_base.SAMPLE_TABLE_NAME, data_base.key_range_string_gen("smog", 300, 320))

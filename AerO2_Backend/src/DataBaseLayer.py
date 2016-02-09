@@ -1,11 +1,33 @@
 ﻿import AzureSQLHandler as sql
 
-'''
-Database Layer allows functions for accessing the SQL Database at a higher abstraction level and easy-access
-'''
-
 
 class DataBaseLayer:
+    """
+    Database Layer allows functions for accessing the SQL Database at a higher abstraction level and easy-access
+
+    The structure of the SQL Tables are as follows:
+        1) SampleDataTable
+            0) time (number)
+            1) lat (number)
+            2) long (number)
+            3) alt (number)
+            4) smog (number)
+            5) normalized (number)
+
+        2) ResultsDataTable
+            0) time (number)
+            1) lat (number)
+            2) long (number)
+            3) air_index (number)
+
+        3) PropertiesTable
+            0) sampled (number)
+            1) lat (number)
+            2) long (number)
+            3) r_index (number)
+            4) i_index (number)
+    """
+    
     # Default Table names
     SAMPLE_TABLE_NAME = "aero2.SampleDataTable"
     RESULTS_TABLE_NAME = "aero2.ResultDataTable"
@@ -18,28 +40,29 @@ class DataBaseLayer:
 
     # Threshold Values for Smog
     SMOG_MAX = 10000
-    SMOG_MIN = -10
+    SMOG_MIN = -1
 
     _sql_handler = None
 
-    '''
-    Connects to the Azure SQL server using the AzureSQLHandler class
-    
-    @params: self
-    @return: None
-    '''
-
     def __init__(self):
+        """
+        Connects to the Azure SQL server using the AzureSQLHandler class
+
+        :return None:
+        """
+        
         self._sql_handler = sql.AzureSQLHandler()
 
-    '''
-    Selects the table according to the where_params
-    
-    @params: self, Table Name (String), Where String (String)
-	@return: Table (String[])
-    '''
-
     def select_data(self, table_name, where_params=None):
+        """
+        Selects the table according to the where_params
+
+        :param table_name: Table Name (String)
+        :param where_params: Where Params (String)
+
+        :return data_table: Table (String[])
+        """
+
         if not where_params:
             where_params = ""
 
@@ -63,14 +86,16 @@ class DataBaseLayer:
 
         return data_table
 
-    '''
-    Inserts a new row into the DB table
-    
-    @params: self, Table Name (String), List of Data Values (String[])
-	@return: Int
-    '''
-
     def insert_row(self, table_name, data_list):
+        """
+        Inserts a new row into the DB table
+
+        :param table_name: Table Name (String)
+        :param data_list: Data List in formatted order (double[])
+
+        :return int:
+        """
+
         if table_name == self.SAMPLE_TABLE_NAME:
             columns_list = self.SAMPLE_COLUMNS
         elif table_name == self.RESULTS_TABLE_NAME:
@@ -86,89 +111,105 @@ class DataBaseLayer:
 
         return 0
 
-    '''
-    Inserts multiple rows into the DB table
-    
-    @params: self, Table Name (String), Table of Data Values (String[][])
-	@return: Int
-    '''
-
     def insert_multiple(self, table_name, data_table):
+        """
+        Inserts multiple rows into the DB table
+
+        :param table_name: Table Name (String)
+        :param data_table: Table of Data Values (String[][])
+
+        :return Int:
+        """
+
         i = 0
         for data_list in data_table:
             i += self.insert_row(table_name, data_list)
 
         return i
 
-    '''
-    Deletes rows according to the specified condition(s)
-    
-    @params: self, Table Name (String), where_params
-	@return: Int
-    '''
-
     def delete_data(self, table_name, where_params):
-        return self._sql_handler.delete_data(table_name, where_params)
+        """
+        Deletes rows according to the specified condition(s)
 
-    '''
-    where_param string generator for key value
-    
-    @params: self, key name, value
-	@return: String
-    '''
+        :param table_name: Table Name (String)
+        :param where_params: Where Params (String)
+
+        :return Int:
+        """
+
+        return self._sql_handler.delete_data(table_name, where_params)
 
     @staticmethod
     def key_value_string_gen(key, value):
-        return key + " = " + str(float(value))
+        """
+        where_param string generator for key value
 
-    '''
-    where_param string generator for key range
-    
-    @params: self, key name, Max value, Min value
-	@return: String
-    '''
+        :param key: key name (String)
+        :param value: the required value for key (String)
+
+        :return String:
+        """
+
+        return key + " = " + str(float(value))
 
     @staticmethod
     def key_range_string_gen(key, min_value, max_value):
+        """
+        where_param string generator for key range
+
+        :param key: key name (String)
+        :param min_value: Max value
+        :param max_value: Min value
+
+        :return String:
+        """
+
         return " " + key + " BETWEEN " + str(float(min_value)) + " AND " + str(
             float(max_value))
 
-    '''
-    where_param string generator for nearby location
-    
-    @params: self, Lat position, long position, X Y range
-	@return: String
-    '''
-
     @staticmethod
     def nearby_string_gen(latitude_position, longitude_position, x_y_range):
+        """
+        where_param string generator for nearby location
+
+        :param latitude_position:
+        :param longitude_position:
+        :param x_y_range:
+
+        :return String:
+        """
+
         return "lat <= " + str(float(latitude_position + x_y_range)) + " AND  lat >= " + str(
             float(latitude_position - x_y_range)) + " AND  long <= " + str(
             float(longitude_position + x_y_range)) + " AND  lat >= " + str(
             float(longitude_position - x_y_range))
 
-    '''
-    where_param string generator for different times
-    
-    @params: self, date, start_time, end_time
-	@return: String
-    '''
-
     @staticmethod
     def when_string_gen(date, start_time=None, end_time=None):
+        """
+        where_param string generator for different times
+
+        :param date:
+        :param start_time:
+        :param end_time:
+
+        :return String:
+        """
+
         if not start_time or not end_time:
             return DataBaseLayer.key_range_string_gen('time', float(date), float(date) + 1.0)
 
         return DataBaseLayer.key_range_string_gen('time', float(date + "." + start_time), float(date + "." + end_time))
 
-    '''
-    Validates values provided in the insert function
-    
-    @params: self, List of Data Values (String[])
-	@return: Int
-    '''
-
     def _validate_data_values(self, data_list):
+        """
+        Validates values provided in the insert function. If values do not comply, then they are discarded
+
+        :param data_list: Data List in formatted order (double[])
+
+        :return Int:
+        """
+
         if len(data_list[0]) != 13 or data_list[0][6] != '.':
             return False
 
@@ -188,12 +229,11 @@ class DataBaseLayer:
 
         return True
 
-    '''
-    Closes the SQL connection
-    
-    @params: self
-	@return: None
-    '''
-
     def close_connection(self):
+        """
+        Closes the SQL connection
+
+        :return None:
+        """
+
         self._sql_handler.close_connection()

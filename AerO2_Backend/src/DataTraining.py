@@ -2,8 +2,13 @@ import Maps as map
 import DataBaseLayer as dbl
 import math
 
-
 class DataTraining:
+    """
+    Data Training class contains methods for Populating the Properties Table according to data provided by
+    DataBaseLayer and Maps. It also has methods for Populating the Results Table based on the results provided
+    by the ML algorithm
+    """
+
     VERIFICATION_THRESHOLD = 0.8
 
     DEFAULT_TIME_INDEX = 0
@@ -20,9 +25,26 @@ class DataTraining:
     maps = map.Maps()
 
     def __init__(self):
+        """
+        Empty Constructor
+        """
+
         pass
 
     def initialize(self, city_name):
+        """
+        Populates the Properties Table with data for a particular city. The recorded attributes are:
+        0) sampled (number)
+        1) lat (number)
+        2) long (number)
+        3) r_index (number)
+        4) i_index (number)
+
+        :param city_name: City name (String)
+
+        :return no_of_modifications: (Int)
+        """
+
         return self._save_all_properties(city_name)
 
     def update_database(self):
