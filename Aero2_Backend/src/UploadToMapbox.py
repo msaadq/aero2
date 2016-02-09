@@ -5,9 +5,8 @@ import mapbox
 import os
 
 '''
-    Upload a specific table's data in the form of geojson files to mapbox
+Upload a specific table's data in the form of geojson files to mapbox
 '''
-
 
 class UploadToMapbox:
 
@@ -19,17 +18,21 @@ class UploadToMapbox:
     divisionInterval=0
     uploader=mapbox.Uploader(access_token='sk.eyJ1IjoibXVkZGFzc2lyMjM1IiwiYSI6ImNpanVnYm1kaTBmZWx0d2tzY2lhYW9oYzIifQ.Thq7Zk5E-xLnozjEB5giLQ')
 
+    '''
+    Divides the table's data in to e.g. 10 divisions in acsending order e.g. sets of smog values
+    from 0to50, 50to102 and so on and uploads those 10 files to mapbox so they can be treated as
+    layers.
+
+    @params: self, Table Name (String), Divisions (Int)
+    @return: None
+    '''
+
     def __init__(self,table_name,divisions=11):
 
         self.table_name=table_name
         self.divisionInterval=(self.maxAirIndex-self.minAirIndex)/divisions
         itertator=1
 
-        '''
-            divides the table's data in to e.g. 10 divisions in acsending order e.g. sets of smog values
-            from 0to50, 50to102 and so on and uploads those 10 files to mapbox so they can be treated as
-            layers.
-        '''
         for x in range(0,self.maxAirIndex,self.divisionInterval):
             geoJson=ResultToGeoJson.GeoJson()
 
