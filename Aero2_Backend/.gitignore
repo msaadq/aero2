@@ -1,4 +1,6 @@
 *.pyc
 *.iml
-
 .idea/
+*.pyproj
+*.sln
+.vs/

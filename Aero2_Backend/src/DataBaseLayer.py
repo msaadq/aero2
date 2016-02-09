@@ -4,7 +4,6 @@
 Database Layer allows functions for accessing the SQL Database at a higher abstraction level and easy-access
 '''
 
-
 class DataBaseLayer:
 
     # Default Table names
@@ -25,19 +24,19 @@ class DataBaseLayer:
 
     '''
     Connects to the Azure SQL server using the AzureSQLHandler class
-    Args: self
-    Return: None
+    
+    @params: self
+    @return: None
     '''
-
     def __init__(self):
         self._sql_handler = sql.AzureSQLHandler()
 
     '''
     Selects the table according to the where_params
-    Args: self, Table Name (String), Where String (String)
-	Return: Table (String[])
+    
+    @params: self, Table Name (String), Where String (String)
+	@return: Table (String[])
     '''
-
     def select_data(self, table_name, where_params=None):
         if not where_params:
             where_params = ""
@@ -61,10 +60,10 @@ class DataBaseLayer:
 
     '''
     Inserts a new row into the DB table
-    Args: self, Table Name (String), List of Data Values (String[])
-	Return: Int
+    
+    @params: self, Table Name (String), List of Data Values (String[])
+	@return: Int
     '''
-
     def insert_row(self, table_name, data_list):
         if table_name == self.SAMPLE_TABLE_NAME:
             columns_list = self.SAMPLE_COLUMNS
@@ -83,10 +82,10 @@ class DataBaseLayer:
 
     '''
     Inserts multiple rows into the DB table
-    Args: self, Table Name (String), Table of Data Values (String[][])
-	Return: Int
+    
+    @params: self, Table Name (String), Table of Data Values (String[][])
+	@return: Int
     '''
-
     def insert_multiple(self, table_name, data_table):
         i = 0
         for data_list in data_table:
@@ -96,19 +95,19 @@ class DataBaseLayer:
 
     '''
     Deletes rows according to the specified condition(s)
-    Args: self, Table Name (String), where_params
-	Return: Int
+    
+    @params: self, Table Name (String), where_params
+	@return: Int
     '''
-
     def delete_data(self, table_name, where_params):
         return self._sql_handler.delete_data(table_name, where_params)
 
     '''
     where_param string generator for key value
-    Args: self, key name, value
-	Return: String
+    
+    @params: self, key name, value
+	@return: String
     '''
-
     @staticmethod
     def key_value_string_gen(key, value):
         return key + " = " + str(float(value))
@@ -116,10 +115,10 @@ class DataBaseLayer:
 
     '''
     where_param string generator for key range
-    Args: self, key name, Max value, Min value
-	Return: String
+    
+    @params: self, key name, Max value, Min value
+	@return: String
     '''
-
     @staticmethod
     def key_range_string_gen(key, min_value, max_value):
         return " " + key + " BETWEEN " + str(float(min_value)) + " AND " + str(
@@ -127,10 +126,10 @@ class DataBaseLayer:
 
     '''
     where_param string generator for nearby location
-    Args: self, Lat position, long position, X Y range
-	Return: String
+    
+    @params: self, Lat position, long position, X Y range
+	@return: String
     '''
-
     @staticmethod
     def nearby_string_gen(latitude_position, longitude_position, x_y_range):
         return "lat <= " + str(float(latitude_position + x_y_range)) + " AND  lat >= " + str(
@@ -140,10 +139,10 @@ class DataBaseLayer:
 
     '''
     where_param string generator for different times
-    Args: self, date, start_time, end_time
-	Return: String
+    
+    @params: self, date, start_time, end_time
+	@return: String
     '''
-
     @staticmethod
     def when_string_gen(date, start_time=None, end_time=None):
         if not start_time or not end_time:
@@ -153,10 +152,10 @@ class DataBaseLayer:
 
     '''
     Validates values provided in the insert function
-    Args: self, List of Data Values (String[])
-	Return: Int
+    
+    @params: self, List of Data Values (String[])
+	@return: Int
     '''
-
     def _validate_data_values(self, data_list):
         if len(data_list[0]) != 13 or data_list[0][6] != '.':
             return False
@@ -179,9 +178,9 @@ class DataBaseLayer:
 
     '''
     Closes the SQL connection
-    Args: self
-	Return: None
+    
+    @params: self
+	@return: None
     '''
-
     def close_connection(self):
         self._sql_handler.close_connection()
