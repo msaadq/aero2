@@ -9,18 +9,24 @@ class DataTraining:
     by the ML algorithm
     """
 
+    DEFAULT_NODE_LENGTH = 100.0
     VERIFICATION_THRESHOLD = 0.8
+
+    _long_interval = 0.0
+    _lat_interval = 0.0
 
     _city_name = None
 
-    _maps = mp.Maps()
-    _data_base = dbl.DataBaseLayer()
+    _maps = None
+    _database = None
 
     def __init__(self):
         """
-        Empty Constructor
+        Initializes the database and Maps API
         """
 
+        self._maps = mp.Maps()
+        self._data_base = dbl.DataBaseLayer()
         pass
 
     def initialize(self, city_name):
@@ -34,13 +40,10 @@ class DataTraining:
         """
 
         self._city_name = city_name
-        self._delete_city_data(city_name)
+        self._data_base.delete_data(self._data_base.PROP_TABLE_NAME,
+                                    self._data_base.key_value_string_gen('city', self._city_name))
 
         return self._save_all_properties(city_name)
-
-    '''
-    Functions inside initialize
-    '''
 
     def _save_all_properties(self, city_name):
         """
@@ -54,12 +57,14 @@ class DataTraining:
 
         final_table = []
         n_saved = 0
+        self._maps.save_industries(city_name)
 
         all_coordinates = self._get_all_coordinates(self._maps.get_corner_coordinates(city_name))
 
+        self._maps.set_intervals(self._lat_interval, self._long_interval)
+
         # Debug Code
-        print "Total nodes for this city: " + str(len(all_coordinates))
-        all_coordinates = all_coordinates[:30]
+        all_coordinates = all_coordinates[40000:40020]
         #
 
         for coordinates in all_coordinates:
@@ -78,21 +83,9 @@ class DataTraining:
 
         return n_saved
 
-    def _delete_city_data(self, city_name):
-        """
-        Deletes all associated data of a city in the Properties Table
-
-        :param city_name:
-
-        :return: no_of_deletions:
-        """
-
-        return self._data_base.delete_data(self._data_base.PROP_TABLE_NAME,
-                                           self._data_base.key_value_string_gen('city', city_name))
-
     def _get_all_coordinates(self, corner_coordinates):
         """
-        Calculates all the node coordinates of a city, separated by 20m using its corner coordinates
+        Calculates all the node coordinates of a city, separated by 50m using its corner coordinates
 
         :param corner_coordinates:
 
@@ -110,8 +103,10 @@ class DataTraining:
         if y1 > y2:
             y1, y2 = y2, y1
 
-        long_interval = (x2 - x1) / (self._maps.calc_distance_on_unit_sphere(y1, x1, y1, x2) / 20.0)
-        lat_interval = (y2 - y1) / (self._maps.calc_distance_on_unit_sphere(y1, x1, y2, x1) / 20.0)
+        self._long_interval = (x2 - x1) / (
+        self._maps.calc_distance_on_unit_sphere(y1, x1, y1, x2) / self.DEFAULT_NODE_LENGTH)
+        self._lat_interval = (y2 - y1) / (
+        self._maps.calc_distance_on_unit_sphere(y1, x1, y2, x1) / self.DEFAULT_NODE_LENGTH)
 
         latitude = y2
         while latitude > y1:
@@ -119,15 +114,11 @@ class DataTraining:
 
             while longitude < x2:
                 nodes_coordinates.append([latitude, longitude])
-                longitude += long_interval
+                longitude += self._long_interval
 
-            latitude -= lat_interval
+            latitude -= self._lat_interval
 
         return nodes_coordinates
-
-    '''
-    Update Function
-    '''
 
     def update_database(self):
         if self._normalize_all() > 0:
@@ -135,10 +126,6 @@ class DataTraining:
                 return self._update_results()
 
         return -1
-
-    '''
-    Functions inside update_database
-    '''
 
     def _normalize_all(self):
         not_normalized_data_table = self._database.select_data(self._database.SAMPLE_TABLE_NAME,
@@ -164,34 +151,5 @@ class DataTraining:
     def _train_system(self):
         pass
 
-    def _get_saved_samples(self):
-        pass
-
-    def _interpolate_data(self, samples_table_75):
-        pass
-
-    def _verify_interpolation(self, samples_table_25):
-        pass
-
-    def _get_single_output(self, list_without_output):
-        pass
-
-    def _update_results_table(self, samples_table):
-        pass
-
     def _update_results(self):
         pass
-
-    def _get_non_sampled_nodes(self):
-        return self._database.select_data(self._database.SAMPLE_TABLE_NAME,
-                                          self._database.key_value_string_gen("sampled", 0))
-
-    def _get_table_output(self, table_without_outputs):
-        pass
-
-    def _calc_distance_from_lat(self, lat_min, lat_max, ref_long):
-        return self._calc_distance_on_unit_sphere(lat_min, ref_long, lat_max, ref_long)
-
-    def _calc_distance_from_long(self, long_min, long_max, ref_lat):
-        return self._calc_distance_on_unit_sphere(ref_lat, long_min, ref_lat, long_max)
-

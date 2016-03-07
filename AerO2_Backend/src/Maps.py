@@ -1,4 +1,5 @@
 import googlemaps as gmaps
+from googlemaps.exceptions import TransportError
 from googleplaces import GooglePlaces, types, lang as gplaces
 import math as m
 
@@ -10,151 +11,29 @@ class Maps:
     """
 
     GOOGLE_API_KEY = "AIzaSyB_th_xYmO9cXL74QGG0bb34D5vp15UxVc"
+    GOOGLE_API_KEY2 = "AIzaSyBLWhWSYDjSjZvW4Ism0y-eMXxs1n5s1iE"
     DEFAULT_ROAD_DISTANCE_THRESHOLD = 500
     DEFAULT_INDUSTRY_DISTANCE_THRESHOLD = 1000
-    DEFAULT_INDUSTRY_TYPE = 'establishment'
 
-    INDUSTRY_KEYWORDS = ['industry', 'factory', 'manufacturing', 'chemical', 'refinery', 'bank', 'limited']
+    INDUSTRY_KEYWORDS = ['industry', 'factory', 'manufacturing', 'chemical', 'refinery', 'limited']
 
+    _industries_coordinates = []
     _google_maps = None
     _google_places = None
 
-    _is_connected = False
+    _lat_interval = 0.0
+    _long_interval = 0.0
 
-    table_name = 'smogTable'
-    partition_key = 'smogValues'
-    count = 0
+    _is_connected = False
+    _industries_info = None
 
     def __init__(self):
         try:
             self._google_maps = gmaps.Client(key=self.GOOGLE_API_KEY)
-            self._google_places = GooglePlaces(self.GOOGLE_API_KEY)
+            self._google_places = GooglePlaces(self.GOOGLE_API_KEY2)
             self._is_connected = True
         except:
             self._is_connected = False
-
-    # Helper Function
-    def get_industry_index(self, coordinates):
-        """
-        Calls Google Place API and returns the nearest place within
-        the radius provided by user.
-        Supported ptypes: https://developers.google.com/places/supported_types
-
-        :param coordinates:
-
-        :return industry_index:
-        """
-
-        distances = []
-        intensities = []
-        index = 0.0
-
-        nearby_industry_query = self._google_places.nearby_search(
-            lat_lng={'lat': coordinates[0], 'lng': coordinates[1]},
-            radius=self.DEFAULT_INDUSTRY_DISTANCE_THRESHOLD, types=[types.TYPE_ESTABLISHMENT])
-
-        for place in nearby_industry_query.places:
-            # Returned places from a query are place summaries.
-            lat = float(place.geo_location["lat"])
-            lng = float(place.geo_location["lng"])
-            name = str(place.name).lower()
-            distance = self.calc_distance_on_unit_sphere(coordinates[0], coordinates[1], lat, lng)
-
-            if distance > 20:
-                distances.append(self.calc_distance_on_unit_sphere(coordinates[0], coordinates[1], lat, lng))
-            else:
-                distances.append(1)
-
-            if any(substring in name for substring in self.INDUSTRY_KEYWORDS):
-                intensities.append(100.0)
-            else:
-                intensities.append(1.0)
-
-        for x in range(0, len(distances)):
-            index += 10 * (intensities[x] / distances[x])
-
-        return index
-
-    def get_nearest_roads(self, coordinates):
-        pass
-
-    def cal_traffic(self, key, origin, destination, departure_time='now', traffic_model='best_guess'):
-        """
-        Calls Google Distance API and returns the duration/km.
-        departure_time is number of seconds in int from December, 1970.
-        traffic model can be 'best_guess', 'optimistic', or 'pessimistic'
-
-        :param key:
-        :param origin:
-        :param destination:
-        :param departure_time:
-        :param traffic_model:
-        """
-
-        web_link = 'https://maps.googleapis.com/maps/api/distancematrix/xml?key' + key
-        web_link += '&origins=' + origin[0] + ',' + origin[1] + '&destinations=' + destination[0] + ','
-        web_link += destination[1]
-        # web_link += '&departure_time='+departure_time+'&traffic_model='+traffic_model
-
-        source = urllib2.urlopen(web_link)
-        tree = bs(source)
-        result = tree.findAll('distance')
-        distance = [i.findChild('text').getText() for i in result]
-
-        if len(distance) != 0:
-            distance = float((distance[0].split())[0])
-        else:
-            distance = 1
-
-        result = tree.findAll('duration')
-        duration = [i.findChild('text').getText() for i in result]
-
-        if len(duration) != 0:
-            duration = float((duration[0].split())[0])
-        else:
-            duration = 0
-
-        return duration / distance
-
-    # Callable Function
-    def cal_data(self, key, origin, latInterval=0.000179807875453, longInterval=0.000215901261691):
-        """
-        Calculates the number of general contractors and averaged traffic
-        density in a given area.
-
-        :param key: Google API Key
-        :param origin: Latitude and longitude stored in a list
-        :param latInterval: Equivalent latitude distance of a node in degrees
-        :param longInterval: Equivalent longitude distance of a node in degrees
-
-        :return General Contractors (int): Is the length of General Contractors within
-        the area
-        :return Traffic (float): Is an estimate of traffic density at corner points
-        """
-
-        corner1 = [(str(float(origin[0]) + latInterval), origin[1])]
-        corner2 = [(str(float(origin[0]) - latInterval), origin[1])]
-        corner3 = [(origin[0], str(float(origin[1]) + longInterval))]
-        corner4 = [(origin[0], str(float(origin[1]) - longInterval))]
-        corners = corner1 + corner2 + corner3 + corner4
-
-        try:
-            general_contractors = self.find_place(key, origin, 'general_contractor')
-
-            # Calculate traffic at all corners
-            traffics = [float(self.cal_traffic(key, origin, i)) for i in corners]
-            # Average traffic density
-            traffic = sum(traffics) / len(traffics)
-
-        except Exception as e:
-            general_contractors = 0
-            traffic = 0
-            print "Faced a problem with this link"
-
-        Maps.count += 1
-        print Maps.count
-
-        return general_contractors, traffic
 
     def get_corner_coordinates(self, city_name):
         """
@@ -181,12 +60,80 @@ class Maps:
 
         return corner_coordinates
 
-    def get_road_index(self, node_coordinates):
-        # return self.calTraffic('AIzaSyDRhcSUYbhG25wWSKRmvau1GuoXCnnjN8c', node_coordinates)
-        return 0
+    def save_industries(self, city_name):
+        for key in self.INDUSTRY_KEYWORDS:
+            result = self._google_places.text_search(key + " in " + city_name)
+            for place in result.places:
+                self._industries_coordinates.append([float(place.geo_location['lat']), float(place.geo_location['lng'])])
+
+        print "no. of industies", len(self._industries_coordinates)
+        return self._industries_coordinates
 
     def get_altitude(self, node_coordinates):
         return self._google_maps.elevation((node_coordinates[0], node_coordinates[1]))[0]['elevation']
+
+    def get_industry_index(self, coordinates):
+        index = 0
+
+        for ind_coordinates in self._industries_coordinates:
+            dis = self.calc_distance_on_unit_sphere(ind_coordinates[0], ind_coordinates[1], coordinates[0], coordinates[1]) + 1
+
+            if dis < 2000:
+                index += 100 / dis
+
+        print "Industry Index: ", index
+
+        return index
+
+    def get_road_index(self, node_coordinates):
+        y, x, lat, lon = node_coordinates[0], node_coordinates[1], self._lat_interval / 2, self._long_interval / 2
+        road = []
+        index = 0
+        corners = [(y + lat, x - lon), (y + lat, x + lon), (y - lat, x + lon), (y - lat, x - lon)]
+        sources, destinations = [], []
+
+        try:
+            query = self._google_maps.snap_to_roads(corners, interpolate=False)
+
+            if len(query) < 2:
+                raise ValueError
+            for lists in query:
+                road.append([lists['location']['latitude'], lists['location']['longitude']])
+
+            if len(road) == 2:
+                sources, destinations = [road[0]], [road[1]]
+            elif len(road) == 3:
+                sources, destinations = [road[0], road[1]], [road[1], road[2]]
+            elif len(road) == 4:
+                sources, destinations = [road[0], road[1], road[2]], [road[1], road[2], road[3]]
+
+            rows = self._google_maps.distance_matrix(sources, destinations)['rows']
+
+            for i in range(0, len(road) - 1):
+                index += 100 * rows[i]['elements'][i]['duration']['value'] / ((float(
+                        rows[i]['elements'][i]['distance']['value']) + 1) * float(
+                        self.calc_distance_on_unit_sphere(y, x, road[i][0], road[i][1])))
+
+            if len(road) > 2:
+                index += 100 * rows[0]['elements'][len(road) - 2]['duration']['value'] / ((float(
+                        rows[0]['elements'][len(road) - 2]['distance']['value']) + 1) * float(
+                        self.calc_distance_on_unit_sphere(y, x, road[0][0], road[0][1])))
+        except ValueError as e:
+            index = 0
+        except KeyError as e:
+            index = 0
+        except ZeroDivisionError as e:
+            index = 2
+        except TransportError as e:
+            index = -1
+
+        print "Road Index: ", index
+
+        return index
+
+    def set_intervals(self, lat_interval, long_interval):
+        self._lat_interval = lat_interval
+        self._long_interval = long_interval
 
     @staticmethod
     def calc_distance_on_unit_sphere(lat1, long1, lat2, long2):

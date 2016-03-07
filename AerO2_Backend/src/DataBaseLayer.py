@@ -138,26 +138,16 @@ class DataBaseLayer:
 
         if city_name:
             columns_string = "(" + columns_list + ", city)"
-
             for data_list in data_table:
                 values_string += "(" + ",".join(map(str, data_list)) + ", \'" + city_name.lower() + "\'),"
         else:
             columns_string = "(" + columns_list + ")"
-
             for data_list in data_table:
                 values_string += "(" + ",".join(map(str, data_list)) + "),"
 
         values_string = values_string[:-1]
 
         return self._sql_handler.insert_data(table_name, columns_string, values_string)
-
-        '''
-        i = 0
-        for data_list in data_table:
-            i += self.insert_row(table_name, data_list, city_name)
-
-        return i
-        '''
 
     def update_data(self, table_name, columns_names, values, where_params=None):
         """

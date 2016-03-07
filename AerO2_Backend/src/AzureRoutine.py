@@ -10,5 +10,5 @@ if __name__ == '__main__':
     data_training.initialize(CITY_NAME);
 
     # Updates the outputs in the database after interpolation
-    data_training.update_database()
+    # data_training.update_database()
 
