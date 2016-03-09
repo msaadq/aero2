@@ -5,4 +5,4 @@
 *.sln
 .vs/
 site-packages
-!site-packages/aero2/*.py
+!/site-packages/aero2
