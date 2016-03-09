@@ -4,5 +4,6 @@
 *.pyproj
 *.sln
 .vs/
-site-packages
-!/site-packages/aero2
+*
+!site-packages/
+!site-packages/aero2
