@@ -4,7 +4,9 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -15,17 +17,24 @@
         <activity
             android:name=".DefaultActivities.SmogRecordActivity"
             android:label="@string/title_activity_test"
-
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".DefaultActivities.SmogMapActivity"
             android:label="@string/polygon_demo_label"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <service
+            android:name=".DefaultActivities.Data.AirAzureDownloadService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".DefaultActivities.Data.AirAzureDownloadService$AlarmReceiver"
+            android:enabled="true" />
+
+        <activity
+            android:name=".MapBoxActivity"
+            android:label="@string/title_activity_map_box"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,11 +42,23 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".DefaultActivities.Data.AirAzureDownloadService"
-            android:exported="false"></service>
-        <receiver android:name=".DefaultActivities.Data.AirAzureDownloadService$AlarmReceiver" android:enabled="true"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAhAq85IxiyyKcNLacUvFRvJ8gVDcyboU8" />
 
+        <service
+            android:name=".DefaultActivities.Data.RecordService"
+            android:exported="false" />
+
+        <activity
+            android:name=".DefaultActivities.RecordingCompleteActivity"
+            android:label="@string/title_activity_recording_complete"
+            android:parentActivityName=".MapBoxActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.aero2.android.MapBoxActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -16,7 +16,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/map_layout">
+
 
     <fragment
         android:id="@+id/map"
@@ -25,23 +27,53 @@
         android:layout_height="match_parent"
         >
     </fragment>
-    <android.support.design.widget.FloatingActionButton android:id="@+id/legend"
+    <android.support.design.widget.FloatingActionButton android:id="@+id/myLocation"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_map"
-        app:backgroundTint="#00aa72"
-        android:tint="#ffffff"
+        android:layout_marginTop="@dimen/fab_margin"
+        android:layout_marginLeft="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/record"
+        android:src="@drawable/go_to_my_location"
+        android:tint="#00af55"
+        app:backgroundTint="#ffffff"
         android:adjustViewBounds="false"
-        android:alpha="0.7" />
+        android:elevation="2dp"
+        android:focusable="false"
+        android:cropToPadding="false" />
+
     <android.support.design.widget.FloatingActionButton android:id="@+id/record"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/presence_online"
         android:layout_alignParentBottom="true"
-        app:backgroundTint="#ffffff"
+        android:layout_alignParentEnd="true"
+        app:backgroundTint="#59C3D8"
         android:contextClickable="false"
-        android:tint="#ff0000"
-        android:alpha="0.7" />
+        android:tint="#ff0055"
+        android:elevation="2dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/loading_tv"
+        android:gravity="center"
+        android:text="Loading smog data"
+        android:textColor="#00beed"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="30dp"
+        android:layout_above="@+id/progressBar"
+        android:layout_centerHorizontal="true" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:progressTintMode="add"
+        android:foregroundTintMode="screen" />
 
 </RelativeLayout>

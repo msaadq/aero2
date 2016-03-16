@@ -1,0 +1,8 @@
+*.pyc
+*.iml
+.idea/
+*.pyproj
+*.sln
+.vs/
+site-packages/*
+!site-packages/aero2

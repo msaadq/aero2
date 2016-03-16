@@ -18,6 +18,9 @@ android {
         }
     }
 }
+repositories {
+    mavenCentral()
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -28,8 +31,12 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
     compile 'com.microsoft.azure:azure-mobile-services-android-sdk:2.0.3'
     compile 'com.microsoft.azure:azure-notifications-handler:1.0.1@jar'
+    compile 'com.google.android.gms:play-services-location:8.4.0'
     compile 'com.google.android.gms:play-services-maps:8.4.0'
     compile 'com.google.maps.android:android-maps-utils:0.4+'
+    compile 'com.android.support:cardview-v7:23.0.+'
+    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:3.1.0@aar'){
+        transitive=true
+    }
 }
-
 

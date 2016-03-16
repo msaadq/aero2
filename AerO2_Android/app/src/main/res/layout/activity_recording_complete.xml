@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.aero2.android.DefaultActivities.RecordingCompleteActivity"
+    android:id="@+id/summaryLayout">
+
+
+    <include layout="@layout/content_recording_complete" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/check"
+        android:tint="#ffffff"
+        app:backgroundTint="#39ADCC"
+        app:elevation="0dp"/>
+
+</android.support.design.widget.CoordinatorLayout>

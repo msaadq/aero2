@@ -38,7 +38,7 @@ public class GPSTracker {
 
     /**
      * Initializes the constructor and create
-     * settings dialog if GPS is not enabled.
+     * settings dialog if GPS is not fullscreenInAndOutEnabled.
      * arg: The Current Activity
      * exception: None
      * return: No return value.
@@ -159,7 +159,7 @@ public class GPSTracker {
 
 
     /**
-     * Returns GPS Status to indicate if it is enabled.
+     * Returns GPS Status to indicate if it is fullscreenInAndOutEnabled.
      * arg: None
      * exception: None
      * return: Boolean indicating GPS Status

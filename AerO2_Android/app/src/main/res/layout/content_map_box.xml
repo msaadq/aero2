@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    xmlns:qwerjk="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.aero2.android.MapBoxActivity"
+    tools:showIn="@layout/app_bar_main_mapbox">
+
+
+
+
+    <com.mapbox.mapboxsdk.views.MapView
+        android:id="@+id/mapboxMapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        mapbox:access_token="pk.eyJ1IjoibXVkZGFzc2lyMjM1IiwiYSI6ImNpanIwdTIzMjA2MjZ2YWx4MWFyODBrbHoifQ.9wJJ6vuiL6GnVyvOGaGrNA"
+        />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/waterScreen"
+        android:background="#FCFFE8" />
+
+
+    <android.support.design.widget.FloatingActionButton android:id="@+id/myLocation"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/fab_margin"
+        android:layout_marginLeft="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/record"
+        android:src="@drawable/go_to_my_location"
+        android:tint="#00af55"
+        app:backgroundTint="#ffffff"
+        android:adjustViewBounds="false"
+        app:elevation="1dp"
+        android:focusable="false"
+        android:cropToPadding="false" />
+
+    <android.support.design.widget.FloatingActionButton android:id="@+id/record"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@android:drawable/presence_online"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        app:backgroundTint="#39ADCC"
+        android:contextClickable="false"
+        android:tint="#EE4035"
+        app:elevation="1dp" />
+    <android.support.design.widget.FloatingActionButton android:id="@+id/stopRecording"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/stop_recording_icon"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        app:backgroundTint="#FFFFFF"
+        android:contextClickable="false"
+        android:tint="#EE4035"
+        app:elevation="1dp" />
+    <android.support.v7.widget.CardView
+        android:id="@+id/searchCardView"
+        android:layout_width="fill_parent"
+        android:layout_height="50sp"
+        card_view:cardElevation="1dp"
+        card_view:cardBackgroundColor="#ddffffff"
+        card_view:cardCornerRadius="4dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginLeft="9dp"
+        android:layout_marginRight="9dp"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <fragment
+                android:id="@+id/place_autocomplete_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+                />
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/menu"
+                android:background="#ffffffff"
+                android:padding="16dp"
+                android:tint="#39ADCC"
+                android:id="@+id/open_drawer"/>
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/recordingSmogCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardElevation="1dp"
+        card_view:cardBackgroundColor="#ddFFFFFF"
+        card_view:cardCornerRadius="4dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="9dp"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:layout_toStartOf="@+id/record"
+        android:layout_alignTop="@+id/myLocation"
+        android:layout_alignBottom="@+id/record"
+        android:height="0dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/locationTextView"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:layout_gravity="bottom"
+            android:padding="10dp"
+            android:textColor="#000000" />
+        <com.aero2.android.DefaultClasses.CustomDigitalClock
+            android:id="@+id/fragment_clock_digital"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DigitalClock"
+            android:textSize="17dp"
+            android:layout_gravity="end"
+            android:padding="10dp"
+            android:textColor="#000000"
+            android:layout_centerHorizontal="true"/>
+        <com.aero2.android.DefaultClasses.MagicTextView
+
+            android:textSize="50sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            qwerjk:strokeColor="#FF000000"
+            qwerjk:strokeJoinStyle="miter"
+            qwerjk:strokeWidth="0.3dp"
+            android:layout_gravity="center"
+            android:text="Hey"
+            android:id="@+id/smog_value_tv" />
+    </android.support.v7.widget.CardView>
+
+
+</RelativeLayout>
