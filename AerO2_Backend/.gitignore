@@ -6,3 +6,4 @@
 .vs/
 site-packages/*
 !site-packages/aero2
+site-packages/aero2/*.pyc
