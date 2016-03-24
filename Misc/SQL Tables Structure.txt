@@ -1,24 +1,35 @@
+Tables:
+    1 - SampleDataTable
+        0) time (number)
+        1) lat (number)
+        2) long (number)
+        3) alt (number)
+        4) smog (number)
+        5) carbon_mono (number)
 
-1) SampleDataTable
-    0) time (number)
-    1) lat (number)
-    2) long (number)
-    3) alt (number)
-    4) smog (number)
-        
-2) ResultsDataTable
-    0) time (number)
-    1) lat (number)
-    2) long (number)
-    3) alt (number)
-    4) air_index (number)
-        
-3) PropertiesTable
-    0) sampled (boolean)
-    1) lat (number)
-    2) long (number)
-    3) alt (number)
-    4) smog (number)
-    5) r_index (number)
-    6) i_index (number)
-    7) city_name(string)
+    2 - ResultsDataTable
+        0) time (number)
+        1) lat (number)
+        2) long (number)
+        3) alt (number)
+        4) smog (number)
+        5) carbon_mono (number)
+        6) air_index (number)
+
+    3 - PropertiesTable
+        0) sampled (number)
+        1) lat (number)
+        2) long (number)
+        3) alt (number)
+        4) smog (number)
+        5) carbon_mono (number)
+        6) r_index (number)
+        7) i_index (number)
+        8) city_name (String)
+
+Following are the Connection Strings for this database:
+    - Server Address: kezq6jecop.database.windows.net,1433
+    - Database Name: aero2_db
+    - Table Name: aero2.PropertiesTable
+    - Username: aero2
+    - Password: h1pa33w0rD
