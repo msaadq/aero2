@@ -17,4 +17,4 @@ Main Contributors:
 -	Saad Qureshi 
 -	Usman Mahmood Khan 
 -	Muddassir Ahmed Khan 
-
+- Uzair Akbar
