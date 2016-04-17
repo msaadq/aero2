@@ -146,7 +146,7 @@ public class RecordingCompleteActivity extends AppCompatActivity {
         Double minLat=90.0;
         Double maxLong=-180.0;
         Double minLong=180.0;
-        Log.v(LOG_TAG, "Entered the add samples to map");
+        Log.v(LOG_TAG, "add samples to map");
         Log.v("CusorLength:", " cursor length is " + cursor.getCount());
         if (cursor.moveToFirst()) {
 
