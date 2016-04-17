@@ -1,6 +1,6 @@
 # AerO2
 
-''Aer02 maps global regions that are ideal for athletes training and performance.''
+''Aer02 maps all global regions for pollution content''
 
 '''Description:'''
 Aer02 maps global regions that are ideal for living, exercising and to be used as routes for
