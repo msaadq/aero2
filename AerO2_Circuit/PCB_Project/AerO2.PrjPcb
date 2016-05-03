@@ -39,7 +39,24 @@ PrefsVaultGUID=
 PrefsRevisionGUID=
 
 [Document1]
-DocumentPath=AerO2.SchDoc
+DocumentPath=AerO2_Sheet1.SchDoc
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=0
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=GECBFCKI
+
+[Document2]
+DocumentPath=HRS4(H)_Relay.PcbLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -53,9 +70,26 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=GECBFCKI
+DocumentUniqueId=HURDJSYM
 
-[Document2]
+[Document3]
+DocumentPath=HRS4(H)_Relay.SchLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=LDQSGQBD
+
+[Document4]
 DocumentPath=AerO2.PcbDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -70,7 +104,11 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=MPTJFOMH
+DocumentUniqueId=INAKJJHU
+
+[GeneratedDocument1]
+DocumentPath=Project Outputs for AerO2\Design Rule Check - AerO2.html
+DItemRevisionGUID=
 
 [Configuration1]
 Name=Default Configuration
