@@ -30,21 +30,15 @@ public class STMCommunicator {
 
     // All the available Out commands
     public final String O_COM_AUT = "OAUT"; // Authenticate
-    public final String O_COM_USR = "OUSR"; // Set Username
     public final String O_COM_PAS = "OPAS"; // Set Password
     public final String O_COM_NSG = "ONSG"; // Enable / Disable Smog Sensor
-    public final String O_COM_NAQ = "ONAQ"; // Enable / Disable Air Quality Sensor
     public final String O_COM_SSG = "OSSG"; // Request Smog Data
-    public final String O_COM_SAQ = "OSAQ"; // Request Air Quality Data
 
     // All the available In commands
     public final String I_COM_AUT = "IAUT"; // Authentication Status
-    public final String I_COM_USR = "IUSR"; // Username Status
     public final String I_COM_PAS = "IPAS"; // Password Status
     public final String I_COM_NSG = "INSG"; // Smog Sensor Status
-    public final String I_COM_NAQ = "INAQ"; // Air Quality Sensor Status
     public final String I_COM_SSG = "ISSG"; // Received Smog Data
-    public final String I_COM_SAQ = "ISAQ"; // Received Air Quality Data
 
     // Authentication Strings
     public static final String DEF_USERNAME = "username";
@@ -52,11 +46,8 @@ public class STMCommunicator {
 
     // Booleans representing program status
     public boolean btAvailable = false;
-    public boolean authenticationStatus = false;
-    public boolean userCorrect = false;
-    public boolean passwordCorrect = false;
+    public boolean autCorrect = false;
     public boolean smogAvailable = false;
-    public boolean airQualityAvailable = false;
     public boolean isDeviceConnected = false;
 
 
@@ -114,16 +105,7 @@ public class STMCommunicator {
 
             }
 
-
-            // Step 2 : Send the Username and wait for approval
-            sendCommand(O_COM_USR, username + "\n");
-
-            if (receiveCommand().equals(I_COM_USR + ":1")) {
-                userCorrect = true;
-                Log.v("STMCommunicator", "username is set to true, authenticate()");
-            }
-
-            // Step 3 : Send the Password and wait for approval
+            // Step 2 : Send the Password and wait for approval
             sendCommand(O_COM_PAS, password + "\n");
 
             if (receiveCommand().equals(I_COM_PAS + ":1")) {
@@ -131,8 +113,8 @@ public class STMCommunicator {
                 Log.v("STMCommunicator", "password is set to true, authenticate()");
             }
 
-            authenticationStatus = btAvailable && userCorrect && passwordCorrect;
-            Log.v("Authenticated? ", String.valueOf(authenticationStatus));
+            autCorrect = btAvailable && userCorrect && passwordCorrect;
+            Log.v("Authenticated? ", String.valueOf(autCorrect));
 
         }
     }
@@ -190,26 +172,6 @@ public class STMCommunicator {
     }
 
     /**
-     * Integrates and returns all the sensor values
-     * arg: None
-     * exception: IOException
-     * return: Integer Array with mapped sensor values
-     */
-
-    public int[] getSensorValues() throws IOException {
-        String temp;
-        int[] sensorValues = new int[nSensors];
-        int sensorValuesIndex = 0;
-
-        sensorValues[sensorValuesIndex++] = Integer.parseInt(getSmogValue());
-
-        sensorValues[sensorValuesIndex++] = getAirQualityValue();
-
-        return sensorValues;
-    }
-
-
-    /**
      * Returns the current Smog sensor value
      * arg: None
      * exception: IOException
@@ -218,8 +180,8 @@ public class STMCommunicator {
 
 
     public String getSmogValue() throws IOException {
-        Log.v(String.valueOf(authenticationStatus),String.valueOf(smogAvailable));
-        if(authenticationStatus && smogAvailable) {
+        Log.v(String.valueOf(autCorrect),String.valueOf(smogAvailable));
+        if(autCorrect && smogAvailable) {
 
             String temp;
             sendCommand(O_COM_SSG, "\n");
@@ -229,27 +191,5 @@ public class STMCommunicator {
             return temp.substring(5, temp.length());
             }
             return "0";
-    }
-
-
-    /**
-     * Returns the current Air Quality sensor value
-     * arg: None
-     * exception: IOException
-     * return: Integer
-     */
-
-    public int getAirQualityValue() throws IOException {
-        if(authenticationStatus && airQualityAvailable) {
-            String temp;
-            sendCommand(O_COM_SAQ, "\n");
-            temp = receiveCommand();
-
-            if(temp.substring(0, 3).equals(I_COM_SAQ)) {
-                return (int) temp.charAt(5);
-            }
-            return 0;
-        }
-        return 0;
     }
 }
